@@ -121,7 +121,7 @@ export class AdminDashboardComponent implements OnInit {
           this.lastInventorySubmission = response;
 
           // Debug
-          console.log('Last Submission: ', this.lastInventorySubmission);
+          //console.log('Last Submission: ', this.lastInventorySubmission);
         }
       );
 

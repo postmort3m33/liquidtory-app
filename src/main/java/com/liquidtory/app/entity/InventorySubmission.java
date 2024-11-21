@@ -20,7 +20,7 @@ public class InventorySubmission {
     private Long userId;
 
     @ElementCollection
-    @CollectionTable(name = "submitted_inventory", joinColumns = @JoinColumn(name = "inventory_submission_id"))
+    @CollectionTable(name = "inventory_snapshots", joinColumns = @JoinColumn(name = "inventory_submission_id"))
     private List<InventorySnapshot> inventorySnapshots; // Snapshot data
 
     //Constructors

@@ -211,7 +211,7 @@ public class LiquidtoryResource {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InventorySubmissionResponse> submitInventory(
             @RequestHeader("Authorization") String currentToken,
-            @RequestBody List<LiquorBottleItemDto> liquorBottleItemDtos) {
+            @RequestBody InventorySubmissionRequest inventorySubmissionRequest) {
 
         /////////////////////////
         // Get User From Token //
@@ -242,7 +242,7 @@ public class LiquidtoryResource {
         List<LiquorBottleItem> liquorBottleItems = new ArrayList<>();
 
         // Turn into Liquor Bottles.
-        for (LiquorBottleItemDto dto: liquorBottleItemDtos) {
+        for (LiquorBottleItemDto dto: inventorySubmissionRequest.getLiquorBottleItemsToSubmit()) {
 
             // Find the bottle
             Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(dto.getLiquorBottleId());
@@ -286,6 +286,10 @@ public class LiquidtoryResource {
         // Save it
         inventorySubmissionRepository.save(submission);
 
+        /////////////////////////////////////
+        // Send back an Inventory Response //
+        /////////////////////////////////////
+
         // Formatter
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
 
@@ -299,7 +303,7 @@ public class LiquidtoryResource {
                 formattedDate
         );
 
-        // Returnok
+        // Return
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }

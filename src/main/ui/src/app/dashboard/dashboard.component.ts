@@ -33,7 +33,8 @@ export class DashboardComponent implements OnInit {
   // Inventory Stuff
   liquorBottleItemsToSubmit: LiquorBottleItem[] = [];
   inventorySubmitted: boolean = false;
-  lastInventorySubmission!: InventorySubmission;
+  lastInventorySubmission!: InventorySubmissionRequest;
+  isOutside: boolean = false;
 
   // Table Stuff
   activeTab: string = 'inventory';
@@ -107,8 +108,14 @@ export class DashboardComponent implements OnInit {
       headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
     };
 
+    // Create Response
+    const submission: InventorySubmissionResponse = {
+      liquorBottleItemsToSubmit: this.liquorBottleItemsToSubmit,
+      isOutside: this.isOutside
+    }
+
     // Post it
-    this.httpClient.post(this.submitInventoryUrl, this.liquorBottleItemsToSubmit, options)
+    this.httpClient.post(this.submitInventoryUrl, submission, options)
       .subscribe(
         (response: any) => {
 
@@ -117,6 +124,9 @@ export class DashboardComponent implements OnInit {
 
           // Was submitted
           this.inventorySubmitted = true;
+
+          // Debug
+          //console.log(this.lastInventorySubmission);
 
         }
       );
@@ -217,11 +227,6 @@ export class DashboardComponent implements OnInit {
   /////////////////
   // Table Stuff //
   /////////////////
-
-  // Set Active Tab
-  setActiveTab(tab: string) {
-    this.activeTab = tab;
-  }
 
   // Sort Deliveries By
   sortInventory(column: keyof LiquorBottle) {
@@ -362,8 +367,13 @@ export interface LiquorBottleItem {
   currentML: number;
 }
 
-export interface InventorySubmission {
+export interface InventorySubmissionRequest {
   firstName: string;
   lastName: string;
   timestamp: Date;
+}
+
+export interface InventorySubmissionResponse {
+  liquorBottleItemsToSubmit: LiquorBottleItem[];
+  isOutside: boolean;
 }
