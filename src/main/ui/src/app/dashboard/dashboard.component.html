@@ -1,0 +1,80 @@
+<div id="main-page">
+  <div id="main-wrapper">
+    <div class="dashboard-info" *ngIf="userInfo">
+      <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
+      <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link" [ngClass]="{'active': activeTab === 'inventory'}"
+          (click)="setActiveTab('inventory')">Inventory</a>
+      </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+
+      <!-- Inventory Group -->
+      <div *ngIf="activeTab === 'inventory'" class="container" id="inventory-group">
+
+        <!-- Title -->
+        <div class="title">
+          <h2>Inventory</h2>
+        </div>
+
+        <br>
+
+        <!-- Save -->
+        <div class="submit-wrapper">
+          <button class="btn btn-primary" [disabled]="inventorySubmitted" (click)="submitInventory()">Submit</button>
+          <h3 *ngIf="lastInventorySubmission">Successfully submitted on <span style="color: red;">{{
+              lastInventorySubmission.timestamp }}</span>
+          </h3>
+        </div>
+        <br>
+
+        <!-- Table Wrapper -->
+        <table class="table" id="inventory-table">
+          <thead>
+            <tr>
+              <th style='width:40%;' (click)="sortInventory('name')"
+                [ngClass]="{'sortable': true, 'sorted': sortColumn === 'name', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
+                Name</th>
+              <th style='width:20%;' (click)="sortInventory('capacityML')"
+                [ngClass]="{'sortable': true, 'sorted': sortColumn === 'capacityML', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
+                Size</th>
+              <th style='width:20%;'>Full</th>
+              <th style='width:20%;'>Partial</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <ng-container *ngFor="let bottle of liquorBottles">
+              <!-- Delivery Row -->
+              <tr>
+                <td data-label="Name">{{ bottle.name }}</td>
+                <td data-label="Size">{{ bottle.capacityML }}mL</td>
+                <td id="full-buttons">
+                  <button data-char="+" class="btn btn-success" (click)="increaseFullInventory(bottle)"></button>
+                  <p>{{ getFullBottleCount(bottle) }}</p>
+                  <button data-char="-" class="btn btn-danger" (click)="decreaseFullInventory(bottle)"
+                    [disabled]="getFullBottleCount(bottle) === 0"></button>
+                </td>
+                <td id="partial-buttons">
+                  <button data-char="+" class="btn btn-success" (click)="increasePartialInventory(bottle)"></button>
+                  <p>{{ getPartialBottleCount(bottle) }}</p>
+                  <button data-char="-" class="btn btn-danger" (click)="resetPartialInventory()"
+                    [disabled]="getPartialBottleCount(bottle) === 0"></button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+</div>

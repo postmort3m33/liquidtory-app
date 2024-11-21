@@ -1,0 +1,86 @@
+<div id="main-page">
+  <div id="main-wrapper">
+    <div class="dashboard-info" *ngIf="userInfo">
+      <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
+      <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link" [ngClass]="{'active': activeTab === 'actions'}"
+          (click)="setActiveTab('actions')">Actions</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [ngClass]="{'active': activeTab === 'inventory'}"
+          (click)="setActiveTab('inventory')">Inventory</a>
+      </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+
+      <!-- Actions Group -->
+      <div *ngIf="activeTab === 'actions'" class="container" id="actions-group">
+        <!-- Title -->
+        <div class="title">
+          <h2>Actions</h2>
+        </div>
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button class="btn btn-primary" (click)="createNewLiquorBottle()">New Bottle Type</button>
+        </div>
+        <br>
+      </div>
+
+      <!-- Inventory Group -->
+      <div *ngIf="activeTab === 'inventory'" class="container" id="inventory-group">
+
+        <!-- Title -->
+        <div class="title">
+          <h2>Inventory</h2>
+          <h3>
+            Last Updated by
+            <span style="color: red;">{{ lastInventorySubmission.firstName }}</span>
+            on
+            <span style="color: red;">{{ lastInventorySubmission.timestamp }}</span>
+          </h3>
+        </div>
+
+        <!-- Table Wrapper -->
+        <table class="table" id="inventory-table">
+          <thead>
+            <tr>
+              <th style='width:40%;' (click)="sortInventory('name')"
+                [ngClass]="{'sortable': true, 'sorted': sortColumn === 'name', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
+                Name</th>
+              <th style='width:20%;' (click)="sortInventory('capacityML')"
+                [ngClass]="{'sortable': true, 'sorted': sortColumn === 'capacityML', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
+                Size</th>
+              <th style='width:20%;'>Full</th>
+              <th style='width:20%;'>Partial</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <ng-container *ngFor="let bottle of liquorBottles">
+              <!-- Delivery Row -->
+              <tr>
+                <td data-label="Name">{{ bottle.name }}</td>
+                <td data-label="Size">{{ bottle.capacityML }}mL</td>
+                <td id="full-buttons">
+                  <p>{{ getFullBottleCount(bottle) }}</p>
+                </td>
+                <td id="partial-buttons">
+                  <p>{{ getPartialBottleCount(bottle) }}</p>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+</div>

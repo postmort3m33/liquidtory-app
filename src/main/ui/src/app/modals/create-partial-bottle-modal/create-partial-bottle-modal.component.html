@@ -1,0 +1,27 @@
+<h1 mat-dialog-title class="dialog-title">New Partial Bottle</h1>
+
+<mat-dialog-content class="content">
+
+    <div class="bottle-form">
+
+        <h3>{{ bottle.name }}</h3>
+
+        <!-- Display the bottle capacity -->
+        <p>Capacity: {{ data.bottle.capacityML }} mL</p>
+
+        <!-- Vertical Slider -->
+        <div class="slider-wrapper">
+            <div class="vertical-slider">
+                <mat-slider discrete [min]="0" [max]="bottle.capacityML" step="1" tickInterval="10">
+                    <input #sliderThumb matSliderThumb [(ngModel)]="currentML" />
+                </mat-slider>
+            </div>
+        </div>
+    </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="action-buttons">
+    <button mat-raised-button (click)="cancel()">Close</button>
+    <button mat-raised-button color="primary" (click)="save()">Save</button>
+</mat-dialog-actions>

@@ -1,0 +1,92 @@
+    // Remove Bottle Item
+    @RequestMapping(path = "/inventory/liquor/remove/full/{bottleId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeFullLiquorBottleItem(
+            @RequestHeader("Authorization") String currentToken,
+            @PathVariable Long bottleId) {
+
+        // Get all LiquorBottleItems
+        List<LiquorBottleItem> allLiquorBottleItems = liquorBottleItemRepository.findAll();
+
+        Optional<LiquorBottleItem> liquorBottleItemOpt = allLiquorBottleItems.stream()
+                .filter(item ->
+                        item.getLiquorBottle().getId().equals(bottleId) &&
+                        item.getCurrentML().equals(item.getLiquorBottle().getCapacityML())
+                )
+                .findFirst();
+
+        // If found
+        if (liquorBottleItemOpt.isPresent()) {
+
+            // Delete the found LiquorBottleItem
+            liquorBottleItemRepository.delete(liquorBottleItemOpt.get());
+
+            // Return success response
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } else {
+            // Return bad request if no item found
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Remove All Partial bottles
+    @RequestMapping(path = "/inventory/liquor/remove/partial", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeAllPartialLiquorBottleItems(@RequestHeader("Authorization") String currentToken) {
+
+        // Get all LiquorBottleItems
+        List<LiquorBottleItem> allLiquorBottleItems = liquorBottleItemRepository.findAll();
+
+        List<LiquorBottleItem> partialLiquorBottleItems = allLiquorBottleItems.stream()
+                .filter(item ->
+                        !item.getCurrentML().equals(item.getLiquorBottle().getCapacityML())
+                )
+                .toList();
+
+        // If found
+        if (!partialLiquorBottleItems.isEmpty()) {
+
+            // Delete the found LiquorBottleItem
+            liquorBottleItemRepository.deleteAll(partialLiquorBottleItems);
+
+            // Return success response
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } else {
+            // Return bad request if no item found
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+        // Add Bottle Item
+        @RequestMapping(path = "/inventory/liquor", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
+                consumes = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<?> addLiquorBottleItem(
+                @RequestHeader("Authorization") String currentToken,
+                @RequestBody LiquorBottleItemDto liquorBottleItemDto) {
+
+            // Get this liquor bottle
+            Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(liquorBottleItemDto.getLiquorBottleId());
+
+            // If Found
+            if (liquorBottleOpt.isPresent()) {
+
+                // Get Actual
+                LiquorBottle liquorBottle = liquorBottleOpt.get();
+
+                // Create New Liquor Bottle Item..
+                LiquorBottleItem liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottleItemDto.getCurrentML());
+
+                // Save Repo
+                liquorBottleItemRepository.save(liquorBottleItem);
+
+                // Return ok
+                return new ResponseEntity<>(HttpStatus.CREATED);
+
+            } else {
+
+                // Bad
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }

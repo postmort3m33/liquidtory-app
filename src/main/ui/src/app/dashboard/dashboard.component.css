@@ -1,0 +1,217 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+#main-page {
+  background-color: #bbb;
+  padding: 10px;
+}
+
+#main-wrapper {
+  display: block;
+  margin: auto;
+  background-color: white;
+  border: 2px solid grey;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.397);
+}
+
+#main-wrapper .dashboard-info {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding: 20px 0px;
+  background-color: rgba(230, 230, 230, 0.8);
+}
+
+#main-wrapper .dashboard-info h3 {
+  font-size: 1.1em;
+  padding: 0 10px;
+}
+
+#main-wrapper .dashboard-info button {
+  width: auto;
+  height: auto;
+  font-weight: 600;
+  padding:3px 8px;
+  margin: 0;
+}
+
+/************/
+/* Nav Tabs */
+/************/
+
+/* Center-align the nav-tabs */
+.nav-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0;
+  border-bottom: 2px solid grey;
+  background-color: rgba(230, 230, 230, 0.8);
+}
+
+.nav-tabs .nav-item {
+  text-align: center;
+  padding: 0;
+  margin: 0 2px;
+  width: 7vw;
+}
+
+.nav-tabs .nav-link {
+  display: flex; /* Flex layout for centering text */
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  color: rgba(0, 0, 0, 0.356);
+  font-weight: 500;
+  font-size: 1.25em;
+  background-color: rgb(243, 243, 243); /* Transparent background */
+  border-radius: 5px 5px 0 0; /* Optional rounded top corners */
+  min-height: 100%;
+}
+
+.nav-tabs .nav-link:hover {
+  cursor: pointer;
+}
+
+.nav-tabs .nav-link.active {
+  color: rgba(0, 0, 0, 0.781); /* Text color for active tab */
+  font-weight: 500;
+  border: 2px solid grey; /* Border around active tab */
+  border-bottom: none;
+  background-color: white;
+  box-shadow: 0px -6px 6px rgba(0, 0, 0, 0.041);
+
+}
+
+/*******************/
+/* Inventory Group */
+/*******************/
+
+#inventory-group {
+  padding:0;
+  margin: 0 auto;
+}
+
+#inventory-group .title {
+  border-bottom: 2px solid grey;
+  background-color: #f4ebd6;
+}
+
+#inventory-group .title h2 {
+  padding:0;
+  margin:0;
+  font-size: 2em;
+  font-weight: 666;
+  text-align: center;
+}
+
+.submit-wrapper {
+  text-align: center;
+}
+
+.submit-wrapper h3 {
+  font-size: 1em;
+  font-weight: 550;
+  text-align: center;
+  margin: 0;
+}
+
+#inventory-table {
+  table-layout: fixed;
+  width:100%;
+}
+
+#inventory-table thead {
+  background-color: rgba(230, 230, 230, 0.8);
+  text-align: center;
+}
+
+#inventory-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.sortable {
+  cursor: pointer;
+}
+
+.sorted.asc::after {
+  content: ' ▲';
+}
+
+.sorted.desc::after {
+  content: ' ▼';
+}
+
+#full-buttons {
+  padding: 10px;
+  margin: auto;
+}
+
+#full-buttons button {
+  position: relative;
+  margin: auto;
+  width: 50%;
+  height: 30px;
+}
+
+#full-buttons p {
+  margin: auto;
+}
+
+#full-buttons button::before {
+  content: attr(data-char); /* Use a data attribute for the single character */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px; /* Adjust size as needed */
+  color: white; /* Match the button's text color */
+}
+
+#partial-buttons {
+  padding:10px;
+  margin:auto;
+}
+
+#partial-buttons p {
+  margin: auto;
+}
+
+#partial-buttons button {
+  position: relative;
+  margin: auto;
+  width: 50%;
+  height: 30px;
+}
+
+#partial-buttons button::before {
+  content: attr(data-char); /* Use a data attribute for the single character */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px; /* Adjust size as needed */
+  color: white; /* Match the button's text color */
+}
+
+/* Styles for small screens */
+@media (max-width: 768px) {
+
+  #main-wrapper .dashboard-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    font-size: 1em;
+  }
+  
+  .nav-tabs .nav-item {
+    margin: 0 2px;
+    width: 33vw;
+  }
+}

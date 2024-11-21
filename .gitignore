@@ -1,0 +1,64 @@
+# General project files
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# Ignore Angular / UI project files in src/main/ui
+/src/main/ui/node_modules
+/src/main/ui/dist
+/src/main/ui/tmp
+/src/main/ui/out-tsc
+/src/main/ui/.angular/cache
+/src/main/ui/.sass-cache
+/src/main/ui/connect.lock
+/src/main/ui/coverage
+/src/main/ui/libpeerconnection.log
+/src/main/ui/testem.log
+/src/main/ui/typings
+/src/main/ui/npm-debug.log
+/src/main/ui/yarn-error.log
+/src/main/ui/.history/
+
+# IDEs and editors (applicable across the project)
+*.sublime-workspace
+.project
+.classpath
+.idea/
+.c9/
+*.launch
+.settings/
+.history/
+
+# System files
+.DS_Store
+Thumbs.db

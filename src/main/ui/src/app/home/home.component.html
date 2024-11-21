@@ -1,0 +1,23 @@
+<div id="main-page">
+    <div id="main-wrapper">
+        <div class="logingroup" *ngIf="!token">
+            <img src="assets/images/liquidtory-logo.png">
+            <form class="d-flex">
+                <input class="form-control me-2" type="text" placeholder="Username" aria-label="Username"
+                    name="username" [(ngModel)]="username" required />
+                <input class="form-control me-2" type="password" placeholder="Password" aria-label="Password"
+                    name="password" [(ngModel)]="password" required />
+                <button class="btn btn-outline-success" (click)="onLoginSubmit()" type="button">Login</button>
+                <!-- Display Error Message if bad Login-->
+                <div class="error" *ngIf="errorMessage">
+                    <h1>Bad Credentials!</h1>
+                </div>
+            </form>
+        </div>
+
+        <!-- Link to Dashboard when token is present -->
+        <div class="dashboard-link" *ngIf="token">
+            <a routerLink="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+        </div>
+    </div>
+</div>

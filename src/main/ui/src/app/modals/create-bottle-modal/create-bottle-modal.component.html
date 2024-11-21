@@ -1,0 +1,26 @@
+
+<h1 mat-dialog-title class="dialog-title">New Liquor Bottle</h1>
+
+<mat-dialog-content class="content" [formGroup]="form">
+
+  <div class="bottle-form">
+
+    <!-- Name Field -->
+    <mat-form-field class="form-field">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name">
+    </mat-form-field>
+    <br>
+    <!-- Capacity ML-->
+    <mat-form-field class="form-field">
+      <mat-label>Capacity (mL)</mat-label>
+      <input matInput formControlName="capacityML">
+    </mat-form-field>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="action-buttons">
+  <button mat-raised-button (click)="cancel()">Close</button>
+  <button mat-raised-button color="primary" (click)="save()">Save</button>
+</mat-dialog-actions>
