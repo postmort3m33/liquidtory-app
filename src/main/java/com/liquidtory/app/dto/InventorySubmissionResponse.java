@@ -5,15 +5,17 @@ public class InventorySubmissionResponse {
     // Vars
     private String firstName;
     private String lastName;
+    private Long barId;
     private String timestamp;
 
     // Constructors
     public InventorySubmissionResponse() {
     }
 
-    public InventorySubmissionResponse(String firstName, String lastName, String timestamp) {
+    public InventorySubmissionResponse(String firstName, String lastName, Long barId, String timestamp) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.barId = barId;
         this.timestamp = timestamp;
     }
 
@@ -33,6 +35,10 @@ public class InventorySubmissionResponse {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    public Long getBarId() { return barId; }
+
+    public void setBarId(Long barId) { this.barId = barId; }
 
     public String getTimestamp() {
         return timestamp;

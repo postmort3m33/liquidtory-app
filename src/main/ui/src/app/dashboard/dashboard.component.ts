@@ -370,6 +370,7 @@ export interface LiquorBottleItem {
 export interface InventorySubmissionRequest {
   firstName: string;
   lastName: string;
+  barName: string;
   timestamp: Date;
 }
 

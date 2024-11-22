@@ -37,63 +37,6 @@
   margin: 0;
 }
 
-/************/
-/* Nav Tabs */
-/************/
-
-/* Center-align the nav-tabs */
-.nav-tabs {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  margin: 0;
-  padding: 0;
-  border-bottom: 2px solid grey;
-  background-color: rgba(230, 230, 230, 0.8);
-}
-
-.nav-tabs .nav-item {
-  text-align: center;
-  padding: 0;
-  margin: 0 2px;
-  width: 7vw;
-}
-
-.nav-tabs .nav-link {
-  display: flex;
-  /* Flex layout for centering text */
-  align-items: center;
-  /* Center text vertically */
-  justify-content: center;
-  /* Center text horizontally */
-  color: rgba(0, 0, 0, 0.356);
-  font-weight: 500;
-  font-size: 1.25em;
-  background-color: rgb(243, 243, 243);
-  /* Transparent background */
-  border-radius: 5px 5px 0 0;
-  /* Optional rounded top corners */
-  min-height: 100%;
-}
-
-.nav-tabs .nav-link:hover {
-  cursor: pointer;
-}
-
-.nav-tabs .nav-link.active {
-  color: rgba(0, 0, 0, 0.781);
-  /* Text color for active tab */
-  font-weight: 500;
-  border: 2px solid grey;
-  /* Border around active tab */
-  border-bottom: none;
-  background-color: white;
-  box-shadow: 0px -6px 6px rgba(0, 0, 0, 0.041);
-
-}
-
 /*******************/
 /* Inventory Group */
 /*******************/
@@ -319,10 +262,5 @@ input:checked+.slider:before {
     justify-content: space-evenly;
     align-items: center;
     font-size: 1em;
-  }
-
-  .nav-tabs .nav-item {
-    margin: 0 2px;
-    width: 33vw;
   }
 }

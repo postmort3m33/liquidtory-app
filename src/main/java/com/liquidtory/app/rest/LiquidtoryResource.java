@@ -2,10 +2,7 @@ package com.liquidtory.app.rest;
 
 import com.liquidtory.app.dto.*;
 import com.liquidtory.app.entity.*;
-import com.liquidtory.app.repository.InventorySubmissionRepository;
-import com.liquidtory.app.repository.LiquorBottleItemRepository;
-import com.liquidtory.app.repository.LiquorBottleRepository;
-import com.liquidtory.app.repository.UserRepository;
+import com.liquidtory.app.repository.*;
 import com.liquidtory.app.security.JwtUtil;
 import com.liquidtory.app.security.MyUserDetailsService;
 import com.liquidtory.app.services.EmailService;
@@ -46,6 +43,10 @@ public class LiquidtoryResource {
     // Inventory Submissions
     @Autowired
     InventorySubmissionRepository inventorySubmissionRepository;
+
+    // Bar Repo
+    @Autowired
+    BarRepository barRepository;
 
     // Security Stuff
     @Autowired
@@ -273,6 +274,25 @@ public class LiquidtoryResource {
         // Create Inventory Submisson //
         ////////////////////////////////
 
+        /////////////////
+        // Get the Bar //
+        /////////////////
+
+        // the Bar
+        BarEntity bar;
+
+        // Determine which Bar..
+        if (inventorySubmissionRequest.getIsOutside()) {
+
+            // Set outside
+            bar = barRepository.findByName("Outside");
+
+        } else {
+
+            // Set inside
+            bar = barRepository.findByName("Inside");
+        }
+
         // List of Inventory Snapshots
         List<InventorySnapshot> inventorySnapshots = liquorBottleItems.stream()
                 .map(bottleItem -> new InventorySnapshot(
@@ -281,7 +301,7 @@ public class LiquidtoryResource {
                 )).toList();
 
         // Create New Submission
-        InventorySubmission submission = new InventorySubmission(LocalDateTime.now(), userEntity.getId(), inventorySnapshots);
+        InventorySubmission submission = new InventorySubmission(LocalDateTime.now(), userEntity.getId(), bar, inventorySnapshots);
 
         // Save it
         inventorySubmissionRepository.save(submission);
@@ -300,6 +320,7 @@ public class LiquidtoryResource {
         InventorySubmissionResponse response = new InventorySubmissionResponse(
                 userEntity.getFirstName(),
                 userEntity.getLastName(),
+                bar.getId(),
                 formattedDate
         );
 
@@ -336,7 +357,12 @@ public class LiquidtoryResource {
             String formattedDate = lastSubmission.getTimestamp().format(formatter);
 
             // Creat New Inventory Submission
-            InventorySubmissionResponse submissionResponse = new InventorySubmissionResponse(userEntity.getFirstName(), userEntity.getLastName(), formattedDate);
+            InventorySubmissionResponse submissionResponse = new InventorySubmissionResponse(
+                    userEntity.getFirstName(),
+                    userEntity.getLastName(),
+                    lastSubmission.getBar().getId(),
+                    formattedDate
+            );
 
             // Now return it..
             return new ResponseEntity<>(submissionResponse, HttpStatus.OK);

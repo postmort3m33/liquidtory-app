@@ -1,6 +1,7 @@
 package com.liquidtory.app.entity;
 
 import jakarta.persistence.*;
+import com.liquidtory.app.entity.BarEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +20,10 @@ public class InventorySubmission {
     @Column(nullable = false)
     private Long userId;
 
+    @ManyToOne
+    @JoinColumn(name = "bar_id", nullable = false)
+    private BarEntity bar;
+
     @ElementCollection
     @CollectionTable(name = "inventory_snapshots", joinColumns = @JoinColumn(name = "inventory_submission_id"))
     private List<InventorySnapshot> inventorySnapshots; // Snapshot data
@@ -27,9 +32,10 @@ public class InventorySubmission {
     public InventorySubmission() {
     }
 
-    public InventorySubmission(LocalDateTime timestamp, Long userId, List<InventorySnapshot> inventorySnapshots) {
+    public InventorySubmission(LocalDateTime timestamp, Long userId, BarEntity bar, List<InventorySnapshot> inventorySnapshots) {
         this.timestamp = timestamp;
         this.userId = userId;
+        this.bar = bar;
         this.inventorySnapshots = inventorySnapshots;
     }
 
@@ -57,6 +63,10 @@ public class InventorySubmission {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
+
+    public BarEntity getBar() { return bar; }
+
+    public void setBar(BarEntity bar) { this.bar = bar; }
 
     public List<InventorySnapshot> getInventorySnapshots() {
         return inventorySnapshots;

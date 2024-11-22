@@ -32,13 +32,15 @@ export class AdminDashboardComponent implements OnInit {
   liquorBottles: LiquorBottle[] = [];
   liquorBottleItems: LiquorBottleItem[] = [];
   isLoading: boolean = false;
+  isOutside: boolean = false;
 
   // Inventory Stuff
-  lastInventorySubmission!: InventorySubmission;
+  lastInventorySubmission!: InventorySubmissionResponse;
 
   // Table Stuff
   sortColumn: string | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
+  selectedBarId: number = 1;
 
   // Init
   ngOnInit() {
@@ -113,9 +115,9 @@ export class AdminDashboardComponent implements OnInit {
     };
 
     // Get deliveries..
-    this.httpClient.get<InventorySubmission>(this.getLastInventorySubmissionUrl, options)
+    this.httpClient.get<InventorySubmissionResponse>(this.getLastInventorySubmissionUrl, options)
       .subscribe(
-        (response: InventorySubmission) => {
+        (response: InventorySubmissionResponse) => {
 
           // Save User Info
           this.lastInventorySubmission = response;
@@ -267,6 +269,19 @@ export class AdminDashboardComponent implements OnInit {
     this.activeTab = tab;
   }
 
+  // when changing Bar Inventories
+  onBarChange() {
+
+    // Change selected Bar..
+    if (this.isOutside) {
+      this.selectedBarId = 2;
+    } else {
+      this.selectedBarId = 1;
+    }
+
+    //console.log(this.selectedBarId);
+  }
+
   // Sort Deliveries By
   sortInventory(column: keyof LiquorBottle) {
 
@@ -315,85 +330,6 @@ export class AdminDashboardComponent implements OnInit {
     // Return the length
     return matchingItems.length;
   }
-
-  // Increase Inventory
-  increaseInventory(bottle: LiquorBottle) {
-
-    // Prevent further requests if the request is in progress
-    if (this.isLoading) {
-      return;
-    }
-
-    // Set loading to true to disable further requests
-    this.isLoading = true;
-
-    // Create JSON Header..
-    const options = {
-      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
-    };
-
-    // Make New Request
-    const liquorBottleItem: LiquorBottleItem = {
-      liquorBottleId: bottle.id,
-      currentML: bottle.capacityML
-    }
-
-    // Post it
-    this.httpClient.post(this.liquorInventoryUrl, liquorBottleItem, options)
-      .subscribe(
-        (response: any) => {
-
-          // Update Inventory..
-          this.getLiquorBottleItems();
-
-          // NOt Loading Anymore..
-          this.isLoading = false;
-
-        }
-      );
-
-  }
-
-  // Decrease Inventory
-  decreaseInventory(bottle: LiquorBottle) {
-
-    // Prevent further requests if the request is in progress
-    if (this.isLoading) {
-      return;
-    }
-
-    // Set loading to true to disable further requests
-    this.isLoading = true;
-
-    // Create JSON Header..
-    const options = {
-      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
-    };
-
-    // New Url
-    const url = `${this.removeLiquorBottleItemUrl}/${bottle.id}`;
-
-    // Post it
-    this.httpClient.post(url, {}, options)
-      .subscribe({
-        next: (response: any) => {
-
-          // Update Inventory..
-          this.getLiquorBottleItems();
-
-          // NOt Loading Anymore..
-          this.isLoading = false;
-
-        },
-        error: (error) => {
-
-          // Still unload
-          this.isLoading = false;
-
-        }
-      });
-
-  }
 }
 
 export interface UserInfo {
@@ -412,8 +348,9 @@ export interface LiquorBottleItem {
   currentML: number;
 }
 
-export interface InventorySubmission {
+export interface InventorySubmissionResponse {
   firstName: string;
   lastName: string;
+  barName: string;
   timestamp: Date;
 }

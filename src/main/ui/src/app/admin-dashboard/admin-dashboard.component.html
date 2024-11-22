@@ -30,7 +30,6 @@
         <div class="action-buttons">
           <button class="btn btn-primary" (click)="createNewLiquorBottle()">New Bottle Type</button>
         </div>
-        <br>
       </div>
 
       <!-- Inventory Group -->
@@ -39,6 +38,21 @@
         <!-- Title -->
         <div class="title">
           <h2>Inventory</h2>
+        </div>
+
+        <!-- Info Wrapper -->
+        <div class="submit-wrapper">
+
+          <!-- Inside/Outside switch -->
+          <div class="switch-wrapper">
+            <h3><strong>Inside</strong></h3>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="isOutside" (change)="onBarChange()">
+              <span class="slider round"></span>
+            </label>
+            <h3><strong>Outside</strong></h3>
+          </div>
+
           <h3>
             Last Updated by
             <span style="color: red;">{{ lastInventorySubmission.firstName }}</span>
