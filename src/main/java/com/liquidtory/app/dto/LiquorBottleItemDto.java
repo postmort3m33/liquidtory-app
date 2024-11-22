@@ -5,14 +5,16 @@ public class LiquorBottleItemDto {
     // Vars
     private Long liquorBottleId;
     private Long currentML;
+    private Long barId;
 
     // Constructor
     public LiquorBottleItemDto() {
     }
 
-    public LiquorBottleItemDto(Long liquorBottleId, Long currentML) {
+    public LiquorBottleItemDto(Long liquorBottleId, Long currentML, Long barId) {
         this.liquorBottleId = liquorBottleId;
         this.currentML = currentML;
+        this.barId = barId;
     }
 
     // Gets and Sets
@@ -32,4 +34,8 @@ public class LiquorBottleItemDto {
     public void setCurrentML(Long currentML) {
         this.currentML = currentML;
     }
+
+    public Long getBarId() { return barId; }
+
+    public void setBarId(Long barId) { this.barId = barId; }
 }

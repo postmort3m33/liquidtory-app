@@ -1,10 +1,11 @@
-import { Component, ViewChild, ElementRef, Inject } from '@angular/core';
+import { Component, ViewChild, ElementRef, Inject, ViewEncapsulation } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-create-partial-bottle-modal',
   templateUrl: './create-partial-bottle-modal.component.html',
-  styleUrl: './create-partial-bottle-modal.component.css'
+  styleUrl: './create-partial-bottle-modal.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class CreatePartialBottleModalComponent {
   @ViewChild('sliderThumb') sliderThumb!: ElementRef;

@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -196,7 +197,8 @@ public class LiquidtoryResource {
         List<LiquorBottleItemDto> liquorBottleItemResponses = liquorBottleItems.stream()
                 .map(item -> new LiquorBottleItemDto(
                         item.getLiquorBottle().getId(),
-                        item.getCurrentML()
+                        item.getCurrentML(),
+                        item.getBar().getId()
                 )).toList();
 
         // Return them
@@ -232,12 +234,31 @@ public class LiquidtoryResource {
         // Get User Entity
         UserEntity userEntity = userRepository.findByUsername(username);
 
+        /////////////////
+        // Get the Bar //
+        /////////////////
+
+        // the Bar
+        BarEntity bar;
+
+        // Determine which Bar..
+        if (inventorySubmissionRequest.getIsOutside()) {
+
+            // Set outside
+            bar = barRepository.findByName("Outside");
+
+        } else {
+
+            // Set inside
+            bar = barRepository.findByName("Inside");
+        }
+
         //////////////////////
         // Update Inventory //
         //////////////////////
 
-        // Empty All Inventory Items
-        liquorBottleItemRepository.deleteAll();
+        // Reset Inventory for this Bar..
+        bar.removeLiquorBottleItems();
 
         // Create New List..
         List<LiquorBottleItem> liquorBottleItems = new ArrayList<>();
@@ -267,31 +288,16 @@ public class LiquidtoryResource {
             }
         }
 
-        // Save all new ones
-        liquorBottleItemRepository.saveAll(liquorBottleItems);
+        // Add all Liquor Bottle Items to Bar..
+        for (LiquorBottleItem item: liquorBottleItems) {
+
+            // Add to Bar
+            bar.addLiquorBottleItem(item);
+        }
 
         ////////////////////////////////
         // Create Inventory Submisson //
         ////////////////////////////////
-
-        /////////////////
-        // Get the Bar //
-        /////////////////
-
-        // the Bar
-        BarEntity bar;
-
-        // Determine which Bar..
-        if (inventorySubmissionRequest.getIsOutside()) {
-
-            // Set outside
-            bar = barRepository.findByName("Outside");
-
-        } else {
-
-            // Set inside
-            bar = barRepository.findByName("Inside");
-        }
 
         // List of Inventory Snapshots
         List<InventorySnapshot> inventorySnapshots = liquorBottleItems.stream()
@@ -300,13 +306,17 @@ public class LiquidtoryResource {
                         bottleItem.getCurrentML()
                 )).toList();
 
+        // Create New Submission with US Central Time Zone
+        ZoneId usCentralZone = ZoneId.of("America/Chicago");
+        LocalDateTime currentCentralTime = LocalDateTime.now(usCentralZone);
+
         // Create New Submission
-        InventorySubmission submission = new InventorySubmission(LocalDateTime.now(), userEntity.getId(), bar, inventorySnapshots);
+        InventorySubmission submission = new InventorySubmission(currentCentralTime, userEntity.getId(), bar, inventorySnapshots);
 
         // Save it
         inventorySubmissionRepository.save(submission);
 
-        // Add this Submission to Last for this Bar..
+        // Add this Submission to Last for this Bar
         bar.setLastSubmissionId(submission.getId());
 
         // Save it

@@ -33,7 +33,7 @@ export class DashboardComponent implements OnInit {
   // Inventory Stuff
   liquorBottleItemsToSubmit: LiquorBottleItem[] = [];
   inventorySubmitted: boolean = false;
-  lastInventorySubmission!: InventorySubmissionRequest;
+  lastInventorySubmission!: InventorySubmissionResponse;
   isOutside: boolean = false;
 
   // Table Stuff
@@ -109,15 +109,15 @@ export class DashboardComponent implements OnInit {
     };
 
     // Create Response
-    const submission: InventorySubmissionResponse = {
+    const submission: InventorySubmissionRequest = {
       liquorBottleItemsToSubmit: this.liquorBottleItemsToSubmit,
       isOutside: this.isOutside
     }
 
     // Post it
-    this.httpClient.post(this.submitInventoryUrl, submission, options)
+    this.httpClient.post<InventorySubmissionResponse>(this.submitInventoryUrl, submission, options)
       .subscribe(
-        (response: any) => {
+        (response: InventorySubmissionResponse) => {
 
           // Set Response to Inventory Submission
           this.lastInventorySubmission = response;
@@ -181,9 +181,9 @@ export class DashboardComponent implements OnInit {
     // Vars
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.height = '90vh';
+    dialogConfig.height = '80vh';
     dialogConfig.width = '80vw';
-    dialogConfig.maxHeight = '90vh';
+    dialogConfig.maxHeight = '80vh';
     dialogConfig.maxWidth = '80vw';
 
     // Data
@@ -367,14 +367,14 @@ export interface LiquorBottleItem {
   currentML: number;
 }
 
-export interface InventorySubmissionRequest {
+export interface InventorySubmissionResponse {
   firstName: string;
   lastName: string;
-  barName: string;
-  timestamp: Date;
+  barId: number;
+  timestamp: string;
 }
 
-export interface InventorySubmissionResponse {
+export interface InventorySubmissionRequest {
   liquorBottleItemsToSubmit: LiquorBottleItem[];
   isOutside: boolean;
 }

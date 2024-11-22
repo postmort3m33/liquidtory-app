@@ -12,12 +12,17 @@ public class LiquorBottleItem {
 
     // Reference to the type of liquor bottle
     @ManyToOne(optional = false)
-    @JoinColumn(name = "type_id", referencedColumnName = "id")
+    @JoinColumn(name = "type_id")
     private LiquorBottle liquorBottle;
 
     // Current amount of liquid in the bottle
     @Column(nullable = false)
     private Long currentML;
+
+    // Bar this item is associated with..
+    @ManyToOne
+    @JoinColumn(name = "bar_id")
+    private BarEntity bar;
 
     // Constructors
     public LiquorBottleItem() {
@@ -53,4 +58,8 @@ public class LiquorBottleItem {
     public void setCurrentML(Long currentML) {
         this.currentML = currentML;
     }
+
+    public BarEntity getBar() { return bar; }
+
+    public void setBar(BarEntity bar) { this.bar = bar; }
 }

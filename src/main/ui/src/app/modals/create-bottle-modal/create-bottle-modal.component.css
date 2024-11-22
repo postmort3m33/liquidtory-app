@@ -1,11 +1,16 @@
 .dialog-title {
-    margin: 15px;
-    font-family: 'Roboto', sans-serif;
-    text-align: center;
-    font-size: 2.5em;
-    font-weight: 666;
-    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 30px;
     border-bottom: 2px solid grey;
+    background-color: #f4ebd6;
+}
+
+.dialog-title h2 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    font-weight: 666;
 }
 
 .content {

@@ -1,4 +1,6 @@
-<h1 mat-dialog-title class="dialog-title">New Partial Bottle</h1>
+<div class="dialog-title">
+    <h2>Partial Bottle</h2>
+</div>
 
 <mat-dialog-content class="content">
 
@@ -12,7 +14,7 @@
         <!-- Vertical Slider -->
         <div class="slider-wrapper">
             <div class="vertical-slider">
-                <mat-slider discrete [min]="0" [max]="bottle.capacityML" step="1" tickInterval="10">
+                <mat-slider [min]="0" [max]="bottle.capacityML" step="1" tickInterval="10">
                     <input #sliderThumb matSliderThumb [(ngModel)]="currentML" />
                 </mat-slider>
             </div>

@@ -19,6 +19,9 @@ public class BarEntity {
     @Column(nullable = true)
     private Long lastSubmissionId;
 
+    @OneToMany(mappedBy = "bar", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LiquorBottleItem> liquorBottleItems = new ArrayList<>();
+
     // Constructors
     public BarEntity() {
     }
@@ -47,5 +50,25 @@ public class BarEntity {
     public Long getLastSubmissionId() { return lastSubmissionId; }
 
     public void setLastSubmissionId(Long lastSubmissionId) { this.lastSubmissionId = lastSubmissionId; }
+
+    public List<LiquorBottleItem> getLiquorBottleItems() { return liquorBottleItems; }
+
+    public void setLiquorBottleItems(List<LiquorBottleItem> liquorBottleItems) { this.liquorBottleItems = liquorBottleItems; }
+
+    // Helper methods..
+    public void addLiquorBottleItem(LiquorBottleItem item) {
+
+        // Add this LiquorBottle Item to the Array
+        liquorBottleItems.add(item);
+
+        // set This bar to this bar for this Liquor Bottle item
+        item.setBar(this);
+    }
+
+    public void removeLiquorBottleItems() {
+
+        // Remove this Liquor Bottle Item from the Array
+        liquorBottleItems.clear();
+    }
 }
 

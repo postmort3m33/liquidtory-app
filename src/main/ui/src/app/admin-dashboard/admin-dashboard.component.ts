@@ -354,7 +354,7 @@ export class AdminDashboardComponent implements OnInit {
   getFullBottleCount(bottle: LiquorBottle): number {
 
     // Filter liquorBottleItems to get only those that match the liquorBottleId
-    const matchingItems = this.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML === bottle.capacityML);
+    const matchingItems = this.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML === bottle.capacityML && item.barId === this.selectedBarId);
 
     // Return the length
     return matchingItems.length;
@@ -364,7 +364,7 @@ export class AdminDashboardComponent implements OnInit {
   getPartialBottleCount(bottle: LiquorBottle): number {
 
     // Filter liquorBottleItems to get only those that match the liquorBottleId
-    const matchingItems = this.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML !== bottle.capacityML);
+    const matchingItems = this.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML !== bottle.capacityML && item.barId === this.selectedBarId);
 
     // Return the length
     return matchingItems.length;
@@ -385,6 +385,7 @@ export interface LiquorBottle {
 export interface LiquorBottleItem {
   liquorBottleId: number;
   currentML: number;
+  barId: number;
 }
 
 export interface InventorySubmissionResponse {
