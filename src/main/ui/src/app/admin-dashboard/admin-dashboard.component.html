@@ -53,11 +53,11 @@
             <h3><strong>Outside</strong></h3>
           </div>
 
-          <h3>
+          <h3 *ngIf="selectedInventorySubmission">
             Last Updated by
-            <span style="color: red;">{{ lastInventorySubmission.firstName }}</span>
+            <span style="color: red;">{{ selectedInventorySubmission.firstName }}</span>
             on
-            <span style="color: red;">{{ lastInventorySubmission.timestamp }}</span>
+            <span style="color: red;">{{ selectedInventorySubmission.timestamp }}</span>
           </h3>
         </div>
 

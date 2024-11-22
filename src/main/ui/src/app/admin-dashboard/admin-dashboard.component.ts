@@ -35,7 +35,8 @@ export class AdminDashboardComponent implements OnInit {
   isOutside: boolean = false;
 
   // Inventory Stuff
-  lastInventorySubmission!: InventorySubmissionResponse;
+  lastInventorySubmissions!: InventorySubmissionResponse[];
+  selectedInventorySubmission: InventorySubmissionResponse | null = null;
 
   // Table Stuff
   sortColumn: string | null = null;
@@ -74,7 +75,7 @@ export class AdminDashboardComponent implements OnInit {
         this.getLiquorBottleItems();
 
         // Get Last Submission
-        this.getLastInventorySubmission();
+        this.getLastInventorySubmissions();
       }
 
     } else {
@@ -107,7 +108,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   // Get Last Submission
-  getLastInventorySubmission() {
+  getLastInventorySubmissions() {
 
     // Create JSON Header..
     const options = {
@@ -115,15 +116,15 @@ export class AdminDashboardComponent implements OnInit {
     };
 
     // Get deliveries..
-    this.httpClient.get<InventorySubmissionResponse>(this.getLastInventorySubmissionUrl, options)
+    this.httpClient.get<InventorySubmissionResponse[]>(this.getLastInventorySubmissionUrl, options)
       .subscribe(
-        (response: InventorySubmissionResponse) => {
+        (response: InventorySubmissionResponse[]) => {
 
           // Save User Info
-          this.lastInventorySubmission = response;
+          this.lastInventorySubmissions = response;
 
           // Debug
-          //console.log('Last Submission: ', this.lastInventorySubmission);
+          //console.log('Last Submissions: ', this.lastInventorySubmissions);
         }
       );
 
@@ -131,7 +132,7 @@ export class AdminDashboardComponent implements OnInit {
 
   // Sign out function
   signOut() {
-    
+
     // Clear the JWT token from sessionStorage
     sessionStorage.removeItem('jwtToken');
 
@@ -260,6 +261,12 @@ export class AdminDashboardComponent implements OnInit {
       // Get INventory Again
       this.getLiquorBottleItems();
 
+      // Get Last Submissions again.
+      this.getLastInventorySubmissions();
+
+      // run on barChage
+      this.onBarChange();
+
       // Reset Sorting..
       this.sortColumn = null;
       this.sortDirection = 'asc';
@@ -274,12 +281,44 @@ export class AdminDashboardComponent implements OnInit {
 
     // Change selected Bar..
     if (this.isOutside) {
-      this.selectedBarId = 2;
-    } else {
-      this.selectedBarId = 1;
-    }
 
-    //console.log(this.selectedBarId);
+      // Set Inventory Submission
+      const foundSubmission = this.lastInventorySubmissions.find(submission => submission.barId === 2);
+
+      if (foundSubmission) {
+
+        //Set it
+        this.selectedInventorySubmission = foundSubmission;
+
+      } else {
+
+        // Set Null
+        this.selectedInventorySubmission = null;
+      }
+
+      // Set Selected Bar Id
+      this.selectedBarId = 2;
+
+    } else {
+
+      // Set Inventory Submission
+      const foundSubmission = this.lastInventorySubmissions.find(submission => submission.barId === 1);
+
+      if (foundSubmission) {
+
+        //Set it
+        this.selectedInventorySubmission = foundSubmission;
+
+      } else {
+
+        // Set null
+        this.selectedInventorySubmission = null;
+      }
+
+      // Set Selected
+      this.selectedBarId = 1;
+
+    }
   }
 
   // Sort Deliveries By
@@ -351,6 +390,6 @@ export interface LiquorBottleItem {
 export interface InventorySubmissionResponse {
   firstName: string;
   lastName: string;
-  barName: string;
+  barId: number;
   timestamp: Date;
 }

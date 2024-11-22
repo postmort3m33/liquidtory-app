@@ -152,12 +152,6 @@ public class H2Bootstrap implements CommandLineRunner {
             BarEntity outsideBar = new BarEntity("Outside");
             barRepository.save(outsideBar);
 
-            // Make Initial Submissions
-            InventorySubmission submission = new InventorySubmission(LocalDateTime.now(), 1L, insideBar, Collections.emptyList());
-            inventorySubmissionRepository.save(submission);
-            InventorySubmission submission2 = new InventorySubmission(LocalDateTime.now(), 1L, outsideBar, Collections.emptyList());
-            inventorySubmissionRepository.save(submission2);
-
         }
     }
 }

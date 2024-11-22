@@ -16,6 +16,9 @@ public class BarEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = true)
+    private Long lastSubmissionId;
+
     // Constructors
     public BarEntity() {
     }
@@ -40,5 +43,9 @@ public class BarEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Long getLastSubmissionId() { return lastSubmissionId; }
+
+    public void setLastSubmissionId(Long lastSubmissionId) { this.lastSubmissionId = lastSubmissionId; }
 }
 

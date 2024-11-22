@@ -306,6 +306,12 @@ public class LiquidtoryResource {
         // Save it
         inventorySubmissionRepository.save(submission);
 
+        // Add this Submission to Last for this Bar..
+        bar.setLastSubmissionId(submission.getId());
+
+        // Save it
+        barRepository.save(bar);
+
         /////////////////////////////////////
         // Send back an Inventory Response //
         /////////////////////////////////////
@@ -331,46 +337,90 @@ public class LiquidtoryResource {
 
     // Get Last Submission
     @RequestMapping(path = "/inventory/submit/last", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InventorySubmissionResponse> getLastInventorySubmission(
+    public ResponseEntity<List<InventorySubmissionResponse>> getLastInventorySubmission(
             @RequestHeader("Authorization") String currentToken) {
 
         ///////////////////////////////////////////
         // Make sure this is Admin in the future //
         ///////////////////////////////////////////
 
-        // Get Lastest Inventory Submission from Repo
-        InventorySubmission lastSubmission = inventorySubmissionRepository.findTopByOrderByTimestampDesc();
+        // Init All Last Submissions..
+        List<InventorySubmission> allLastSubmissions = new ArrayList<>();
 
-        // find user Associated
-        Optional<UserEntity> userEntityOpt = userRepository.findById(lastSubmission.getUserId());
+        // Get all the Bars..
+        List<BarEntity> allBars = barRepository.findAll();
 
-        // If found..
-        if (userEntityOpt.isPresent()) {
+        // Leave if Empty..
+        if (allBars.isEmpty()) { return new ResponseEntity<>(HttpStatus.BAD_REQUEST); }
 
-            // Get actual user
-            UserEntity userEntity = userEntityOpt.get();
+        // Loop through Bars..
+        for (BarEntity bar: allBars) {
 
-            // Formatter
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
+            // Get last Submission Id
+            Long lastSubmissionId = bar.getLastSubmissionId();
 
-            // Formated Date
-            String formattedDate = lastSubmission.getTimestamp().format(formatter);
+            // Skip if lastSubmissionId is null
+            if (lastSubmissionId == null) {
+                continue;
+            }
 
-            // Creat New Inventory Submission
-            InventorySubmissionResponse submissionResponse = new InventorySubmissionResponse(
-                    userEntity.getFirstName(),
-                    userEntity.getLastName(),
-                    lastSubmission.getBar().getId(),
-                    formattedDate
-            );
+            // Find submission
+            Optional<InventorySubmission> inventorySubmissionOpt = inventorySubmissionRepository.findById(lastSubmissionId);
 
-            // Now return it..
-            return new ResponseEntity<>(submissionResponse, HttpStatus.OK);
+            // If found..
+            if (inventorySubmissionOpt.isPresent()) {
 
-        } else {
+                // Get Real one..
+                InventorySubmission inventorySubmission = inventorySubmissionOpt.get();
 
-            // Bad
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                // Add to List.
+                allLastSubmissions.add(inventorySubmission);
+
+            } else {
+
+                // Bad
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }
+
+        /////////////////////////////////
+        // Set Inventory Sub Responses //
+        /////////////////////////////////
+
+        // make List
+        List<InventorySubmissionResponse> inventoryResponses = new ArrayList<>();
+
+        for (InventorySubmission submission: allLastSubmissions) {
+
+            // Get User
+            Optional<UserEntity> userOpt = userRepository.findById(submission.getUserId());
+
+            // If present
+            if (userOpt.isPresent()) {
+
+                // Get User
+                UserEntity user = userOpt.get();
+
+                // Formatter
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
+
+                // Formated Date
+                String formattedDate = submission.getTimestamp().format(formatter);
+
+                // Make new Response
+                InventorySubmissionResponse inventoryResponse = new InventorySubmissionResponse(user.getFirstName(), user.getLastName(), submission.getBar().getId(), formattedDate);
+
+                // Add to List
+                inventoryResponses.add(inventoryResponse);
+
+            } else {
+
+                continue;
+            }
+        }
+
+        // Now return it..
+        return new ResponseEntity<>(inventoryResponses, HttpStatus.OK);
+
     }
 }
