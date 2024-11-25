@@ -212,7 +212,7 @@ public class LiquidtoryResource {
     // Inventory Submission Snapshot
     @RequestMapping(path = "/inventory/submit", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InventorySubmissionResponse> submitInventory(
+    public ResponseEntity<LastInventorySubmissionResponse> submitInventory(
             @RequestHeader("Authorization") String currentToken,
             @RequestBody InventorySubmissionRequest inventorySubmissionRequest) {
 
@@ -333,7 +333,7 @@ public class LiquidtoryResource {
         String formattedDate = submission.getTimestamp().format(formatter);
 
         // Now send it back
-        InventorySubmissionResponse response = new InventorySubmissionResponse(
+        LastInventorySubmissionResponse response = new LastInventorySubmissionResponse(
                 userEntity.getFirstName(),
                 userEntity.getLastName(),
                 bar.getId(),
@@ -347,7 +347,7 @@ public class LiquidtoryResource {
 
     // Get Last Submission
     @RequestMapping(path = "/inventory/submit/last", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InventorySubmissionResponse>> getLastInventorySubmission(
+    public ResponseEntity<List<LastInventorySubmissionResponse>> getLastInventorySubmission(
             @RequestHeader("Authorization") String currentToken) {
 
         ///////////////////////////////////////////
@@ -398,7 +398,7 @@ public class LiquidtoryResource {
         /////////////////////////////////
 
         // make List
-        List<InventorySubmissionResponse> inventoryResponses = new ArrayList<>();
+        List<LastInventorySubmissionResponse> inventoryResponses = new ArrayList<>();
 
         for (InventorySubmission submission: allLastSubmissions) {
 
@@ -418,7 +418,98 @@ public class LiquidtoryResource {
                 String formattedDate = submission.getTimestamp().format(formatter);
 
                 // Make new Response
-                InventorySubmissionResponse inventoryResponse = new InventorySubmissionResponse(user.getFirstName(), user.getLastName(), submission.getBar().getId(), formattedDate);
+                LastInventorySubmissionResponse inventoryResponse = new LastInventorySubmissionResponse(user.getFirstName(), user.getLastName(), submission.getBar().getId(), formattedDate);
+
+                // Add to List
+                inventoryResponses.add(inventoryResponse);
+
+            } else {
+
+                continue;
+            }
+        }
+
+        // Now return it..
+        return new ResponseEntity<>(inventoryResponses, HttpStatus.OK);
+
+    }
+
+    // Get all Inventory Submissions..
+    @RequestMapping(path = "/inventory/submit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<InventorySubmissionResponse>> getAllInventorySubmissions(
+            @RequestHeader("Authorization") String currentToken) {
+
+        ///////////////////////////////////////////
+        // Make sure this is Admin in the future //
+        ///////////////////////////////////////////
+
+        // Init All Last Submissions..
+        List<InventorySubmission> allSubmissions = inventorySubmissionRepository.findAll();
+
+        /////////////////////////////////
+        // Set Inventory Sub Responses //
+        /////////////////////////////////
+
+        // make List
+        List<InventorySubmissionResponse> inventoryResponses = new ArrayList<>();
+
+        for (InventorySubmission submission: allSubmissions) {
+
+            // Get User
+            Optional<UserEntity> userOpt = userRepository.findById(submission.getUserId());
+
+            // If present
+            if (userOpt.isPresent()) {
+
+                // Get User
+                UserEntity user = userOpt.get();
+
+                //////////////////////
+                // Stream Snapshots //
+                //////////////////////
+
+                // New List
+                List<InventorySnapshotDto> snapshotDtos = new ArrayList<>();
+
+                // Loop
+                for (InventorySnapshot snapshot: submission.getInventorySnapshots()) {
+
+                    // GEt Liquor Bottle
+                    Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(snapshot.getLiquorBottleId());
+
+                    // If
+                    if (liquorBottleOpt.isPresent()) {
+
+                        // Get iut
+                        LiquorBottle liquorBottle = liquorBottleOpt.get();
+
+                        // Add new One
+                        snapshotDtos.add(new InventorySnapshotDto(liquorBottle.getName(), snapshot.getCurrentML()));
+                    } else {
+
+                        continue;
+                    }
+                }
+
+                ////////////////////////////////
+                // Finish Submission Response //
+                ////////////////////////////////
+
+                // Formatter
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
+
+                // Formated Date
+                String formattedDate = submission.getTimestamp().format(formatter);
+
+                // Make new Response
+                InventorySubmissionResponse inventoryResponse = new InventorySubmissionResponse(
+                        submission.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        submission.getBar().getName(),
+                        formattedDate,
+                        snapshotDtos
+                );
 
                 // Add to List
                 inventoryResponses.add(inventoryResponse);

@@ -138,10 +138,14 @@
 
 #actions-group .action-buttons {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   padding: 30px 0;
+}
+
+#actions-group .action-buttons button {
+  margin: 20px 0;
 }
 
 /*******************/

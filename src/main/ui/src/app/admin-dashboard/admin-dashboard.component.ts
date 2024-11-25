@@ -5,6 +5,7 @@ import config from '../config';
 import { jwtDecode } from 'jwt-decode';  // Import the jwt-decode library
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { CreateBottleModalComponent } from '../modals/create-bottle-modal/create-bottle-modal.component';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -22,7 +23,8 @@ export class AdminDashboardComponent implements OnInit {
   private liquorBottleUrl: string = this.baseUrl + '/api/liquor';
   private liquorInventoryUrl: string = this.baseUrl + '/api/inventory/liquor';
   private removeLiquorBottleItemUrl: string = this.baseUrl + '/api/inventory/liquor/remove';
-  private getLastInventorySubmissionUrl: string = this.baseUrl + '/api/inventory/submit/last'
+  private getLastInventorySubmissionUrl: string = this.baseUrl + '/api/inventory/submit/last';
+  private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
 
 
   // Vars
@@ -35,8 +37,8 @@ export class AdminDashboardComponent implements OnInit {
   isOutside: boolean = false;
 
   // Inventory Stuff
-  lastInventorySubmissions!: InventorySubmissionResponse[];
-  selectedInventorySubmission: InventorySubmissionResponse | null = null;
+  lastInventorySubmissions!: LastInventorySubmissionResponse[];
+  selectedInventorySubmission: LastInventorySubmissionResponse | null = null;
 
   // Table Stuff
   sortColumn: string | null = null;
@@ -116,9 +118,9 @@ export class AdminDashboardComponent implements OnInit {
     };
 
     // Get deliveries..
-    this.httpClient.get<InventorySubmissionResponse[]>(this.getLastInventorySubmissionUrl, options)
+    this.httpClient.get<LastInventorySubmissionResponse[]>(this.getLastInventorySubmissionUrl, options)
       .subscribe(
-        (response: InventorySubmissionResponse[]) => {
+        (response: LastInventorySubmissionResponse[]) => {
 
           // Save User Info
           this.lastInventorySubmissions = response;
@@ -369,6 +371,91 @@ export class AdminDashboardComponent implements OnInit {
     // Return the length
     return matchingItems.length;
   }
+
+  /////////////
+  // Exports //
+  /////////////
+
+  exportSubmissionsExcel() {
+
+    //////////////////
+    // Get the Data //
+    //////////////////
+
+    // Create JSON Header..
+    const options = {
+      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+    };
+
+    // Get deliveries..
+    this.httpClient.get<InventorySubmission[]>(this.getAllInventorySubmissionsUrl, options)
+      .subscribe(
+        (response: InventorySubmission[]) => {
+
+          // Debug
+          console.log(response);
+
+          // Define the header row, including a single column for snapshots
+          const header = ['ID', 'First Name', 'Last Name', 'Timestamp', 'Bar Name', 'Snapshots'];
+
+          // Get a unique list of bar names
+          const barNames = [...new Set(response.map(submission => submission.barName).filter(name => name))];
+
+          // Create a new workbook
+          const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+
+          // Create a worksheet for each barName
+          barNames.forEach((barName, index) => {
+            
+            const barSubmissions = response.filter(submission => submission.barName === barName);
+
+            // Map submissions to rows, formatting snapshots into a single string
+            const barData = barSubmissions.map(submission => {
+              // Group the snapshots by liquorBottleName and currentML, and count occurrences
+              const snapshotCount = submission.snapshots?.reduce((acc, snapshot) => {
+                const key = `${snapshot.liquorBottleName}:${snapshot.currentML}ml`;
+                acc[key] = (acc[key] || 0) + 1; // Increment the count for this snapshot
+                return acc;
+              }, {} as Record<string, number>) || {};
+
+              // Create the snapshot string with counts
+              const snapshotString = Object.entries(snapshotCount)
+                .map(([snapshot, count]) => count > 1 ? `${snapshot} x${count}` : snapshot)
+                .join('; ') || 'No Snapshots';
+
+              return [
+                submission.id,
+                submission.firstName,
+                submission.lastName,
+                submission.timestamp,
+                barName,
+                snapshotString,
+              ];
+            });
+
+            // Combine the header and data
+            const data = [header, ...barData];
+
+            // If it's the first worksheet, add a blank row at the top
+            if (index === 0) {
+              data.unshift([]); // Add an empty row before the data
+            }
+
+            // Create the worksheet
+            const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
+
+            // Append the worksheet to the workbook, sanitizing the sheet name
+            const sanitizeName = (name: string) => name.replace(/[:\/\\?\*\[\]]/g, '').substring(0, 31);
+            XLSX.utils.book_append_sheet(workbook, worksheet, sanitizeName(barName));
+          });
+
+          // Generate the Excel file
+          XLSX.writeFile(workbook, 'InventorySubmissions.xlsx');
+
+
+        }
+      );
+  }
 }
 
 export interface UserInfo {
@@ -388,9 +475,23 @@ export interface LiquorBottleItem {
   barId: number;
 }
 
-export interface InventorySubmissionResponse {
+export interface LastInventorySubmissionResponse {
   firstName: string;
   lastName: string;
   barId: number;
   timestamp: Date;
+}
+
+export interface InventorySubmission {
+  id: number;
+  firstName: string;
+  lastName: string;
+  barName: string;
+  timestamp: Date;
+  snapshots: InventorySnapshot[];
+}
+
+export interface InventorySnapshot {
+  liquorBottleName: string;
+  currentML: number;
 }
