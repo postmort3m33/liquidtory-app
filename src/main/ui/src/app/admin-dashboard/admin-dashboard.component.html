@@ -40,7 +40,7 @@
           <!-- Export Inventory Submissions -->
           <div id="export-wrapper">
             <h2>Inventory Submissions</h2>
-            <form class="form-horizontal mt-3" [formGroup]="inventorySearchForm" (ngSubmit)="exportSubmissionsExcel(inventorySearchForm)">
+            <form class="form-horizontal" [formGroup]="inventorySearchForm" (ngSubmit)="exportSubmissionsExcel(inventorySearchForm)">
               <div class="form-group">
                 <label for="from">From:</label>
                 <input id="from" type="date" class="form-control" formControlName="from">

@@ -59,7 +59,7 @@
   text-align: center;
   padding: 0;
   margin: 0 2px;
-  width: 7vw;
+  width: 33vw;
 }
 
 .nav-tabs .nav-link {
@@ -174,7 +174,16 @@
 }
 
 #export-wrapper .form-group {
-  text-align: left;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 0 33px;
+}
+
+#export-wrapper .form-group input {
+  width: 70%;
 }
 
 #export-wrapper .button-group {
@@ -345,16 +354,4 @@ input:checked+.slider:before {
 /* Styles for small screens */
 @media (max-width: 768px) {
 
-  #main-wrapper .dashboard-info {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    font-size: 1em;
-  }
-
-  .nav-tabs .nav-item {
-    margin: 0 2px;
-    width: 33vw;
-  }
 }
