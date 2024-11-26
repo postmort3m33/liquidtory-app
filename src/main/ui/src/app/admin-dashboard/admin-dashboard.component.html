@@ -1,5 +1,7 @@
 <div id="main-page">
   <div id="main-wrapper">
+
+    <!-- Dashboard Info -->
     <div class="dashboard-info" *ngIf="userInfo">
       <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
       <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
@@ -28,8 +30,30 @@
         </div>
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <button class="btn btn-primary" (click)="createNewLiquorBottle()">New Bottle Type</button>
-          <button class="btn btn-primary" (click)="exportSubmissionsExcel()">Export Submissions</button>
+
+          <!-- Create New Bottle -->
+          <div id="createbottle-wrapper">
+            <h2>New Liquor Bottle</h2>
+            <button class="btn btn-primary" (click)="createNewLiquorBottle()">New Bottle Type</button>
+          </div>
+
+          <!-- Export Inventory Submissions -->
+          <div id="export-wrapper">
+            <h2>Inventory Submissions</h2>
+            <form class="form-horizontal mt-3" [formGroup]="inventorySearchForm" (ngSubmit)="exportSubmissionsExcel(inventorySearchForm)">
+              <div class="form-group">
+                <label for="from">From:</label>
+                <input id="from" type="date" class="form-control" formControlName="from">
+              </div>
+              <div class="form-group">
+                <label for="to">To:</label>
+                <input id="to" type="date" class="form-control" formControlName="to">
+              </div>
+              <div class="button-group">
+                <button type="submit" class="btn btn-primary">Export Submissions</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 

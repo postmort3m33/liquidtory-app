@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode';  // Import the jwt-decode library
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { CreateBottleModalComponent } from '../modals/create-bottle-modal/create-bottle-modal.component';
 import * as XLSX from 'xlsx';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -35,6 +36,9 @@ export class AdminDashboardComponent implements OnInit {
   liquorBottleItems: LiquorBottleItem[] = [];
   isLoading: boolean = false;
   isOutside: boolean = false;
+  inventorySearchForm!: FormGroup;
+  currentFromVal!: string;
+  currentToVal!: string;
 
   // Inventory Stuff
   lastInventorySubmissions!: LastInventorySubmissionResponse[];
@@ -66,6 +70,17 @@ export class AdminDashboardComponent implements OnInit {
         this.router.navigate(['home']);
 
       } else {
+
+        // Subscribe to Date Range Form
+        this.inventorySearchForm = new FormGroup({
+          from: new FormControl(''),
+          to: new FormControl('')
+        });
+        const inventorySearchFormChanges$ = this.inventorySearchForm.valueChanges;
+        inventorySearchFormChanges$.subscribe(x => {
+          this.currentFromVal = x.from;
+          this.currentToVal = x.to;
+        });
 
         // Get USer INfo
         this.getUserInfo();
@@ -376,7 +391,7 @@ export class AdminDashboardComponent implements OnInit {
   // Exports //
   /////////////
 
-  exportSubmissionsExcel() {
+  exportSubmissionsExcel({ value, valid }: { value: InventorySearch, valid: boolean }) {
 
     //////////////////
     // Get the Data //
@@ -388,12 +403,9 @@ export class AdminDashboardComponent implements OnInit {
     };
 
     // Get deliveries..
-    this.httpClient.get<InventorySubmission[]>(this.getAllInventorySubmissionsUrl, options)
+    this.httpClient.get<InventorySubmission[]>(this.getAllInventorySubmissionsUrl + '?from=' + this.currentFromVal + '&to=' + this.currentToVal, options)
       .subscribe(
         (response: InventorySubmission[]) => {
-
-          // Debug
-          console.log(response);
 
           // Define the header row, including a single column for snapshots
           const header = ['ID', 'First Name', 'Last Name', 'Timestamp', 'Bar Name', 'Snapshots'];
@@ -404,54 +416,56 @@ export class AdminDashboardComponent implements OnInit {
           // Create a new workbook
           const workbook: XLSX.WorkBook = XLSX.utils.book_new();
 
-          // Create a worksheet for each barName
-          barNames.forEach((barName, index) => {
-            
-            const barSubmissions = response.filter(submission => submission.barName === barName);
+          if (barNames.length > 0) {
+            // Create a worksheet for each barName
+            barNames.forEach((barName) => {
+              const barSubmissions = response.filter(submission => submission.barName === barName);
 
-            // Map submissions to rows, formatting snapshots into a single string
-            const barData = barSubmissions.map(submission => {
-              // Group the snapshots by liquorBottleName and currentML, and count occurrences
-              const snapshotCount = submission.snapshots?.reduce((acc, snapshot) => {
-                const key = `${snapshot.liquorBottleName}:${snapshot.currentML}ml`;
-                acc[key] = (acc[key] || 0) + 1; // Increment the count for this snapshot
-                return acc;
-              }, {} as Record<string, number>) || {};
+              // Map submissions to rows, formatting snapshots into a single string
+              const barData = barSubmissions.map(submission => {
+                // Group the snapshots by liquorBottleName and currentML, and count occurrences
+                const snapshotCount = submission.snapshots?.reduce((acc, snapshot) => {
+                  const key = `${snapshot.liquorBottleName}:${snapshot.currentML}ml`;
+                  acc[key] = (acc[key] || 0) + 1; // Increment the count for this snapshot
+                  return acc;
+                }, {} as Record<string, number>) || {};
 
-              // Create the snapshot string with counts
-              const snapshotString = Object.entries(snapshotCount)
-                .map(([snapshot, count]) => count > 1 ? `${snapshot} x${count}` : snapshot)
-                .join('; ') || 'No Snapshots';
+                // Create the snapshot string with counts
+                const snapshotString = Object.entries(snapshotCount)
+                  .map(([snapshot, count]) => (count > 1 ? `${snapshot} x${count}` : snapshot))
+                  .join('; ') || 'No Snapshots';
 
-              return [
-                submission.id,
-                submission.firstName,
-                submission.lastName,
-                submission.timestamp,
-                barName,
-                snapshotString,
-              ];
+                return [
+                  submission.id,
+                  submission.firstName,
+                  submission.lastName,
+                  submission.timestamp,
+                  barName,
+                  snapshotString,
+                ];
+              });
+
+              // Combine the header and data
+              const data = [header, ...barData];
+
+              // Create the worksheet
+              const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
+
+              // Append the worksheet to the workbook, sanitizing the sheet name
+              const sanitizeName = (name: string) => name.replace(/[:\/\\?\*\[\]]/g, '').substring(0, 31);
+              XLSX.utils.book_append_sheet(workbook, worksheet, sanitizeName(barName));
+
             });
+          } else {
 
-            // Combine the header and data
-            const data = [header, ...barData];
-
-            // If it's the first worksheet, add a blank row at the top
-            if (index === 0) {
-              data.unshift([]); // Add an empty row before the data
-            }
-
-            // Create the worksheet
+            // If no bar names or submissions exist, create a blank sheet with just the header row
+            const data = [header];
             const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
-
-            // Append the worksheet to the workbook, sanitizing the sheet name
-            const sanitizeName = (name: string) => name.replace(/[:\/\\?\*\[\]]/g, '').substring(0, 31);
-            XLSX.utils.book_append_sheet(workbook, worksheet, sanitizeName(barName));
-          });
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Empty Report');
+          }
 
           // Generate the Excel file
           XLSX.writeFile(workbook, 'InventorySubmissions.xlsx');
-
 
         }
       );
@@ -494,4 +508,9 @@ export interface InventorySubmission {
 export interface InventorySnapshot {
   liquorBottleName: string;
   currentML: number;
+}
+
+export interface InventorySearch {
+  from: string;
+  to: string;
 }

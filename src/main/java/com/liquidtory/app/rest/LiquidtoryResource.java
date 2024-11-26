@@ -7,6 +7,7 @@ import com.liquidtory.app.security.JwtUtil;
 import com.liquidtory.app.security.MyUserDetailsService;
 import com.liquidtory.app.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +17,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -436,15 +440,34 @@ public class LiquidtoryResource {
 
     // Get all Inventory Submissions..
     @RequestMapping(path = "/inventory/submit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InventorySubmissionResponse>> getAllInventorySubmissions(
-            @RequestHeader("Authorization") String currentToken) {
+    public ResponseEntity<List<InventorySubmissionResponse>> getInventorySubmissionsByDate(
+            @RequestHeader("Authorization") String currentToken,
+            @RequestParam(value = "from")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate from,
+            @RequestParam(value = "to")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate to) {
 
         ///////////////////////////////////////////
         // Make sure this is Admin in the future //
         ///////////////////////////////////////////
 
-        // Init All Last Submissions..
+        // Convert LocalDate to LocalDateTime for range comparison
+        LocalDateTime fromDateTime = from.atStartOfDay(); // Start of 'from' day
+        LocalDateTime toDateTime = to.atTime(LocalTime.MAX); // End of 'to' day
+
+        // Fetch all submissions
         List<InventorySubmission> allSubmissions = inventorySubmissionRepository.findAll();
+
+        // Filter submissions within the date range
+        List<InventorySubmission> filteredSubmissions = allSubmissions.stream()
+                .filter(submission -> {
+                    LocalDateTime timestamp = submission.getTimestamp();
+                    return (timestamp.isEqual(fromDateTime) || timestamp.isAfter(fromDateTime)) &&
+                            (timestamp.isEqual(toDateTime) || timestamp.isBefore(toDateTime));
+                })
+                .toList();
 
         /////////////////////////////////
         // Set Inventory Sub Responses //
@@ -453,7 +476,7 @@ public class LiquidtoryResource {
         // make List
         List<InventorySubmissionResponse> inventoryResponses = new ArrayList<>();
 
-        for (InventorySubmission submission: allSubmissions) {
+        for (InventorySubmission submission: filteredSubmissions) {
 
             // Get User
             Optional<UserEntity> userOpt = userRepository.findById(submission.getUserId());

@@ -22,12 +22,6 @@
 
         <div class="button-switch-wrapper">
 
-          <!-- Button -->
-          <div class="button-wrapper">
-            <button class="btn btn-primary" [disabled]="inventorySubmitted"
-              (click)="submitInventory()"><strong>Submit</strong></button>
-          </div>
-
           <!-- Inside/Outside switch -->
           <div class="switch-wrapper">
             <h3><strong>Inside</strong></h3>
@@ -37,9 +31,17 @@
             </label>
             <h3><strong>Outside</strong></h3>
           </div>
+
+          <!-- Button -->
+          <div class="button-wrapper">
+            <button class="btn btn-primary" [disabled]="inventorySubmitted"
+              (click)="submitInventory()"><strong>Submit</strong></button>
+          </div>
+
         </div>
 
-        <h3 *ngIf="lastInventorySubmission">Successfully submitted on <span style="color: red;">{{ lastInventorySubmission.timestamp }}</span></h3>
+        <h3 *ngIf="lastInventorySubmission">Successfully submitted on <span style="color: red;">{{
+            lastInventorySubmission.timestamp }}</span></h3>
 
       </div>
       <br>
