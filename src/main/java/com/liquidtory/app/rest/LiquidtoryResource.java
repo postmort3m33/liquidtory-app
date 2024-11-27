@@ -6,6 +6,7 @@ import com.liquidtory.app.repository.*;
 import com.liquidtory.app.security.JwtUtil;
 import com.liquidtory.app.security.MyUserDetailsService;
 import com.liquidtory.app.services.EmailService;
+import com.liquidtory.app.constants.LiquorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -257,6 +258,42 @@ public class LiquidtoryResource {
             bar = barRepository.findByName("Inside");
         }
 
+        /////////////////////////////////////////////////////////
+        // Calculate How Many Shots used since Last Submission //
+        /////////////////////////////////////////////////////////
+
+        // Vars to use
+        Long lastSubmissionTotalMls = 0L;
+        Long thisSubmissionTotalMls = 0L;
+
+        // Get Last Inventory..
+        if (bar.getLastSubmissionId() != null) {
+
+            Optional<InventorySubmission> lastSubmissionOpt = inventorySubmissionRepository.findById(bar.getLastSubmissionId());
+
+            // If present
+            if (lastSubmissionOpt.isPresent()) {
+
+                // Get it
+                InventorySubmission lastSubmission = lastSubmissionOpt.get();
+
+                // Get the snapshots..
+                List<InventorySnapshot> lastSubmissionSnapshots = lastSubmission.getInventorySnapshots();
+
+                // Loop through them..
+                for (InventorySnapshot snapshot: lastSubmissionSnapshots) {
+
+                    // Add to total Ml Used..
+                    lastSubmissionTotalMls += snapshot.getCurrentML();
+                }
+
+            } else {
+
+                // Bad
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
         //////////////////////
         // Update Inventory //
         //////////////////////
@@ -279,6 +316,9 @@ public class LiquidtoryResource {
                 // Create Real bottle
                 LiquorBottle liquorBottle = liquorBottleOpt.get();
 
+                // Shot Calculation
+                thisSubmissionTotalMls += dto.getCurrentML();
+
                 // Create new one to add.
                 LiquorBottleItem newItem = new LiquorBottleItem(liquorBottle, dto.getCurrentML());
 
@@ -299,9 +339,12 @@ public class LiquidtoryResource {
             bar.addLiquorBottleItem(item);
         }
 
-        ////////////////////////////////
-        // Create Inventory Submisson //
-        ////////////////////////////////
+        /////////////////////////////////
+        // Create Inventory Submission //
+        /////////////////////////////////
+
+        // Calculate shots used..
+        Long totalShotsUsed = Math.round((double)(lastSubmissionTotalMls - thisSubmissionTotalMls) / LiquorConstants.mlPerShot);
 
         // List of Inventory Snapshots
         List<InventorySnapshot> inventorySnapshots = liquorBottleItems.stream()
@@ -315,7 +358,7 @@ public class LiquidtoryResource {
         LocalDateTime currentCentralTime = LocalDateTime.now(usCentralZone);
 
         // Create New Submission
-        InventorySubmission submission = new InventorySubmission(currentCentralTime, userEntity.getId(), bar, inventorySnapshots);
+        InventorySubmission submission = new InventorySubmission(currentCentralTime, userEntity.getId(), bar, totalShotsUsed, inventorySnapshots);
 
         // Save it
         inventorySubmissionRepository.save(submission);
@@ -531,6 +574,7 @@ public class LiquidtoryResource {
                         user.getLastName(),
                         submission.getBar().getName(),
                         formattedDate,
+                        submission.getNumShotsUsed(),
                         snapshotDtos
                 );
 

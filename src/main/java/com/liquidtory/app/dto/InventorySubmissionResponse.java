@@ -12,18 +12,20 @@ public class InventorySubmissionResponse {
     private String lastName;
     private String barName;
     private String timestamp;
+    private Long numShotsUsed;
     private List<InventorySnapshotDto> snapshots;
 
     // Constructors
     public InventorySubmissionResponse() {
     }
 
-    public InventorySubmissionResponse(Long id, String firstName, String lastName, String barName, String timestamp, List<InventorySnapshotDto> snapshots) {
+    public InventorySubmissionResponse(Long id, String firstName, String lastName, String barName, String timestamp, Long numShotsUsed, List<InventorySnapshotDto> snapshots) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.barName = barName;
         this.timestamp = timestamp;
+        this.numShotsUsed = numShotsUsed;
         this.snapshots = snapshots;
     }
 
@@ -59,6 +61,10 @@ public class InventorySubmissionResponse {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+
+    public Long getNumShotsUsed() { return numShotsUsed; }
+
+    public void setNumShotsUsed(Long numShotsUsed) { this.numShotsUsed = numShotsUsed; }
 
     public List<InventorySnapshotDto> getSnapshots() { return snapshots; }
 

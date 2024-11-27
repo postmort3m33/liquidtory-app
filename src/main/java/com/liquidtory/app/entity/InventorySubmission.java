@@ -24,6 +24,9 @@ public class InventorySubmission {
     @JoinColumn(name = "bar_id", nullable = false)
     private BarEntity bar;
 
+    @Column(nullable = false)
+    private Long numShotsUsed;
+
     @ElementCollection
     @CollectionTable(name = "inventory_snapshots", joinColumns = @JoinColumn(name = "inventory_submission_id"))
     private List<InventorySnapshot> inventorySnapshots; // Snapshot data
@@ -32,10 +35,11 @@ public class InventorySubmission {
     public InventorySubmission() {
     }
 
-    public InventorySubmission(LocalDateTime timestamp, Long userId, BarEntity bar, List<InventorySnapshot> inventorySnapshots) {
+    public InventorySubmission(LocalDateTime timestamp, Long userId, BarEntity bar, Long numShotsUsed, List<InventorySnapshot> inventorySnapshots) {
         this.timestamp = timestamp;
         this.userId = userId;
         this.bar = bar;
+        this.numShotsUsed = numShotsUsed;
         this.inventorySnapshots = inventorySnapshots;
     }
 
@@ -67,6 +71,10 @@ public class InventorySubmission {
     public BarEntity getBar() { return bar; }
 
     public void setBar(BarEntity bar) { this.bar = bar; }
+
+    public Long getNumShotsUsed() { return numShotsUsed; }
+
+    public void setNumShotsUsed(Long numShotsUsed) { this.numShotsUsed = numShotsUsed; }
 
     public List<InventorySnapshot> getInventorySnapshots() {
         return inventorySnapshots;

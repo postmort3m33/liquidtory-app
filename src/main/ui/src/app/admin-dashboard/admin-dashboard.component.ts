@@ -408,13 +408,25 @@ export class AdminDashboardComponent implements OnInit {
         (response: InventorySubmission[]) => {
 
           // Define the header row, including a single column for snapshots
-          const header = ['ID', 'First Name', 'Last Name', 'Timestamp', 'Bar Name', 'Snapshots'];
+          const header = ['ID', 'First Name', 'Last Name', 'Timestamp', 'Bar Name', 'Shots Used', 'Snapshots'];
 
           // Get a unique list of bar names
           const barNames = [...new Set(response.map(submission => submission.barName).filter(name => name))];
 
           // Create a new workbook
           const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+
+          // Function to adjust column widths based on content
+          const autoFitColumns = (data: any[][]) => {
+            return data[0].map((_, colIndex) => {
+              const maxLength = data.reduce((max, row) => {
+                const cell = row[colIndex] || '';
+                const cellLength = cell.toString().length;
+                return Math.max(max, cellLength);
+              }, 0);
+              return { width: maxLength + 2 }; // Add some padding
+            });
+          };
 
           if (barNames.length > 0) {
             // Create a worksheet for each barName
@@ -441,6 +453,7 @@ export class AdminDashboardComponent implements OnInit {
                   submission.lastName,
                   submission.timestamp,
                   barName,
+                  submission.numShotsUsed,
                   snapshotString,
                 ];
               });
@@ -450,6 +463,9 @@ export class AdminDashboardComponent implements OnInit {
 
               // Create the worksheet
               const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
+
+              // Auto-fit columns for the worksheet
+              worksheet['!cols'] = autoFitColumns(data);
 
               // Append the worksheet to the workbook, sanitizing the sheet name
               const sanitizeName = (name: string) => name.replace(/[:\/\\?\*\[\]]/g, '').substring(0, 31);
@@ -461,6 +477,8 @@ export class AdminDashboardComponent implements OnInit {
             // If no bar names or submissions exist, create a blank sheet with just the header row
             const data = [header];
             const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
+            // Auto-fit columns for the empty worksheet
+            worksheet['!cols'] = autoFitColumns(data);
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Empty Report');
           }
 
@@ -502,6 +520,7 @@ export interface InventorySubmission {
   lastName: string;
   barName: string;
   timestamp: Date;
+  numShotsUsed: number;
   snapshots: InventorySnapshot[];
 }
 
