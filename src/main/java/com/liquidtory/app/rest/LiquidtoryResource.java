@@ -54,6 +54,10 @@ public class LiquidtoryResource {
     @Autowired
     BarRepository barRepository;
 
+    // Admin Action Repo
+    @Autowired
+    AdminInventoryActionRepository adminInventoryActionRepository;
+
     // Security Stuff
     @Autowired
     AuthenticationManager authManager;
@@ -589,6 +593,114 @@ public class LiquidtoryResource {
 
         // Now return it..
         return new ResponseEntity<>(inventoryResponses, HttpStatus.OK);
+
+    }
+
+    ///////////////////
+    // Admin Actions //
+    ///////////////////
+    // Add Admin Inventory Action
+    @RequestMapping(path = "/inventory/admin", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> submitAdminAction(
+            @RequestHeader("Authorization") String currentToken,
+            @RequestBody AdminActionRequest adminActionRequest) {
+
+        /////////////////////////
+        // Get User From Token //
+        /////////////////////////
+
+        // Extract token..
+        String extractedToken = currentToken.substring(7);
+
+        // Extract username from token
+        String username = jwtUtil.extractUsername(extractedToken);
+
+        // Return null if none is found
+        if (username == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Get User Entity
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        // If not Admin leave..
+        if (!userEntity.getRole().equalsIgnoreCase("ADMIN")) {
+
+            // LEave
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        /////////////
+        // Get Bar //
+        /////////////
+
+        BarEntity bar = barRepository.findByName(adminActionRequest.getBarName());
+
+        /////////////////////////////////
+        // Perform Action on Inventory //
+        /////////////////////////////////
+
+        // Was it successful
+        Boolean success = false;
+
+        // Finds Liquor Bottle
+        Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(adminActionRequest.getLiquorBottleId());
+
+        // If found
+        if (liquorBottleOpt.isPresent()) {
+
+            // Real one
+            LiquorBottle liquorBottle = liquorBottleOpt.get();
+
+            // New Inventory Item
+            LiquorBottleItem liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottle.getCapacityML());
+
+            // If add
+            if (adminActionRequest.getActionType().equalsIgnoreCase("ADD_BOTTLE")) {
+
+                // Add this to the bar..
+                success = bar.addLiquorBottleItem(liquorBottleItem);
+
+            } else if (adminActionRequest.getActionType().equalsIgnoreCase("REMOVE_BOTTLE")) {
+
+                // Add this to the bar..
+                success = bar.removeLiquorBottleItem(liquorBottleItem);
+            }
+
+            // Save it
+            barRepository.save(bar);
+
+        } else {
+
+            // Bad
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        /////////////////////////////
+        // Create New Admin Action //
+        /////////////////////////////
+
+        // Create New Submission with US Central Time Zone
+        ZoneId usCentralZone = ZoneId.of("America/Chicago");
+        LocalDateTime currentCentralTime = LocalDateTime.now(usCentralZone);
+
+        // Save a new Admin Action
+        AdminInventoryAction adminInventoryAction = new AdminInventoryAction(
+                currentCentralTime,
+                adminActionRequest.getActionType(),
+                adminActionRequest.getLiquorBottleId(),
+                userEntity,
+                bar,
+                adminActionRequest.getNotes(),
+                success
+        );
+
+        // Save it
+        adminInventoryActionRepository.save(adminInventoryAction);
+
+        // Good return
+        return new ResponseEntity<>(HttpStatus.OK);
 
     }
 }
