@@ -22,6 +22,7 @@ import { WarningModalComponent } from './modals/warning-modal/warning-modal.comp
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { CreateBottleModalComponent } from './modals/create-bottle-modal/create-bottle-modal.component';
 import { CreatePartialBottleModalComponent } from './modals/create-partial-bottle-modal/create-partial-bottle-modal.component';
+import { AdminInventoryModalComponent } from './modals/admin-inventory-modal/admin-inventory-modal.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { CreatePartialBottleModalComponent } from './modals/create-partial-bottl
     AdminDashboardComponent,
     CreateBottleModalComponent,
     CreatePartialBottleModalComponent,
+    AdminInventoryModalComponent,
   ],
   imports: [
     BrowserModule,

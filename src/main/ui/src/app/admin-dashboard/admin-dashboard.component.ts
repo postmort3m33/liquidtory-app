@@ -7,6 +7,7 @@ import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { CreateBottleModalComponent } from '../modals/create-bottle-modal/create-bottle-modal.component';
 import * as XLSX from 'xlsx';
 import { FormControl, FormGroup } from '@angular/forms';
+import { AdminInventoryModalComponent } from '../modals/admin-inventory-modal/admin-inventory-modal.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -26,7 +27,7 @@ export class AdminDashboardComponent implements OnInit {
   private removeLiquorBottleItemUrl: string = this.baseUrl + '/api/inventory/liquor/remove';
   private getLastInventorySubmissionUrl: string = this.baseUrl + '/api/inventory/submit/last';
   private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
-
+  private submitAdminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
 
   // Vars
   currentToken: string | null = null;
@@ -175,9 +176,9 @@ export class AdminDashboardComponent implements OnInit {
     // Vars
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.height = '60vh';
+    dialogConfig.height = '50vh';
     dialogConfig.width = '80vw';
-    dialogConfig.maxHeight = '60vh';
+    dialogConfig.maxHeight = '50vh';
     dialogConfig.maxWidth = '80vw';
 
     // Open It.
@@ -186,6 +187,63 @@ export class AdminDashboardComponent implements OnInit {
     // return the answer..
     return dialogRef.afterClosed();
 
+  }
+
+  // Open Admin Invenbtory Action Modal
+  openAdminInventoryModal() {
+
+    // Create new Dialog 
+    const dialogConfig = new MatDialogConfig();
+
+    // Vars
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.height = '80vh';
+    dialogConfig.width = '80vw';
+    dialogConfig.maxHeight = '80vh';
+    dialogConfig.maxWidth = '80vw';
+
+    // Data
+    dialogConfig.data = {
+      liquorBottles: this.liquorBottles
+    }
+
+    // Open It.
+    const dialogRef = this.dialog.open(AdminInventoryModalComponent, dialogConfig);
+
+    // return the answer..
+    return dialogRef.afterClosed();
+  }
+
+  ///////////////
+  // Inventory //
+  ///////////////
+
+  submitNewAdminInventoryAction() {
+
+    // Open and subscribe to modal..
+    this.openAdminInventoryModal().subscribe(result => {
+
+      // If we gfot a result..
+      if (result) {
+
+        // Debug
+        //console.log(result);
+
+        // Create JSON Header..
+        const options = {
+          headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+        };
+
+        // Post it
+        this.httpClient.post(this.submitAdminInventoryActionUrl, result, options)
+          .subscribe(
+            (response: any) => {
+
+            }
+          )
+      }
+    });
   }
 
   //////////////////

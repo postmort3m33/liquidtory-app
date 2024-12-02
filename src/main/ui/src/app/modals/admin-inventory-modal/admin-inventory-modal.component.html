@@ -1,0 +1,58 @@
+<div class="dialog-title">
+    <h2>Add/Remove Bottle</h2>
+</div>
+
+<mat-dialog-content class="content" [formGroup]="form">
+
+    <div class="bottle-form">
+
+        <!-- Action Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Action</mat-label>
+            <mat-select formControlName="actionType">
+                <mat-option [value]="'ADD_BOTTLE'">Add Bottle</mat-option>
+                <mat-option [value]="'REMOVE_BOTTLE'">Remove Bottle</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('actionType')?.invalid && form.get('actionType')?.touched">
+            Action Required
+        </div>
+        <br>
+        <!-- Bottle Type -->
+        <mat-form-field class="form-field">
+            <mat-label>Bottle</mat-label>
+            <mat-select formControlName="liquorBottleId">
+                <mat-option *ngFor="let bottle of liquorBottles" [value]="bottle.id">
+                    {{ bottle.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('liquorBottleId')?.invalid && form.get('liquorBottleId')?.touched">
+            Liquor Bottle Required
+        </div>
+        <br>
+        <!-- Bar -->
+        <mat-form-field class="form-field">
+            <mat-label>Bar</mat-label>
+            <mat-select formControlName="barName">
+                <mat-option [value]="'Inside'">Inside</mat-option>
+                <mat-option [value]="'Outside'">Outside</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('barName')?.invalid && form.get('barName')?.touched">
+            Bar Required
+        </div>
+        <br>
+        <!-- Notes -->
+        <mat-form-field class="form-field" appearance="fill">
+            <mat-label>Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="3"></textarea>
+        </mat-form-field>
+    </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="action-buttons">
+    <button mat-raised-button (click)="cancel()">Close</button>
+    <button mat-raised-button color="primary" (click)="save()">Save</button>
+</mat-dialog-actions>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { FormGroup, FormControl } from "@angular/forms";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
 
 @Component({
   selector: 'app-create-bottle-modal',
@@ -14,8 +14,8 @@ export class CreateBottleModalComponent {
 
   // The Form
   form = new FormGroup({
-    name: new FormControl(''),
-    capacityML: new FormControl('')
+    name: new FormControl('', Validators.required),
+    capacityML: new FormControl('', Validators.required)
   });
 
   // On Close
@@ -25,6 +25,17 @@ export class CreateBottleModalComponent {
 
   // On Save
   save() {
-    this.dialogRef.close(this.form.value); // Passes form data back to the calling component
+
+    // If Valid..
+    if (this.form.valid) {
+
+      // Passes form data back to the calling component
+      this.dialogRef.close(this.form.value);
+      
+    } else {
+
+      // Mark all as touched..
+      this.form.markAllAsTouched();
+    }
   }
 }

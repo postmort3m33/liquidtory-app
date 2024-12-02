@@ -56,15 +56,40 @@ public class BarEntity {
     public void setLiquorBottleItems(List<LiquorBottleItem> liquorBottleItems) { this.liquorBottleItems = liquorBottleItems; }
 
     // Helper methods..
-    public void addLiquorBottleItem(LiquorBottleItem item) {
+    public Boolean addLiquorBottleItem(LiquorBottleItem item) {
 
         // Add this LiquorBottle Item to the Array
         liquorBottleItems.add(item);
 
         // set This bar to this bar for this Liquor Bottle item
         item.setBar(this);
+
+        // Return
+        return true;
     }
 
+    // Remove Single Bottle
+    public Boolean removeLiquorBottleItem(LiquorBottleItem liquorBottleItem) {
+
+        // Loop Through
+        for (LiquorBottleItem inventoryItem: liquorBottleItems) {
+
+            // If Id is the same
+            if (inventoryItem.getLiquorBottle().getId().equals(liquorBottleItem.getLiquorBottle().getId()) && inventoryItem.getCurrentML().equals(liquorBottleItem.getCurrentML())) {
+
+                // Remove this instance
+                liquorBottleItems.remove(inventoryItem);
+
+                // Leave loop
+                return true;
+            }
+        }
+
+        // False if not found..
+        return false;
+    }
+
+    // Remove All Items (Clear Inventory)
     public void removeLiquorBottleItems() {
 
         // Remove this Liquor Bottle Item from the Array

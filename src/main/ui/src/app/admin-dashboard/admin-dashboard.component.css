@@ -161,6 +161,7 @@
   text-align: center;
   width: 90%;
   border-top: 4px solid grey;
+  padding-bottom: 20px;
 }
 
 #export-wrapper h2 {
@@ -188,6 +189,18 @@
 
 #export-wrapper .button-group {
   text-align: center;
+}
+
+#admin-action-wrapper {
+  text-align: center;
+  width:90%;
+  border-top: 4px solid grey;
+}
+
+#admin-action-wrapper h2 {
+  padding-top: 20px;
+  font-size: 1.5em;
+  font-weight: 600;
 }
 
 /*******************/

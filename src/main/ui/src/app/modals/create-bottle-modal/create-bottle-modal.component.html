@@ -11,12 +11,19 @@
       <mat-label>Name</mat-label>
       <input matInput formControlName="name">
     </mat-form-field>
+    <div class="error-message" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+      Name Required
+    </div>
     <br>
     <!-- Capacity ML-->
     <mat-form-field class="form-field">
       <mat-label>Capacity (mL)</mat-label>
       <input matInput formControlName="capacityML">
     </mat-form-field>
+    <div class="error-message" *ngIf="form.get('capacityML')?.invalid && form.get('capacityML')?.touched">
+      Capacity Required
+    </div>
+    <br>
   </div>
 
 </mat-dialog-content>
