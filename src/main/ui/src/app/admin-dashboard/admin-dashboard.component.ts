@@ -24,7 +24,6 @@ export class AdminDashboardComponent implements OnInit {
   private userUrl: string = this.baseUrl + '/api/user';
   private liquorBottleUrl: string = this.baseUrl + '/api/liquor';
   private liquorInventoryUrl: string = this.baseUrl + '/api/inventory/liquor';
-  private removeLiquorBottleItemUrl: string = this.baseUrl + '/api/inventory/liquor/remove';
   private getLastInventorySubmissionUrl: string = this.baseUrl + '/api/inventory/submit/last';
   private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
   private submitAdminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
@@ -170,7 +169,7 @@ export class AdminDashboardComponent implements OnInit {
   // Open Create Bottle Modal
   openCreateBottleModal() {
 
-    // Create new Dialog 
+    // Create new Dialog
     const dialogConfig = new MatDialogConfig();
 
     // Vars
@@ -192,7 +191,7 @@ export class AdminDashboardComponent implements OnInit {
   // Open Admin Invenbtory Action Modal
   openAdminInventoryModal() {
 
-    // Create new Dialog 
+    // Create new Dialog
     const dialogConfig = new MatDialogConfig();
 
     // Vars

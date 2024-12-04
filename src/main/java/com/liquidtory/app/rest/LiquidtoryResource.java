@@ -225,6 +225,16 @@ public class LiquidtoryResource {
             @RequestHeader("Authorization") String currentToken,
             @RequestBody InventorySubmissionRequest inventorySubmissionRequest) {
 
+        //////////////////
+        // Current Time //
+        /////////////////
+
+        ZoneId usCentralZone = ZoneId.of("America/Chicago");
+        LocalDateTime currentCentralTime = LocalDateTime.now(usCentralZone);
+
+        // Last Sub Timestamp (Init to Now Time Just Incase)
+        LocalDateTime lastSubmissionTimestamp = currentCentralTime;
+
         /////////////////////////
         // Get User From Token //
         /////////////////////////
@@ -269,8 +279,9 @@ public class LiquidtoryResource {
         // Vars to use
         Long lastSubmissionTotalMls = 0L;
         Long thisSubmissionTotalMls = 0L;
+        Long adminSubmissionsTotalMls = 0L;
 
-        // Get Last Inventory..
+        // 1. Get Last Inventory..
         if (bar.getLastSubmissionId() != null) {
 
             Optional<InventorySubmission> lastSubmissionOpt = inventorySubmissionRepository.findById(bar.getLastSubmissionId());
@@ -280,6 +291,9 @@ public class LiquidtoryResource {
 
                 // Get it
                 InventorySubmission lastSubmission = lastSubmissionOpt.get();
+
+                // Get the timestamp for later use
+                lastSubmissionTimestamp = lastSubmission.getTimestamp();
 
                 // Get the snapshots..
                 List<InventorySnapshot> lastSubmissionSnapshots = lastSubmission.getInventorySnapshots();
@@ -295,6 +309,40 @@ public class LiquidtoryResource {
 
                 // Bad
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // 2. Get Admin Submissions ML's
+        List<AdminInventoryAction> adminActions = adminInventoryActionRepository.findAllByTimestampBetween(lastSubmissionTimestamp, currentCentralTime);
+
+        // Loop through them..
+        for (AdminInventoryAction action: adminActions) {
+
+            // If it was successful
+            if (action.getSuccessful()) {
+
+                // Get the Bottle
+                Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(action.getLiquorBottleId());
+
+                // If found..
+                if (liquorBottleOpt.isPresent()) {
+
+                    // Get real one..
+                    LiquorBottle liquorBottle = liquorBottleOpt.get();
+
+                    // Was it an Add?
+                    if (action.getActionType().equalsIgnoreCase("ADD_BOTTLE")) {
+
+                        // Add to Var
+                        adminSubmissionsTotalMls += liquorBottle.getCapacityML();
+
+                    } else if (action.getActionType().equalsIgnoreCase("REMOVE_BOTTLE")) {
+
+                        // Add to Var
+                        adminSubmissionsTotalMls -= liquorBottle.getCapacityML();
+
+                    }
+                }
             }
         }
 
@@ -343,12 +391,15 @@ public class LiquidtoryResource {
             bar.addLiquorBottleItem(item);
         }
 
+        ///////////////////////////////
+        // Finalize Shot Calculation //
+        ///////////////////////////////
+
+        Long totalShotsUsed = Math.round((double)((lastSubmissionTotalMls - thisSubmissionTotalMls) + adminSubmissionsTotalMls) / LiquorConstants.mlPerShot);
+
         /////////////////////////////////
         // Create Inventory Submission //
         /////////////////////////////////
-
-        // Calculate shots used..
-        Long totalShotsUsed = Math.round((double)(lastSubmissionTotalMls - thisSubmissionTotalMls) / LiquorConstants.mlPerShot);
 
         // List of Inventory Snapshots
         List<InventorySnapshot> inventorySnapshots = liquorBottleItems.stream()
@@ -356,10 +407,6 @@ public class LiquidtoryResource {
                         bottleItem.getLiquorBottle().getId(),
                         bottleItem.getCurrentML()
                 )).toList();
-
-        // Create New Submission with US Central Time Zone
-        ZoneId usCentralZone = ZoneId.of("America/Chicago");
-        LocalDateTime currentCentralTime = LocalDateTime.now(usCentralZone);
 
         // Create New Submission
         InventorySubmission submission = new InventorySubmission(currentCentralTime, userEntity.getId(), bar, totalShotsUsed, inventorySnapshots);
