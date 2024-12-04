@@ -215,7 +215,7 @@ public class LiquidtoryResource {
     }
 
     ///////////////////////////
-    // Invenbtory Submission //
+    // Inventory Submissions //
     ///////////////////////////
 
     // Inventory Submission Snapshot
@@ -551,17 +551,8 @@ public class LiquidtoryResource {
         LocalDateTime fromDateTime = from.atStartOfDay(); // Start of 'from' day
         LocalDateTime toDateTime = to.atTime(LocalTime.MAX); // End of 'to' day
 
-        // Fetch all submissions
-        List<InventorySubmission> allSubmissions = inventorySubmissionRepository.findAll();
-
-        // Filter submissions within the date range
-        List<InventorySubmission> filteredSubmissions = allSubmissions.stream()
-                .filter(submission -> {
-                    LocalDateTime timestamp = submission.getTimestamp();
-                    return (timestamp.isEqual(fromDateTime) || timestamp.isAfter(fromDateTime)) &&
-                            (timestamp.isEqual(toDateTime) || timestamp.isBefore(toDateTime));
-                })
-                .toList();
+        // Get Submissions within Dat Range
+        List<InventorySubmission> allSubmissions = inventorySubmissionRepository.findAllByTimestampBetween(fromDateTime, toDateTime);
 
         /////////////////////////////////
         // Set Inventory Sub Responses //
@@ -570,7 +561,8 @@ public class LiquidtoryResource {
         // make List
         List<InventorySubmissionResponse> inventoryResponses = new ArrayList<>();
 
-        for (InventorySubmission submission: filteredSubmissions) {
+        // Loop to create Responses
+        for (InventorySubmission submission: allSubmissions) {
 
             // Get User
             Optional<UserEntity> userOpt = userRepository.findById(submission.getUserId());
@@ -640,6 +632,75 @@ public class LiquidtoryResource {
 
         // Now return it..
         return new ResponseEntity<>(inventoryResponses, HttpStatus.OK);
+
+    }
+
+    // Get Admin Action Submissions within Date Range..
+    @RequestMapping(path = "/inventory/admin", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AdminActionResponse>> getAdminSubmissionsByDate(
+            @RequestHeader("Authorization") String currentToken,
+            @RequestParam(value = "from")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate from,
+            @RequestParam(value = "to")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate to) {
+
+        ///////////////////////////////////////////
+        // Make sure this is Admin in the future //
+        ///////////////////////////////////////////
+
+        // Convert LocalDate to LocalDateTime for range comparison
+        LocalDateTime fromDateTime = from.atStartOfDay(); // Start of 'from' day
+        LocalDateTime toDateTime = to.atTime(LocalTime.MAX); // End of 'to' day
+
+        // Get Submissions within Dat Range
+        List<AdminInventoryAction> allAdminSubmissions = adminInventoryActionRepository.findAllByTimestampBetween(fromDateTime, toDateTime);
+
+        /////////////////////////////////
+        // Set Inventory Sub Responses //
+        /////////////////////////////////
+
+        // make List
+        List<AdminActionResponse> adminActionResponses = new ArrayList<>();
+
+        // Loop to create Responses
+        for (AdminInventoryAction action: allAdminSubmissions) {
+
+            // If not successful, skip..
+            if (!action.getSuccessful()) { continue; }
+
+            // Get User
+            UserEntity user = action.getPerformedBy();
+
+            ////////////////////////////////
+            // Finish Submission Response //
+            ////////////////////////////////
+
+            // Formatter
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
+
+            // Formatted Date
+            String formattedDate = action.getTimestamp().format(formatter);
+
+            // Make new Response
+            AdminActionResponse adminActionResponse = new AdminActionResponse(
+                    action.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    action.getBar().getName(),
+                    formattedDate,
+                    action.getActionType(),
+                    action.getLiquorBottleId(),
+                    action.getNotes()
+            );
+
+            // Add to List
+            adminActionResponses.add(adminActionResponse);
+        }
+
+        // Now return it..
+        return new ResponseEntity<>(adminActionResponses, HttpStatus.OK);
 
     }
 

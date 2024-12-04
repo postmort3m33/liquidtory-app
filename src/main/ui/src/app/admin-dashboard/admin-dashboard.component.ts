@@ -26,7 +26,7 @@ export class AdminDashboardComponent implements OnInit {
   private liquorInventoryUrl: string = this.baseUrl + '/api/inventory/liquor';
   private getLastInventorySubmissionUrl: string = this.baseUrl + '/api/inventory/submit/last';
   private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
-  private submitAdminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
+  private adminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
 
   // Vars
   currentToken: string | null = null;
@@ -235,7 +235,7 @@ export class AdminDashboardComponent implements OnInit {
         };
 
         // Post it
-        this.httpClient.post(this.submitAdminInventoryActionUrl, result, options)
+        this.httpClient.post(this.adminInventoryActionUrl, result, options)
           .subscribe(
             (response: any) => {
 
@@ -448,102 +448,148 @@ export class AdminDashboardComponent implements OnInit {
   // Exports //
   /////////////
 
+  // Main Submission Export function
   exportSubmissionsExcel({ value, valid }: { value: InventorySearch, valid: boolean }) {
 
-    //////////////////
-    // Get the Data //
-    //////////////////
+    //////////
+    // Vars //
+    //////////
+    let adminActionSubmissions: AdminActionSubmission[] | null = null;
+    let inventorySubmissions: InventorySubmission[] | null = null;
 
     // Create JSON Header..
     const options = {
       headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
     };
 
-    // Get deliveries..
+    // Get Admin Actions
+    this.httpClient.get<AdminActionSubmission[]>(this.adminInventoryActionUrl + '?from=' + this.currentFromVal + '&to=' + this.currentToVal, options)
+      .subscribe(
+        (response: AdminActionSubmission[]) => {
+          adminActionSubmissions = response;
+          // Once both requests are completed, create the Excel
+          this.generateExcel(adminActionSubmissions, inventorySubmissions);
+        }
+      );
+
+    // Get Inventory Submissions
     this.httpClient.get<InventorySubmission[]>(this.getAllInventorySubmissionsUrl + '?from=' + this.currentFromVal + '&to=' + this.currentToVal, options)
       .subscribe(
         (response: InventorySubmission[]) => {
-
-          // Define the header row, including a single column for snapshots
-          const header = ['ID', 'First Name', 'Last Name', 'Timestamp', 'Bar Name', 'Shots Used', 'Snapshots'];
-
-          // Get a unique list of bar names
-          const barNames = [...new Set(response.map(submission => submission.barName).filter(name => name))];
-
-          // Create a new workbook
-          const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-
-          // Function to adjust column widths based on content
-          const autoFitColumns = (data: any[][]) => {
-            return data[0].map((_, colIndex) => {
-              const maxLength = data.reduce((max, row) => {
-                const cell = row[colIndex] || '';
-                const cellLength = cell.toString().length;
-                return Math.max(max, cellLength);
-              }, 0);
-              return { width: maxLength + 2 }; // Add some padding
-            });
-          };
-
-          if (barNames.length > 0) {
-            // Create a worksheet for each barName
-            barNames.forEach((barName) => {
-              const barSubmissions = response.filter(submission => submission.barName === barName);
-
-              // Map submissions to rows, formatting snapshots into a single string
-              const barData = barSubmissions.map(submission => {
-                // Group the snapshots by liquorBottleName and currentML, and count occurrences
-                const snapshotCount = submission.snapshots?.reduce((acc, snapshot) => {
-                  const key = `${snapshot.liquorBottleName}:${snapshot.currentML}ml`;
-                  acc[key] = (acc[key] || 0) + 1; // Increment the count for this snapshot
-                  return acc;
-                }, {} as Record<string, number>) || {};
-
-                // Create the snapshot string with counts
-                const snapshotString = Object.entries(snapshotCount)
-                  .map(([snapshot, count]) => (count > 1 ? `${snapshot} x${count}` : snapshot))
-                  .join('; ') || 'No Snapshots';
-
-                return [
-                  submission.id,
-                  submission.firstName,
-                  submission.lastName,
-                  submission.timestamp,
-                  barName,
-                  submission.numShotsUsed,
-                  snapshotString,
-                ];
-              });
-
-              // Combine the header and data
-              const data = [header, ...barData];
-
-              // Create the worksheet
-              const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
-
-              // Auto-fit columns for the worksheet
-              worksheet['!cols'] = autoFitColumns(data);
-
-              // Append the worksheet to the workbook, sanitizing the sheet name
-              const sanitizeName = (name: string) => name.replace(/[:\/\\?\*\[\]]/g, '').substring(0, 31);
-              XLSX.utils.book_append_sheet(workbook, worksheet, sanitizeName(barName));
-
-            });
-          } else {
-
-            // If no bar names or submissions exist, create a blank sheet with just the header row
-            const data = [header];
-            const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
-            // Auto-fit columns for the empty worksheet
-            worksheet['!cols'] = autoFitColumns(data);
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Empty Report');
-          }
-
-          // Generate the Excel file
-          XLSX.writeFile(workbook, 'InventorySubmissions.xlsx');
-
+          inventorySubmissions = response;
+          // Once both requests are completed, create the Excel
+          this.generateExcel(adminActionSubmissions, inventorySubmissions);
         }
       );
+  }
+
+  // Sub Function to generate the Excel sheet
+  generateExcel(adminActionSubmissions: AdminActionSubmission[] | null, inventorySubmissions: InventorySubmission[] | null) {
+    if (!adminActionSubmissions || !inventorySubmissions) {
+      return; // Exit early if data isn't available yet
+    }
+  
+    //////////////////
+    // Create Excel //
+    //////////////////
+    const header = ['ID', 'First Name', 'Last Name', 'Timestamp', 'Action Type', 'Shots Used', 'Notes', 'Bottle(s)'];
+  
+    // Combine both submission arrays
+    const combinedSubmissions = [
+      ...adminActionSubmissions.map(action => ({
+        ...action,
+        type: 'Admin Action',  // Mark these as Admin Actions
+        numShotsUsed: '',      // Admin actions don't have numShotsUsed
+        snapshots: '',         // Admin actions don't have snapshots
+      })),
+      ...inventorySubmissions.map(inventory => ({
+        ...inventory,
+        type: 'Inventory Submission',  // Mark these as Inventory Submissions
+        actionType: '',               // Inventory submissions don't have actionType
+        liquorBottleId: '',           // Inventory submissions don't have liquorBottleId
+        notes: '',                    // Inventory submissions don't have notes
+      }))
+    ];
+  
+    // Helper function to parse the custom timestamp format
+    const parseTimestamp = (timestamp: string): number => {
+      const [date, time, period] = timestamp.split(' ');
+      const [month, day] = date.split('-').map(Number);
+      const [hours, minutes] = time.split(':').map(Number);
+      const adjustedHours = period === 'PM' && hours !== 12 ? hours + 12 : period === 'AM' && hours === 12 ? 0 : hours;
+      return new Date(new Date().getFullYear(), month - 1, day, adjustedHours, minutes).getTime();
+    };
+  
+    // Sort combined submissions by parsed timestamp
+    combinedSubmissions.sort((a, b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
+  
+    // Group submissions by barName
+    const submissionsByBar = combinedSubmissions.reduce((group, submission) => {
+      group[submission.barName] = group[submission.barName] || [];
+      group[submission.barName].push(submission);
+      return group;
+    }, {} as Record<string, typeof combinedSubmissions>);
+  
+    // Create a new workbook
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  
+    // Iterate over each barName and create a worksheet
+    Object.entries(submissionsByBar).forEach(([barName, submissions]) => {
+      // Map submissions to rows
+      const data = submissions.map(submission => {
+        const isAdminAction = submission.type === 'Admin Action';
+  
+        // Check if snapshots is an array (only for Inventory Submissions)
+        const snapshotString = Array.isArray(submission.snapshots)
+          ? submission.snapshots.reduce((acc, snapshot) => {
+            const key = `${snapshot.liquorBottleName}:${snapshot.currentML}ml`;
+            acc[key] = (acc[key] || 0) + 1; // Increment the count for this combination
+            return acc;
+          }, {} as Record<string, number>) // Group by liquorBottleName and currentML
+          : 'No Snapshots';
+  
+        // Convert the grouped snapshots into a string
+        const snapshotFormattedString = Object.entries(snapshotString)
+          .map(([key, count]) => count > 1 ? `${key} x${count}` : key) // Add count if more than 1
+          .join('; ') || 'No Snapshots'; // Join by semicolon and return 'No Snapshots' if empty
+  
+        // Map the data based on whether it's an Admin Action or Inventory Submission
+        return [
+          submission.id,
+          submission.firstName,
+          submission.lastName,
+          submission.timestamp,
+          isAdminAction ? submission.actionType : '', // Show actionType for Admin Actions
+          isAdminAction ? '' : submission.numShotsUsed, // Show numShotsUsed for Inventory Submissions
+          isAdminAction ? submission.notes : '', // Show notes for Admin Actions
+          isAdminAction ? '' : snapshotFormattedString // Show snapshot info for Inventory Submissions
+        ];
+      });
+  
+      // Create a worksheet with the bar-specific data
+      const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([header, ...data]);
+  
+      // Auto-fit columns for the worksheet
+      worksheet['!cols'] = this.autoFitColumns([header, ...data]);
+  
+      // Append the worksheet to the workbook with the barName as the sheet name
+      XLSX.utils.book_append_sheet(workbook, worksheet, barName);
+    });
+  
+    // Generate the Excel file
+    XLSX.writeFile(workbook, 'InventorySubmissions.xlsx');
+  }  
+
+  // Function to adjust column widths based on content
+  autoFitColumns(data: any[][]) {
+    return data[0].map((_, colIndex) => {
+      const maxLength = data.reduce((max, row) => {
+        const cell = row[colIndex] || '';
+        const cellLength = cell.toString().length;
+        return Math.max(max, cellLength);
+      }, 0);
+      return { width: maxLength + 2 }; // Add some padding
+    });
   }
 }
 
@@ -576,9 +622,20 @@ export interface InventorySubmission {
   firstName: string;
   lastName: string;
   barName: string;
-  timestamp: Date;
+  timestamp: string;
   numShotsUsed: number;
   snapshots: InventorySnapshot[];
+}
+
+export interface AdminActionSubmission {
+  id: number;
+  firstName: string;
+  lastName: string;
+  barName: string;
+  timestamp: string;
+  actionType: string;
+  liquorBottleId: number;
+  notes: string;
 }
 
 export interface InventorySnapshot {

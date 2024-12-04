@@ -1,10 +1,12 @@
 package com.liquidtory.app.repository;
 
+import com.liquidtory.app.entity.AdminInventoryAction;
 import com.liquidtory.app.entity.InventorySubmission;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface InventorySubmissionRepository extends JpaRepository<InventorySubmission, Long> {
+import java.time.LocalDateTime;
+import java.util.List;
 
-    // Find latest Submission based on Timestamp
-    InventorySubmission findTopByOrderByTimestampDesc();
+public interface InventorySubmissionRepository extends JpaRepository<InventorySubmission, Long> {
+    List<InventorySubmission> findAllByTimestampBetween(LocalDateTime startDate, LocalDateTime endDate);
 }
