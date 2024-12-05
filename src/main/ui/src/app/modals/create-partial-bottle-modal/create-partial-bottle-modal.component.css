@@ -14,9 +14,13 @@
 }
 
 .content {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
     width: 100%;
-    height: 100%;
-    max-height: 100%;
 }
 
 .bottle-form {
@@ -26,15 +30,19 @@
 
 .bottle-form h3 {
     font-size: 2em;
-    font-weight: 600
+    font-weight: 600;
 }
+
+/**************/
+/* NGX Slider */
+/**************/
 
 .slider-wrapper {
     padding: 0;
     margin: 0;
     background-color: transparent;
     background-image: url('../../../../public/assets/images/empty-bottle.png');
-    background-size: contain;
+    background-size:contain;
     background-position: top;
     background-repeat: no-repeat;
 }
@@ -43,17 +51,44 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: auto;
-    height: 333px;
+    height: 50vh;
+    margin: 0 auto;
+    padding: 0;
 }
 
-.vertical-slider mat-slider {
-    /* writing-mode: bt-lr; */
-    /* Browser compatibility for vertical sliders */
-    transform: rotate(270deg);
-    /* Rotate to make it vertical */
-    width: 333px;
+.vertical-slider .ngx-slider .ngx-slider-pointer {
+    width: 30vw;
+    height: 25px;
+    background-color: #84451ee0;
 }
+
+.vertical-slider .ngx-slider .ngx-slider-pointer:after {
+    display: none;
+}
+
+.vertical-slider .ngx-slider .ngx-slider-selection {
+    background: #84451ee0;
+}
+
+.vertical-slider .ngx-slider .ngx-slider-bubble.ngx-slider-ceil {
+    color: rgba(255, 255, 255, 0);
+}
+
+.vertical-slider .ngx-slider .ngx-slider-bubble.ngx-slider-floor {
+    color: rgba(255, 255, 255, 0);
+}
+
+.vertical-slider .ngx-slider .ngx-slider-bubble.ngx-slider-model-value {
+    color: white;
+    font-size: 1em;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/*****************/
+/* End of Slider */
+/*****************/
 
 .action-buttons {
     display: flex;

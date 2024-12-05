@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef, Inject, ViewEncapsulation } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Options } from '@angular-slider/ngx-slider';
 
 @Component({
   selector: 'app-create-partial-bottle-modal',
@@ -8,11 +9,11 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   encapsulation: ViewEncapsulation.None
 })
 export class CreatePartialBottleModalComponent {
-  @ViewChild('sliderThumb') sliderThumb!: ElementRef;
 
   // Vars
   bottle: LiquorBottle;
   currentML: number = 0;
+  options!: Options;
 
   // Constructor
   constructor(
@@ -20,10 +21,17 @@ export class CreatePartialBottleModalComponent {
     @Inject(MAT_DIALOG_DATA) public data: any // Inject the data passed to the modal
   ) {
     this.bottle = data.bottle;
-  }
 
-  ngAfterViewInit() {
-    this.sliderThumb.nativeElement.focus();
+    // Initialize options after `bottle` is assigned
+    this.options = {
+      floor: 0,
+      ceil: this.bottle.capacityML,
+      vertical: true,
+      showSelectionBar: true,
+      translate: (value: number): string => {
+        return value + ' mL';
+      }
+    };
   }
 
   // On Close

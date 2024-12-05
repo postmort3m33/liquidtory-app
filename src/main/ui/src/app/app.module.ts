@@ -14,7 +14,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
-import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,6 +22,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { CreateBottleModalComponent } from './modals/create-bottle-modal/create-bottle-modal.component';
 import { CreatePartialBottleModalComponent } from './modals/create-partial-bottle-modal/create-partial-bottle-modal.component';
 import { AdminInventoryModalComponent } from './modals/admin-inventory-modal/admin-inventory-modal.component';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
   declarations: [
@@ -48,7 +48,7 @@ import { AdminInventoryModalComponent } from './modals/admin-inventory-modal/adm
     ReactiveFormsModule,
     BrowserAnimationsModule,
     MatIconModule,
-    MatSliderModule
+    NgxSliderModule
   ],
   providers: [],
   bootstrap: [AppComponent]

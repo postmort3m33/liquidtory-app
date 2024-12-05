@@ -181,9 +181,9 @@ export class DashboardComponent implements OnInit {
     // Vars
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.height = '80vh';
+    dialogConfig.height = '90vh';
     dialogConfig.width = '80vw';
-    dialogConfig.maxHeight = '80vh';
+    dialogConfig.maxHeight = '90vh';
     dialogConfig.maxWidth = '80vw';
 
     // Data

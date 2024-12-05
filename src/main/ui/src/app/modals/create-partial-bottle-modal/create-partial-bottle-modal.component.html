@@ -14,11 +14,10 @@
         <!-- Vertical Slider -->
         <div class="slider-wrapper">
             <div class="vertical-slider">
-                <mat-slider [min]="0" [max]="bottle.capacityML" step="1" tickInterval="10">
-                    <input #sliderThumb matSliderThumb [(ngModel)]="currentML" />
-                </mat-slider>
+                <ngx-slider [(value)]="currentML" [options]="options"></ngx-slider>
             </div>
         </div>
+
     </div>
 
 </mat-dialog-content>
