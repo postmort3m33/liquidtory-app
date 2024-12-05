@@ -36,7 +36,11 @@ form {
     justify-content: center;
     align-items: center;
     margin: 0 auto;
-    width: 70%;
+    width: 85%;
+}
+
+form button {
+    width:50%;
 }
 
 input.form-control {
@@ -51,12 +55,13 @@ button {
 }
 
 .error {
-    color: red;
-    /* Change error message text color */
-    margin-top: 10px;
-    /* Space above error message */
     text-align: center;
-    /* Center the error message */
+}
+
+.error h3 {
+    color: red;
+    font-size: 3vh;
+    text-wrap:nowrap;
 }
 
 .dashboard-link {

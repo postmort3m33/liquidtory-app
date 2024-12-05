@@ -90,9 +90,6 @@ public class LiquidtoryResource {
             );
         } catch (BadCredentialsException e) {
 
-            // Debug
-            System.out.println("Bad Credentials");
-
             // Empty Auth Response
             AuthenticationResponse emptyResponse = new AuthenticationResponse("");
 
