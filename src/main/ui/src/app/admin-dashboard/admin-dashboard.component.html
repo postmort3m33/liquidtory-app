@@ -40,15 +40,30 @@
           <!-- Export Inventory Submissions -->
           <div id="export-wrapper">
             <h2>Inventory Submissions</h2>
-            <form class="form-horizontal" [formGroup]="inventorySearchForm" (ngSubmit)="exportSubmissionsExcel(inventorySearchForm)">
+            <form class="form-horizontal" [formGroup]="inventorySearchForm"
+              (ngSubmit)="exportSubmissionsExcel(inventorySearchForm)">
               <div class="form-group">
                 <label for="from">From:</label>
-                <input id="from" type="date" class="form-control" formControlName="from">
+                <input id="from" type="date" class="form-control" formControlName="from"
+                  [ngClass]="{'is-invalid': inventorySearchForm.get('from')?.invalid && inventorySearchForm.get('from')?.touched}">                
               </div>
+
+              <!-- From error message -->
+              <div *ngIf="inventorySearchForm.get('from')?.invalid && inventorySearchForm.get('from')?.touched" class="error-message">
+                From date is required.
+              </div>
+
               <div class="form-group">
                 <label for="to">To:</label>
-                <input id="to" type="date" class="form-control" formControlName="to">
+                <input id="to" type="date" class="form-control" formControlName="to"
+                  [ngClass]="{'is-invalid': inventorySearchForm.get('to')?.invalid && inventorySearchForm.get('to')?.touched}">
               </div>
+
+              <!-- To error message -->
+              <div *ngIf="inventorySearchForm.get('to')?.invalid && inventorySearchForm.get('to')?.touched" class="error-message">
+                To date is required.
+              </div>
+
               <div class="button-group">
                 <button type="submit" class="btn btn-primary">Export Submissions</button>
               </div>

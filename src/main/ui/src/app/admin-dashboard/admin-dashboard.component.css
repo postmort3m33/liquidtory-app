@@ -183,6 +183,13 @@
   padding: 0 33px;
 }
 
+.error-message {
+  padding-right: 50px;
+  margin-bottom: 15px;
+  text-align: right;
+  color: red;
+}
+
 #export-wrapper .form-group input {
   width: 70%;
 }

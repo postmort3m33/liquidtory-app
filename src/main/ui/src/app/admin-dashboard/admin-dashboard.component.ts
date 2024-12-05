@@ -6,7 +6,7 @@ import { jwtDecode } from 'jwt-decode';  // Import the jwt-decode library
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { CreateBottleModalComponent } from '../modals/create-bottle-modal/create-bottle-modal.component';
 import * as XLSX from 'xlsx';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AdminInventoryModalComponent } from '../modals/admin-inventory-modal/admin-inventory-modal.component';
 
 @Component({
@@ -73,8 +73,8 @@ export class AdminDashboardComponent implements OnInit {
 
         // Subscribe to Date Range Form
         this.inventorySearchForm = new FormGroup({
-          from: new FormControl(''),
-          to: new FormControl('')
+          from: new FormControl('', Validators.required),
+          to: new FormControl('', Validators.required)
         });
         const inventorySearchFormChanges$ = this.inventorySearchForm.valueChanges;
         inventorySearchFormChanges$.subscribe(x => {
@@ -450,6 +450,12 @@ export class AdminDashboardComponent implements OnInit {
 
   // Main Submission Export function
   exportSubmissionsExcel({ value, valid }: { value: InventorySearch, valid: boolean }) {
+
+    // Is the for valid?
+    if (!valid) {
+      this.inventorySearchForm.markAllAsTouched();
+      return;
+    }
 
     //////////
     // Vars //
