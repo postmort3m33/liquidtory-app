@@ -1,0 +1,72 @@
+<div class="dialog-title">
+    <h2>New User</h2>
+</div>
+
+<mat-dialog-content class="content" [formGroup]="form">
+
+    <div class="user-form">
+
+        <!-- First Name Field -->
+        <mat-form-field class="form-field">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('firstName')?.invalid && form.get('firstName')?.touched">
+            First Name Required
+        </div>
+
+        <br>
+
+        <!-- Last Name Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched">
+            Last Name Required
+        </div>
+
+        <br>
+
+        <!-- UserName Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('username')?.invalid && form.get('username')?.touched">
+            Username Required
+        </div>
+
+        <br>
+
+        <!-- Password Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+            Password Required
+        </div>
+
+        <br>
+
+        <!-- Role Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Role</mat-label>
+            <mat-select formControlName="role">
+                <mat-option [value]="'ADMIN'">Admin</mat-option>
+                <mat-option [value]="'USER'">User</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('role')?.invalid && form.get('role')?.touched">
+            Role Required
+        </div>
+
+    </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="action-buttons">
+    <button mat-raised-button (click)="cancel()">Close</button>
+    <button mat-raised-button color="primary" (click)="save()">Save</button>
+</mat-dialog-actions>

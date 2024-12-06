@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -71,9 +72,9 @@ public class LiquidtoryResource {
     @Autowired
     EmailService emailService;
 
-    ////////////
-    // Login  //
-    ////////////
+    ////////////////
+    // Login/User //
+    ////////////////
 
     // Authenticate
     @RequestMapping(path = "/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
@@ -135,6 +136,36 @@ public class LiquidtoryResource {
 
         // Return
         return new ResponseEntity<>(userInfoResponse, HttpStatus.OK);
+    }
+
+    // Create New User
+    @RequestMapping(path = "/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createUser(
+            @RequestHeader("Authorization") String currentToken,
+            @RequestBody UserInfoRequest userInfoRequest) {
+
+        // Create password encoder
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+        // Encrypt password
+        String encodedPassword = encoder.encode(userInfoRequest.getPassword());
+
+        // New User
+        UserEntity newUser = new UserEntity(
+                userInfoRequest.getFirstName(),
+                userInfoRequest.getLastName(),
+                userInfoRequest.getUsername(),
+                encodedPassword,
+                userInfoRequest.getRole()
+        );
+
+        // Save it
+        userRepository.save(newUser);
+
+        // Return OK
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     ////////////////////

@@ -24,12 +24,20 @@
 
       <!-- Actions Group -->
       <div *ngIf="activeTab === 'actions'" class="container" id="actions-group">
+
         <!-- Title -->
         <div class="title">
           <h2>Actions</h2>
         </div>
+
         <!-- Action Buttons -->
         <div class="action-buttons">
+
+          <!-- Create New User -->
+          <div id="createuser-wrapper">
+            <h2>New User</h2>
+            <button class="btn btn-primary" (click)="createNewUser()">New User</button>
+          </div>
 
           <!-- Create New Bottle -->
           <div id="createbottle-wrapper">
@@ -50,7 +58,7 @@
 
               <!-- From error message -->
               <div *ngIf="inventorySearchForm.get('from')?.invalid && inventorySearchForm.get('from')?.touched" class="error-message">
-                From date is required.
+                Date required
               </div>
 
               <div class="form-group">
@@ -61,7 +69,7 @@
 
               <!-- To error message -->
               <div *ngIf="inventorySearchForm.get('to')?.invalid && inventorySearchForm.get('to')?.touched" class="error-message">
-                To date is required.
+                Date required
               </div>
 
               <div class="button-group">
@@ -73,7 +81,7 @@
           <!-- Admin Action -->
           <div id="admin-action-wrapper">
             <h2>Admin Inventory Action</h2>
-            <button class="btn btn-primary" (click)="submitNewAdminInventoryAction()">Create Action</button>
+            <button class="btn btn-primary" (click)="createNewAdminInventoryAction()">Create Action</button>
           </div>
         </div>
       </div>

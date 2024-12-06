@@ -146,9 +146,21 @@
   margin: 20px 0;
 }
 
+#createuser-wrapper {
+  text-align: center;
+  width:90%;
+  padding-bottom: 20px;
+}
+
+#createuser-wrapper h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
 #createbottle-wrapper {
   text-align: center;
   width:90%;
+  border-top: 4px solid grey;
   padding-bottom: 20px;
 }
 
@@ -184,7 +196,7 @@
 }
 
 .error-message {
-  padding-right: 50px;
+  padding-right: 90px;
   margin-bottom: 15px;
   text-align: right;
   color: red;

@@ -8,6 +8,7 @@ import { CreateBottleModalComponent } from '../modals/create-bottle-modal/create
 import * as XLSX from 'xlsx';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AdminInventoryModalComponent } from '../modals/admin-inventory-modal/admin-inventory-modal.component';
+import { CreateUserModalComponent } from '../modals/create-user-modal/create-user-modal.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -160,8 +161,6 @@ export class AdminDashboardComponent implements OnInit {
     this.router.navigate(['/home']);
   }
 
-  // Get Last
-
   ////////////
   // Modals //
   ////////////
@@ -175,9 +174,9 @@ export class AdminDashboardComponent implements OnInit {
     // Vars
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.height = '50vh';
+    dialogConfig.height = '55vh';
     dialogConfig.width = '80vw';
-    dialogConfig.maxHeight = '50vh';
+    dialogConfig.maxHeight = '55vh';
     dialogConfig.maxWidth = '80vw';
 
     // Open It.
@@ -214,11 +213,32 @@ export class AdminDashboardComponent implements OnInit {
     return dialogRef.afterClosed();
   }
 
+  // Open Create User Modal
+  openCreateUserModal() {
+
+    // Create new Dialog
+    const dialogConfig = new MatDialogConfig();
+
+    // Vars
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.height = '80vh';
+    dialogConfig.width = '80vw';
+    dialogConfig.maxHeight = '80vh';
+    dialogConfig.maxWidth = '80vw';
+
+    // Open It.
+    const dialogRef = this.dialog.open(CreateUserModalComponent, dialogConfig);
+
+    // return the answer..
+    return dialogRef.afterClosed();
+  }
+
   ///////////////
   // Inventory //
   ///////////////
 
-  submitNewAdminInventoryAction() {
+  createNewAdminInventoryAction() {
 
     // Open and subscribe to modal..
     this.openAdminInventoryModal().subscribe(result => {
@@ -243,6 +263,38 @@ export class AdminDashboardComponent implements OnInit {
           )
       }
     });
+  }
+
+  //////////
+  // User //
+  //////////
+
+  createNewUser() {
+
+    // Open and subscribe to modal..
+    this.openCreateUserModal().subscribe(result => {
+
+      // If we gfot a result..
+      if (result) {
+
+        // Debug
+        //console.log(result);
+
+        // Create JSON Header..
+        const options = {
+          headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+        };
+
+        // Post it
+        this.httpClient.post(this.userUrl, result, options)
+          .subscribe(
+            (response: any) => {
+
+            }
+          )
+      }
+    });
+
   }
 
   //////////////////
