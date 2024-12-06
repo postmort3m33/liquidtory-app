@@ -165,8 +165,33 @@ export class AdminDashboardComponent implements OnInit {
   // Modals //
   ////////////
 
+  // Utility function to calculate modal width
+  calculateModalWidth(screenWidth: number): number {
+    // Define breakpoints and width range
+    const minScreenWidth = 320; // Minimum screen width (e.g., mobile)
+    const maxScreenWidth = 1920; // Maximum screen width (e.g., desktop)
+    const minWidth = 80; // 80vw for smallest screen
+    const maxWidth = 20; // 50vw for largest screen
+
+    // Ensure screenWidth is clamped between minScreenWidth and maxScreenWidth
+    const clampedScreenWidth = Math.max(minScreenWidth, Math.min(screenWidth, maxScreenWidth));
+
+    // Calculate modal width as a percentage of the viewport width
+    return (
+      minWidth +
+      (maxWidth - minWidth) *
+      ((clampedScreenWidth - minScreenWidth) / (maxScreenWidth - minScreenWidth))
+    );
+  }
+
   // Open Create Bottle Modal
   openCreateBottleModal() {
+
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
 
     // Create new Dialog
     const dialogConfig = new MatDialogConfig();
@@ -175,9 +200,9 @@ export class AdminDashboardComponent implements OnInit {
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.height = '55vh';
-    dialogConfig.width = '80vw';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
     dialogConfig.maxHeight = '55vh';
-    dialogConfig.maxWidth = '80vw';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
 
     // Open It.
     const dialogRef = this.dialog.open(CreateBottleModalComponent, dialogConfig);
@@ -190,6 +215,12 @@ export class AdminDashboardComponent implements OnInit {
   // Open Admin Invenbtory Action Modal
   openAdminInventoryModal() {
 
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
+
     // Create new Dialog
     const dialogConfig = new MatDialogConfig();
 
@@ -197,9 +228,9 @@ export class AdminDashboardComponent implements OnInit {
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.height = '80vh';
-    dialogConfig.width = '80vw';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
     dialogConfig.maxHeight = '80vh';
-    dialogConfig.maxWidth = '80vw';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
 
     // Data
     dialogConfig.data = {
@@ -216,16 +247,22 @@ export class AdminDashboardComponent implements OnInit {
   // Open Create User Modal
   openCreateUserModal() {
 
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
+
     // Create new Dialog
     const dialogConfig = new MatDialogConfig();
 
     // Vars
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.height = '80vh';
-    dialogConfig.width = '80vw';
-    dialogConfig.maxHeight = '80vh';
-    dialogConfig.maxWidth = '80vw';
+    dialogConfig.height = '85vh';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
+    dialogConfig.maxHeight = '85vh';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
 
     // Open It.
     const dialogRef = this.dialog.open(CreateUserModalComponent, dialogConfig);
@@ -546,12 +583,12 @@ export class AdminDashboardComponent implements OnInit {
     if (!adminActionSubmissions || !inventorySubmissions) {
       return; // Exit early if data isn't available yet
     }
-  
+
     //////////////////
     // Create Excel //
     //////////////////
     const header = ['ID', 'First Name', 'Last Name', 'Timestamp', 'Action Type', 'Shots Used', 'Notes', 'Bottle(s)'];
-  
+
     // Combine both submission arrays
     const combinedSubmissions = [
       ...adminActionSubmissions.map(action => ({
@@ -568,7 +605,7 @@ export class AdminDashboardComponent implements OnInit {
         notes: '',                    // Inventory submissions don't have notes
       }))
     ];
-  
+
     // Helper function to parse the custom timestamp format
     const parseTimestamp = (timestamp: string): number => {
       const [date, time, period] = timestamp.split(' ');
@@ -577,26 +614,26 @@ export class AdminDashboardComponent implements OnInit {
       const adjustedHours = period === 'PM' && hours !== 12 ? hours + 12 : period === 'AM' && hours === 12 ? 0 : hours;
       return new Date(new Date().getFullYear(), month - 1, day, adjustedHours, minutes).getTime();
     };
-  
+
     // Sort combined submissions by parsed timestamp
     combinedSubmissions.sort((a, b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
-  
+
     // Group submissions by barName
     const submissionsByBar = combinedSubmissions.reduce((group, submission) => {
       group[submission.barName] = group[submission.barName] || [];
       group[submission.barName].push(submission);
       return group;
     }, {} as Record<string, typeof combinedSubmissions>);
-  
+
     // Create a new workbook
     const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-  
+
     // Iterate over each barName and create a worksheet
     Object.entries(submissionsByBar).forEach(([barName, submissions]) => {
       // Map submissions to rows
       const data = submissions.map(submission => {
         const isAdminAction = submission.type === 'Admin Action';
-  
+
         // Check if snapshots is an array (only for Inventory Submissions)
         const snapshotString = Array.isArray(submission.snapshots)
           ? submission.snapshots.reduce((acc, snapshot) => {
@@ -605,12 +642,12 @@ export class AdminDashboardComponent implements OnInit {
             return acc;
           }, {} as Record<string, number>) // Group by liquorBottleName and currentML
           : 'No Snapshots';
-  
+
         // Convert the grouped snapshots into a string
         const snapshotFormattedString = Object.entries(snapshotString)
           .map(([key, count]) => count > 1 ? `${key} x${count}` : key) // Add count if more than 1
           .join('; ') || 'No Snapshots'; // Join by semicolon and return 'No Snapshots' if empty
-  
+
         // Map the data based on whether it's an Admin Action or Inventory Submission
         return [
           submission.id,
@@ -623,20 +660,20 @@ export class AdminDashboardComponent implements OnInit {
           isAdminAction ? '' : snapshotFormattedString // Show snapshot info for Inventory Submissions
         ];
       });
-  
+
       // Create a worksheet with the bar-specific data
       const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([header, ...data]);
-  
+
       // Auto-fit columns for the worksheet
       worksheet['!cols'] = this.autoFitColumns([header, ...data]);
-  
+
       // Append the worksheet to the workbook with the barName as the sheet name
       XLSX.utils.book_append_sheet(workbook, worksheet, barName);
     });
-  
+
     // Generate the Excel file
     XLSX.writeFile(workbook, 'InventorySubmissions.xlsx');
-  }  
+  }
 
   // Function to adjust column widths based on content
   autoFitColumns(data: any[][]) {

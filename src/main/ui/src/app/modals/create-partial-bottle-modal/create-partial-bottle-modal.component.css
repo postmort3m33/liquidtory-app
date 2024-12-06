@@ -71,8 +71,8 @@
 }
 
 .vertical-slider .ngx-slider .ngx-slider-pointer {
-    width: 30vw;
-    height: 4vh;
+    width: 8vw;
+    height: 3vh;
     background-color: #84451eec;
 }
 
@@ -115,4 +115,9 @@
 
 /* Styles for small screens */
 @media (max-width: 768px) {
+
+    .vertical-slider .ngx-slider .ngx-slider-pointer {
+        width: 30vw;
+        height: 4vh;
+    }
 }

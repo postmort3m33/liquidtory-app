@@ -11,9 +11,10 @@
 #main-wrapper {
   display: block;
   margin: auto;
+  width:30%;
   background-color: white;
-  border: 2px solid grey;
-  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.397);
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
 #main-wrapper .dashboard-info {
@@ -47,10 +48,8 @@
   flex-wrap: nowrap;
   overflow-x: auto;
   margin: 0;
-  border-bottom: 2px solid #747474;
-  /* Bottom border for the tab container */
+  border-bottom: 2px solid #999;
   position: relative;
-  /* Ensure proper stacking context */
   background-color: rgba(230, 230, 230, 0.8);
   z-index: 1;
 }
@@ -59,29 +58,21 @@
   text-align: center;
   padding: 0;
   margin: 0 2px;
-  width: 33vw;
+  width: 7vw;
 }
 
 .nav-tabs .nav-link {
   display: flex;
-  /* Flex layout for centering text */
   align-items: center;
-  /* Center text vertically */
   justify-content: center;
-  /* Center text horizontally */
   color: rgba(0, 0, 0, 0.356);
   font-weight: 500;
   font-size: 1.25em;
-  border: 2px solid grey;
-  /* Border around each tab */
+  border: 2px solid #ccc;
   border-bottom: none;
-  /* Remove bottom border */
   z-index: 2;
-  /* Make sure tabs are above the container border */
   background-color: rgb(243, 243, 243);
-  /* Transparent background */
   border-radius: 5px 5px 0 0;
-  /* Optional rounded top corners */
   min-height: 100%;
 }
 
@@ -91,17 +82,12 @@
 
 .nav-tabs .nav-link.active {
   color: rgba(0, 0, 0, 0.781);
-  /* Text color for active tab */
   font-weight: 500;
-  border: 2px solid grey;
-  /* Border around active tab */
+  border: 2px solid #999;
   background-color: white;
-  border-bottom: 2px solid white;
-  /* White bottom border to cover nav-tabs border */
+  border-bottom: 2px solid #999;
   margin-bottom: -2px;
-  /* Pull active tab down to cover container border */
   z-index: 3;
-  /* Ensure active tab is above other elements */
   box-shadow: 0px -6px 6px rgba(0, 0, 0, 0.041);
 }
 
@@ -121,7 +107,7 @@
 
 #actions-group .title {
   padding: 30px 0px;
-  border-bottom: 2px solid grey;
+  border-bottom: 2px solid #999;
   margin: 0 auto;
   background-color: #f4ebd6;
 }
@@ -160,11 +146,12 @@
 #createbottle-wrapper {
   text-align: center;
   width:90%;
-  border-top: 4px solid grey;
+  border-top: 4px solid #999;
   padding-bottom: 20px;
 }
 
 #createbottle-wrapper h2 {
+  padding-top: 20px;
   font-size: 1.5em;
   font-weight: 600;
 }
@@ -172,7 +159,7 @@
 #export-wrapper {
   text-align: center;
   width: 90%;
-  border-top: 4px solid grey;
+  border-top: 4px solid #999;
   padding-bottom: 20px;
 }
 
@@ -213,7 +200,7 @@
 #admin-action-wrapper {
   text-align: center;
   width:90%;
-  border-top: 4px solid grey;
+  border-top: 4px solid #999;
 }
 
 #admin-action-wrapper h2 {
@@ -233,7 +220,7 @@
 
 #inventory-group .title {
   padding: 30px 0px;
-  border-bottom: 2px solid grey;
+  border-bottom: 2px solid #999;
   margin: 0 auto;
   background-color: #f4ebd6;
 }
@@ -248,7 +235,7 @@
 
 .submit-wrapper {
   padding: 10px 0;
-  border-bottom: 2px solid grey;
+  border-bottom: 2px solid #999;
 }
 
 .submit-wrapper h3 {
@@ -385,5 +372,13 @@ input:checked+.slider:before {
 
 /* Styles for small screens */
 @media (max-width: 768px) {
+
+  #main-wrapper {
+    width:100%;
+  }
+
+  .nav-tabs .nav-item {
+    width: 33vw;
+  }
 
 }

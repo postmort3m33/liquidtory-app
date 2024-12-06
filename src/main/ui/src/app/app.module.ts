@@ -17,7 +17,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
-import { WarningModalComponent } from './modals/warning-modal/warning-modal.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { CreateBottleModalComponent } from './modals/create-bottle-modal/create-bottle-modal.component';
 import { CreatePartialBottleModalComponent } from './modals/create-partial-bottle-modal/create-partial-bottle-modal.component';
@@ -30,7 +29,6 @@ import { CreateUserModalComponent } from './modals/create-user-modal/create-user
     AppComponent,
     DashboardComponent,
     HomeComponent,
-    WarningModalComponent,
     AdminDashboardComponent,
     CreateBottleModalComponent,
     CreatePartialBottleModalComponent,

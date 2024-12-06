@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import config from '../config';
-import { WarningModalComponent } from '../modals/warning-modal/warning-modal.component';
 import { CreatePartialBottleModalComponent } from '../modals/create-partial-bottle-modal/create-partial-bottle-modal.component';
 import { jwtDecode } from 'jwt-decode';  // Import the jwt-decode library
 
@@ -150,30 +149,33 @@ export class DashboardComponent implements OnInit {
   // Modals //
   ////////////
 
-  // Open Add Deliveyr Modal Box
-  openWarningModal(messageParam: string) {
+  // Utility function to calculate modal width
+  calculateModalWidth(screenWidth: number): number {
+    // Define breakpoints and width range
+    const minScreenWidth = 320; // Minimum screen width (e.g., mobile)
+    const maxScreenWidth = 1920; // Maximum screen width (e.g., desktop)
+    const minWidth = 80; // 80vw for smallest screen
+    const maxWidth = 20; // 50vw for largest screen
 
-    // Create new Dialog 
-    const dialogConfig = new MatDialogConfig();
+    // Ensure screenWidth is clamped between minScreenWidth and maxScreenWidth
+    const clampedScreenWidth = Math.max(minScreenWidth, Math.min(screenWidth, maxScreenWidth));
 
-    // Vars
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.height = 'auto';
-    dialogConfig.width = '80vw';
-
-    // Add the warning message as data
-    dialogConfig.data = {
-      message: messageParam
-    };
-
-    // Open It.
-    this.dialog.open(WarningModalComponent, dialogConfig);
-
+    // Calculate modal width as a percentage of the viewport width
+    return (
+      minWidth +
+      (maxWidth - minWidth) *
+      ((clampedScreenWidth - minScreenWidth) / (maxScreenWidth - minScreenWidth))
+    );
   }
 
   // Open Partial Bottle Creator
   openCreatePartialBottleModal(bottleParam: LiquorBottle) {
+
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
 
     // Create new Dialog 
     const dialogConfig = new MatDialogConfig();
@@ -182,9 +184,9 @@ export class DashboardComponent implements OnInit {
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.height = '85vh';
-    dialogConfig.width = '80vw';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
     dialogConfig.maxHeight = '85vh';
-    dialogConfig.maxWidth = '80vw';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
 
     // Data
     dialogConfig.data = {
