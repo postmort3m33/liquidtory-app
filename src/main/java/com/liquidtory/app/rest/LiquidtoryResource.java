@@ -59,6 +59,10 @@ public class LiquidtoryResource {
     @Autowired
     AdminInventoryActionRepository adminInventoryActionRepository;
 
+    // Company Repo
+    @Autowired
+    CompanyEntityRepository companyEntityRepository;
+
     // Security Stuff
     @Autowired
     AuthenticationManager authManager;
@@ -71,6 +75,105 @@ public class LiquidtoryResource {
 
     @Autowired
     EmailService emailService;
+
+    //////////////////////
+    // Company Endpoint //
+    //////////////////////
+
+    // Create New Company
+    @RequestMapping(path = "/company", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createCompany(
+            @RequestHeader("Authorization") String currentToken,
+            @RequestBody CompanyEntityRequest companyEntityRequest) {
+
+        /////////////////////////
+        // Get User From Token //
+        /////////////////////////
+
+        // Extract token..
+        String extractedToken = currentToken.substring(7);
+
+        // Extract username from token
+        String username = jwtUtil.extractUsername(extractedToken);
+
+        // Return null if none is found
+        if (username == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Get User Entity
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        // If not Admin leave..
+        if (!userEntity.getRole().equalsIgnoreCase("ROOT")) {
+
+            // LEave
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        ////////////////////////////
+        // Create the new Company //
+        ////////////////////////////
+
+        // New
+        CompanyEntity newCompany = new CompanyEntity(
+                companyEntityRequest.getName(),
+                companyEntityRequest.getAddress(),
+                companyEntityRequest.getEmail(),
+                companyEntityRequest.getOwnerPhone(),
+                companyEntityRequest.getBusinessPhone()
+        );
+
+        // Save It
+        companyEntityRepository.save(newCompany);
+
+        // Return OK
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    // Get all Companies
+    @RequestMapping(path = "/company", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CompanyEntityResponse>> getAllCompanies(@RequestHeader("Authorization") String currentToken) {
+
+        /////////////////////////
+        // Get User From Token //
+        /////////////////////////
+
+        // Extract token..
+        String extractedToken = currentToken.substring(7);
+
+        // Extract username from token
+        String username = jwtUtil.extractUsername(extractedToken);
+
+        // Return null if none is found
+        if (username == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Get User Entity
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        // If not Admin leave..
+        if (!userEntity.getRole().equalsIgnoreCase("ROOT")) {
+
+            // LEave
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // List of Companies
+        List<CompanyEntity> allCompanies = companyEntityRepository.findAll();
+
+        // List of Responses
+        List<CompanyEntityResponse> companyEntityResponses = allCompanies.stream()
+                .map(company -> new CompanyEntityResponse(
+                        company.getId(),
+                        company.getName()
+                )).toList();
+
+        // Return the List
+        return new ResponseEntity<>(companyEntityResponses, HttpStatus.OK);
+    }
 
     ////////////////
     // Login/User //
@@ -145,6 +248,71 @@ public class LiquidtoryResource {
             @RequestHeader("Authorization") String currentToken,
             @RequestBody UserInfoRequest userInfoRequest) {
 
+        /////////////////////////
+        // Get User From Token //
+        /////////////////////////
+
+        // Extract token..
+        String extractedToken = currentToken.substring(7);
+
+        // Extract username from token
+        String username = jwtUtil.extractUsername(extractedToken);
+
+        // Return null if none is found
+        if (username == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Get User Entity
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        // If not Admin or ROOT leave..
+        if (userEntity.getRole().equalsIgnoreCase("USER")) {
+
+            // LEave
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        ////////////////////////////
+        // Get the Company Entity //
+        ////////////////////////////
+
+        //Var
+        CompanyEntity companyEntity = null;
+
+        // Is there a company Id?
+        if (userInfoRequest.getCompanyId() == null) {
+
+            // This User creation came from a Company admin
+            // Company is gotten from the Users Entity from the token
+            companyEntity = userEntity.getCompany();
+
+        } else {
+
+            // This User creation came from the ROOT account
+            // Get Company from company ID
+
+            Optional<CompanyEntity> companyEntityOpt = companyEntityRepository.findById(userInfoRequest.getCompanyId());
+
+            // If found
+            if (companyEntityOpt.isPresent()) {
+
+                // Get actual
+                companyEntity = companyEntityOpt.get();
+            }
+        }
+
+        // Did we get something?
+        if (companyEntity == null) {
+
+            // Leave
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        /////////////////////////
+        // Create the new User //
+        /////////////////////////
+
         // Create password encoder
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -157,6 +325,7 @@ public class LiquidtoryResource {
                 userInfoRequest.getLastName(),
                 userInfoRequest.getUsername(),
                 encodedPassword,
+                companyEntity,
                 userInfoRequest.getRole()
         );
 
@@ -164,7 +333,7 @@ public class LiquidtoryResource {
         userRepository.save(newUser);
 
         // Return OK
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
 
     }
 
@@ -207,7 +376,7 @@ public class LiquidtoryResource {
         liquorBottleRepository.save(liquorBottle);
 
         // Return it.
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /////////////////////////

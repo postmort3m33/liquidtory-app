@@ -23,6 +23,9 @@ import { CreatePartialBottleModalComponent } from './modals/create-partial-bottl
 import { AdminInventoryModalComponent } from './modals/admin-inventory-modal/admin-inventory-modal.component';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { CreateUserModalComponent } from './modals/create-user-modal/create-user-modal.component';
+import { RootDashboardComponent } from './root-dashboard/root-dashboard.component';
+import { CreateCompanyModalComponent } from './modals/create-company-modal/create-company-modal.component';
+import { CreateUserRootModalComponent } from './modals/create-user-root-modal/create-user-root-modal.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +37,9 @@ import { CreateUserModalComponent } from './modals/create-user-modal/create-user
     CreatePartialBottleModalComponent,
     AdminInventoryModalComponent,
     CreateUserModalComponent,
+    RootDashboardComponent,
+    CreateCompanyModalComponent,
+    CreateUserRootModalComponent,
   ],
   imports: [
     BrowserModule,

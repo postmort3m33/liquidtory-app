@@ -7,17 +7,19 @@ public class UserInfoRequest {
     private String lastName;
     private String username;
     private String password;
+    private Long companyId;
     private String role;
 
     // Constrcutror
     public UserInfoRequest() {
     }
 
-    public UserInfoRequest(String firstName, String lastName, String username, String password, String role) {
+    public UserInfoRequest(String firstName, String lastName, String username, String password, Long companyId, String role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+        this.companyId = companyId;
         this.role = role;
     }
 
@@ -45,6 +47,10 @@ public class UserInfoRequest {
     public String getPassword() { return password; }
 
     public void setPassword(String password) { this.password = password; }
+
+    public Long getCompanyId() { return companyId; }
+
+    public void setCompanyId(Long companyId) { this.companyId = companyId; }
 
     public String getRole() { return role; }
 

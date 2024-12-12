@@ -1,0 +1,70 @@
+<div class="dialog-title">
+    <h2>New Company</h2>
+</div>
+
+<mat-dialog-content class="content" [formGroup]="form">
+
+    <div class="user-form">
+
+        <!-- Name Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+            Name Required
+        </div>
+
+        <br>
+
+        <!-- Address Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="address">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('address')?.invalid && form.get('address')?.touched">
+            Address Required
+        </div>
+
+        <br>
+
+        <!-- Email Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+            Email Required
+        </div>
+
+        <br>
+
+        <!-- Owner Phone Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Owner Phone</mat-label>
+            <input matInput formControlName="ownerPhone">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('ownerPhone')?.invalid && form.get('ownerPhone')?.touched">
+            Owner Phone Required
+        </div>
+
+        <br>
+
+        <!-- Business Phone Field -->
+        <mat-form-field class="form-field">
+            <mat-label>Business Phone</mat-label>
+            <input matInput formControlName="businessPhone">
+        </mat-form-field>
+        <div class="error-message" *ngIf="form.get('businessPhone')?.invalid && form.get('businessPhone')?.touched">
+            Business Phone Required
+        </div>
+
+        <br>
+    </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="action-buttons">
+    <button mat-raised-button (click)="cancel()">Close</button>
+    <button mat-raised-button color="primary" (click)="save()">Save</button>
+</mat-dialog-actions>

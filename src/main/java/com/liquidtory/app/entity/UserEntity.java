@@ -22,6 +22,10 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private CompanyEntity company;
+
     @Column(nullable = false)
     private String role;
 
@@ -29,11 +33,12 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(String firstName, String lastName, String username, String password, String role) {
+    public UserEntity(String firstName, String lastName, String username, String password, CompanyEntity company, String role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+        this.setCompany(company);
         this.role = role;
     }
 
@@ -68,6 +73,19 @@ public class UserEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public CompanyEntity getCompany() { return company; }
+
+    public void setCompany(CompanyEntity company) {
+
+        // set this company
+        this.company = company;
+
+        // add this user to that company
+        if (company != null && !company.getUsers().contains(this)) {
+            company.addUser(this);
+        }
     }
 
     public String getRole() { return role; }

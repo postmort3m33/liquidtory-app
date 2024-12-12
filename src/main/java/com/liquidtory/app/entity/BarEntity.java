@@ -16,6 +16,10 @@ public class BarEntity {
     @Column(nullable = false)
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private CompanyEntity company;
+
     @Column(nullable = true)
     private Long lastSubmissionId;
 
@@ -26,8 +30,9 @@ public class BarEntity {
     public BarEntity() {
     }
 
-    public BarEntity(String name) {
+    public BarEntity(String name, CompanyEntity company) {
         this.name = name;
+        this.setCompany(company);
     }
 
     // gets and Sets
@@ -47,6 +52,19 @@ public class BarEntity {
         this.name = name;
     }
 
+    public CompanyEntity getCompany() { return company; }
+
+    public void setCompany(CompanyEntity company) {
+
+        // Set this company
+        this.company = company;
+
+        // add this bar to that company
+        if (company != null && !company.getBars().contains(this)) {
+            company.addBar(this);
+        }
+    }
+
     public Long getLastSubmissionId() { return lastSubmissionId; }
 
     public void setLastSubmissionId(Long lastSubmissionId) { this.lastSubmissionId = lastSubmissionId; }
@@ -55,7 +73,11 @@ public class BarEntity {
 
     public void setLiquorBottleItems(List<LiquorBottleItem> liquorBottleItems) { this.liquorBottleItems = liquorBottleItems; }
 
-    // Helper methods..
+    //////////////////////
+    // Helper methods.. //
+    //////////////////////
+
+    // Add Liquor Bottle Item
     public Boolean addLiquorBottleItem(LiquorBottleItem item) {
 
         // Add this LiquorBottle Item to the Array

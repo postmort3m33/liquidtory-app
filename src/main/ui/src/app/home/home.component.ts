@@ -63,7 +63,12 @@ export class HomeComponent {
           } else if (userRole == "ADMIN") {
 
             // Go to Admin Dashboard
-            this.router.navigate(['/admin'])
+            this.router.navigate(['/admin']);
+
+          } else if (userRole == "ROOT") {
+
+            // Go to Root Dashboard
+            this.router.navigate(['/root']);
           }
 
         },

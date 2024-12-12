@@ -1,13 +1,7 @@
 package com.liquidtory.app;
 
-import com.liquidtory.app.entity.BarEntity;
-import com.liquidtory.app.entity.InventorySubmission;
-import com.liquidtory.app.entity.LiquorBottle;
-import com.liquidtory.app.entity.UserEntity;
-import com.liquidtory.app.repository.BarRepository;
-import com.liquidtory.app.repository.InventorySubmissionRepository;
-import com.liquidtory.app.repository.LiquorBottleRepository;
-import com.liquidtory.app.repository.UserRepository;
+import com.liquidtory.app.entity.*;
+import com.liquidtory.app.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,6 +31,10 @@ public class H2Bootstrap implements CommandLineRunner {
     @Autowired
     BarRepository barRepository;
 
+    // Company Repo
+    @Autowired
+    CompanyEntityRepository companyEntityRepository;
+
     // Other Vars
     private boolean runBootstrap = false;
 
@@ -46,6 +44,15 @@ public class H2Bootstrap implements CommandLineRunner {
         // Running bootstrap?
         if (runBootstrap) {
 
+            //////////////////////
+            // Add Root Company //
+            //////////////////////
+
+            CompanyEntity rootCompany = new CompanyEntity("Liquidtory", "N/A", "jtouchstone6141@yahoo.com", "409-434-2933", "N/A");
+
+            // Save it
+            companyEntityRepository.save(rootCompany);
+
             ///////////////
             // Add Users //
             ///////////////
@@ -53,44 +60,34 @@ public class H2Bootstrap implements CommandLineRunner {
             // Create Password Encrypter
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-            ///////////////
-            // Add Admin //
-            ///////////////
+            //////////////////////
+            // Add Root Account //
+            //////////////////////
 
             // User 1
-            String encodedPassword1 = encoder.encode("admin");
+            String encodedPassword1 = encoder.encode("M0dels13");
 
             // Create and Add user
-            UserEntity user1 = new UserEntity("Admin", "Account","admin", encodedPassword1, "ADMIN");
+            UserEntity user1 = new UserEntity("Joshua", "Touchstone","admin", encodedPassword1, rootCompany, "ROOT");
 
             // Save to Repo
             userRepository.save(user1);
 
-            ////////////////
-            // Add User 1 //
-            ////////////////
+            ////////////////////////
+            // Add Aspens Company //
+            ////////////////////////
 
-            // User 1
+            CompanyEntity aspensCompany = new CompanyEntity("Aspens Bar & Grill", "817 Clear Lake Rd, Kemah, TX 77565", "N/A", "409-771-7833", "281-549-6384");
+
+            // Save
+            companyEntityRepository.save(aspensCompany);
+
+            // Add Company Admin
             String encodedPassword2 = encoder.encode("password");
+            UserEntity companyAdmin = new UserEntity("Vincent", "Pandanell","vpandanell", encodedPassword2, aspensCompany, "ADMIN");
 
-            // Create and Add user
-            UserEntity user2 = new UserEntity("John", "Smith","jsmith", encodedPassword2, "USER");
-
-            // Save to Repo
-            userRepository.save(user2);
-
-            ////////////////
-            // Add User 2 //
-            ////////////////
-
-            // User 1
-            String encodedPassword3 = encoder.encode("password");
-
-            // Create and Add user
-            UserEntity user3 = new UserEntity("Jane", "Doe","jdoe", encodedPassword2, "USER");
-
-            // Save to Repo
-            userRepository.save(user3);
+            // Save User
+            userRepository.save(companyAdmin);
 
             //////////////////////////////////////
             // Add Pre-defined Liquor Bottles.. //
@@ -144,12 +141,10 @@ public class H2Bootstrap implements CommandLineRunner {
             // Create the Bars //
             /////////////////////
 
-            // Inside
-            BarEntity insideBar = new BarEntity("Inside");
+            // Bars
+            BarEntity insideBar = new BarEntity("Inside", aspensCompany);
+            BarEntity outsideBar = new BarEntity("Outside", aspensCompany);
             barRepository.save(insideBar);
-
-            // Outside
-            BarEntity outsideBar = new BarEntity("Outside");
             barRepository.save(outsideBar);
 
         }
