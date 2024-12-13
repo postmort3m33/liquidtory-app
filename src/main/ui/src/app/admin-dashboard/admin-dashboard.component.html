@@ -3,8 +3,22 @@
 
     <!-- Dashboard Info -->
     <div class="dashboard-info" *ngIf="userInfo">
-      <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
-      <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
+
+      <!-- Compan Info-->
+      <div class="company-info">
+        <h3><strong>Company: </strong>{{ userInfo.company }}</h3>
+      </div>
+
+      <!-- User Info -->
+      <div class="user-info">
+        <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
+      </div>
+
+      <!-- Sign Out Button -->
+      <div class="button-wrapper">
+        <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
+      </div>
+
     </div>
 
     <!-- Navigation Tabs -->
@@ -43,6 +57,12 @@
           <div id="createbottle-wrapper">
             <h2>New Liquor Bottle</h2>
             <button class="btn btn-primary" (click)="createNewLiquorBottle()">New Bottle Type</button>
+          </div>
+
+          <!-- New Bar -->
+          <div id="createbar-wrapper">
+            <h2>New Bar</h2>
+            <button class="btn btn-primary" (click)="createNewBar()">New Bar</button>
           </div>
 
           <!-- Export Inventory Submissions -->
@@ -97,22 +117,27 @@
         <!-- Info Wrapper -->
         <div class="submit-wrapper">
 
-          <!-- Inside/Outside switch -->
+          <!-- Bar Selection -->
           <div class="switch-wrapper">
-            <h3><strong>Inside</strong></h3>
-            <label class="switch">
-              <input type="checkbox" [(ngModel)]="isOutside" (change)="onBarChange()">
-              <span class="slider round"></span>
-            </label>
-            <h3><strong>Outside</strong></h3>
+
+            <select [(ngModel)]="selectedBar" class="form-control">
+              <!-- Placeholder Option -->
+              <option [ngValue]="null" disabled selected>Select a bar...</option>
+              
+              <!-- Dynamic Options -->
+              <option *ngFor="let bar of bars" [ngValue]="bar">
+                {{ bar.name }}
+              </option>
+            </select>            
           </div>
 
-          <h3 *ngIf="selectedInventorySubmission">
+          <h3 *ngIf="selectedBar?.lastSubmission">
             Last Updated by
-            <span style="color: red;">{{ selectedInventorySubmission.firstName }}</span>
+            <span style="color: red;">{{ selectedBar?.lastSubmission?.firstName }}</span>
             on
-            <span style="color: red;">{{ selectedInventorySubmission.timestamp }}</span>
+            <span style="color: red;">{{ selectedBar?.lastSubmission?.timestamp }}</span>
           </h3>
+
         </div>
 
         <!-- Table Wrapper -->

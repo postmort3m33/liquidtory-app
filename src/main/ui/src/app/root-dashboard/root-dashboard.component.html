@@ -2,10 +2,24 @@
     <div id="main-wrapper">
   
       <!-- Dashboard Info -->
-      <div class="dashboard-info" *ngIf="userInfo">
+    <div class="dashboard-info" *ngIf="userInfo">
+
+      <!-- Compan Info-->
+      <div class="company-info">
+        <h3><strong>Company: </strong>{{ userInfo.company }}</h3>
+      </div>
+
+      <!-- User Info -->
+      <div class="user-info">
         <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
+      </div>
+
+      <!-- Sign Out Button -->
+      <div class="button-wrapper">
         <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
       </div>
+
+    </div>
   
       <!-- Navigation Tabs -->
       <ul class="nav nav-tabs">

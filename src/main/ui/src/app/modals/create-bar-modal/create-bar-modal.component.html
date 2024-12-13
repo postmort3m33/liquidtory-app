@@ -1,0 +1,26 @@
+<div class="dialog-title">
+    <h2>New Bar</h2>
+  </div>
+  
+  <mat-dialog-content class="content" [formGroup]="form">
+  
+    <div class="bottle-form">
+  
+      <!-- Name Field -->
+      <mat-form-field class="form-field">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <div class="error-message" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+        Name Required
+      </div>
+      <br>
+      
+    </div>
+  
+  </mat-dialog-content>
+  
+  <mat-dialog-actions class="action-buttons">
+    <button mat-raised-button (click)="cancel()">Close</button>
+    <button mat-raised-button color="primary" (click)="save()">Save</button>
+  </mat-dialog-actions>

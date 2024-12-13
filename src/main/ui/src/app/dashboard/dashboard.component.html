@@ -3,8 +3,22 @@
 
     <!-- Dashboard Info -->
     <div class="dashboard-info" *ngIf="userInfo">
-      <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
-      <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
+
+      <!-- Compan Info-->
+      <div class="company-info">
+        <h3><strong>Company: </strong>{{ userInfo.company }}</h3>
+      </div>
+
+      <!-- User Info -->
+      <div class="user-info">
+        <h3><strong>Name: </strong>{{ userInfo.firstName }} {{ userInfo.lastName }}</h3>
+      </div>
+
+      <!-- Sign Out Button -->
+      <div class="button-wrapper">
+        <button class="btn btn-danger" (click)="signOut()">Sign Out</button>
+      </div>
+
     </div>
 
     <!-- Inventory Group -->
@@ -15,8 +29,6 @@
         <h2>Inventory</h2>
       </div>
 
-      <br>
-
       <!-- Save -->
       <div class="submit-wrapper">
 
@@ -24,12 +36,19 @@
 
           <!-- Inside/Outside switch -->
           <div class="switch-wrapper">
-            <h3><strong>Inside</strong></h3>
-            <label class="switch">
-              <input type="checkbox" [(ngModel)]="isOutside">
-              <span class="slider round"></span>
-            </label>
-            <h3><strong>Outside</strong></h3>
+
+            <select [(ngModel)]="selectedBar" class="form-control"
+              [ngClass]="{'error-message': showError && !selectedBar}">
+
+              <!-- Placeholder Option -->
+              <option [ngValue]="null" disabled selected>Select a bar...</option>
+
+              <!-- Dynamic Options -->
+              <option *ngFor="let bar of bars" [ngValue]="bar">
+                {{ bar.name }}
+              </option>
+            </select>
+
           </div>
 
           <!-- Button -->
@@ -40,11 +59,16 @@
 
         </div>
 
+        <!-- Error Message -->
+        <div *ngIf="showError" class="error-message">
+          <h3>Please select a bar before submitting.</h3>
+        </div>
+
+        <!-- Submission info -->
         <h3 *ngIf="lastInventorySubmission">Successfully submitted on <span style="color: red;">{{
             lastInventorySubmission.timestamp }}</span></h3>
 
       </div>
-      <br>
 
       <!-- Table Wrapper -->
       <table class="table" id="inventory-table">

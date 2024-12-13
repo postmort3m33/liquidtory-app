@@ -137,16 +137,6 @@ public class H2Bootstrap implements CommandLineRunner {
             // Save to Repo
             liquorBottleRepository.saveAll(liquorBottles);
 
-            /////////////////////
-            // Create the Bars //
-            /////////////////////
-
-            // Bars
-            BarEntity insideBar = new BarEntity("Inside", aspensCompany);
-            BarEntity outsideBar = new BarEntity("Outside", aspensCompany);
-            barRepository.save(insideBar);
-            barRepository.save(outsideBar);
-
         }
     }
 }

@@ -9,6 +9,7 @@ import * as XLSX from 'xlsx';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AdminInventoryModalComponent } from '../modals/admin-inventory-modal/admin-inventory-modal.component';
 import { CreateUserModalComponent } from '../modals/create-user-modal/create-user-modal.component';
+import { CreateBarModalComponent } from '../modals/create-bar-modal/create-bar-modal.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -24,8 +25,7 @@ export class AdminDashboardComponent implements OnInit {
   private baseUrl: string = config.baseUrl;
   private userUrl: string = this.baseUrl + '/api/user';
   private liquorBottleUrl: string = this.baseUrl + '/api/liquor';
-  private liquorInventoryUrl: string = this.baseUrl + '/api/inventory/liquor';
-  private getLastInventorySubmissionUrl: string = this.baseUrl + '/api/inventory/submit/last';
+  private barUrl: string = this.baseUrl + '/api/bar';
   private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
   private adminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
 
@@ -34,21 +34,15 @@ export class AdminDashboardComponent implements OnInit {
   activeTab: string = 'actions';
   userInfo!: UserInfo;
   liquorBottles: LiquorBottle[] = [];
-  liquorBottleItems: LiquorBottleItem[] = [];
-  isLoading: boolean = false;
-  isOutside: boolean = false;
+  bars: Bar[] = [];
+  selectedBar: Bar | null = null;
   inventorySearchForm!: FormGroup;
   currentFromVal!: string;
   currentToVal!: string;
 
-  // Inventory Stuff
-  lastInventorySubmissions!: LastInventorySubmissionResponse[];
-  selectedInventorySubmission: LastInventorySubmissionResponse | null = null;
-
   // Table Stuff
   sortColumn: string | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
-  selectedBarId: number = 1;
 
   // Init
   ngOnInit() {
@@ -62,7 +56,7 @@ export class AdminDashboardComponent implements OnInit {
       // Get Role
       const decodedToken: any = jwtDecode(this.currentToken); // Decode the JWT token
       const userRole = decodedToken.role
-      console.log('Token Role: ', userRole);
+      //console.log('Token Role: ', userRole);
 
       // Check Role..
       if (userRole != 'ADMIN') {
@@ -89,11 +83,9 @@ export class AdminDashboardComponent implements OnInit {
         // Get Bottles
         this.getLiquorBottles();
 
-        // Get Inventory
-        this.getLiquorBottleItems();
+        // Get Bars
+        this.getBars();
 
-        // Get Last Submission
-        this.getLastInventorySubmissions();
       }
 
     } else {
@@ -119,14 +111,12 @@ export class AdminDashboardComponent implements OnInit {
           // Save User Info
           this.userInfo = response;
 
-          // Debug
-          //console.log(this.userInfo);
         }
       );
   }
 
-  // Get Last Submission
-  getLastInventorySubmissions() {
+  // Get Bottles
+  getLiquorBottles() {
 
     // Create JSON Header..
     const options = {
@@ -134,18 +124,38 @@ export class AdminDashboardComponent implements OnInit {
     };
 
     // Get deliveries..
-    this.httpClient.get<LastInventorySubmissionResponse[]>(this.getLastInventorySubmissionUrl, options)
+    this.httpClient.get<LiquorBottle[]>(this.liquorBottleUrl, options)
       .subscribe(
-        (response: LastInventorySubmissionResponse[]) => {
+        (response: LiquorBottle[]) => {
 
           // Save User Info
-          this.lastInventorySubmissions = response;
+          this.liquorBottles = response;
 
-          // Debug
-          //console.log('Last Submissions: ', this.lastInventorySubmissions);
         }
       );
+  }
 
+  // Get Bars
+  getBars() {
+
+    // Create JSON Header..
+    const options = {
+      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+    };
+
+    // Get deliveries..
+    this.httpClient.get<Bar[]>(this.barUrl, options)
+      .subscribe({
+        next: (response) => {
+
+          // Save User Info
+          this.bars = response;
+
+        },
+        error: (error) => {
+
+        }
+      });
   }
 
   // Sign out function
@@ -227,9 +237,9 @@ export class AdminDashboardComponent implements OnInit {
     // Vars
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.height = '80vh';
+    dialogConfig.height = '85vh';
     dialogConfig.width = `${modalWidthPercentage}vw`;
-    dialogConfig.maxHeight = '80vh';
+    dialogConfig.maxHeight = '85vh';
     dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
 
     // Data
@@ -271,10 +281,38 @@ export class AdminDashboardComponent implements OnInit {
     return dialogRef.afterClosed();
   }
 
-  ///////////////
-  // Inventory //
-  ///////////////
+  // Open Create Bar Modal
+  openCreateBarModal() {
 
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
+
+    // Create new Dialog
+    const dialogConfig = new MatDialogConfig();
+
+    // Vars
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.height = '45vh';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
+    dialogConfig.maxHeight = '45vh';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
+
+    // Open It.
+    const dialogRef = this.dialog.open(CreateBarModalComponent, dialogConfig);
+
+    // return the answer..
+    return dialogRef.afterClosed();
+  }
+
+  ///////////////////////
+  // Actions Functions //
+  ///////////////////////
+
+  // New Admin Inventory Action
   createNewAdminInventoryAction() {
 
     // Open and subscribe to modal..
@@ -282,9 +320,6 @@ export class AdminDashboardComponent implements OnInit {
 
       // If we gfot a result..
       if (result) {
-
-        // Debug
-        //console.log(result);
 
         // Create JSON Header..
         const options = {
@@ -302,10 +337,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  //////////
-  // User //
-  //////////
-
+  // Create New User
   createNewUser() {
 
     // Open and subscribe to modal..
@@ -313,9 +345,6 @@ export class AdminDashboardComponent implements OnInit {
 
       // If we gfot a result..
       if (result) {
-
-        // Debug
-        //console.log(result);
 
         // Create JSON Header..
         const options = {
@@ -333,10 +362,6 @@ export class AdminDashboardComponent implements OnInit {
     });
 
   }
-
-  //////////////////
-  // Bottle Stuff //
-  //////////////////
 
   // Create new Bottle
   createNewLiquorBottle() {
@@ -364,48 +389,29 @@ export class AdminDashboardComponent implements OnInit {
 
   }
 
-  // Get Bottles
-  getLiquorBottles() {
+  // Create new Bar
+  createNewBar() {
 
-    // Create JSON Header..
-    const options = {
-      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
-    };
+    // Open and subscribe to modal..
+    this.openCreateBarModal().subscribe(result => {
 
-    // Get deliveries..
-    this.httpClient.get<LiquorBottle[]>(this.liquorBottleUrl, options)
-      .subscribe(
-        (response: LiquorBottle[]) => {
+      // If we gfot a result..
+      if (result) {
 
-          // Save User Info
-          this.liquorBottles = response;
+        // Create JSON Header..
+        const options = {
+          headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+        };
 
-          // Debug
-          //console.log('Liquor Bottles: ', this.liquorBottles);
-        }
-      );
-  }
+        // Post it
+        this.httpClient.post(this.barUrl, result, options)
+          .subscribe(
+            (response: any) => {
 
-  // Get Liquor Inventory
-  getLiquorBottleItems() {
-
-    // Create JSON Header..
-    const options = {
-      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
-    };
-
-    // Get deliveries..
-    this.httpClient.get<LiquorBottleItem[]>(this.liquorInventoryUrl, options)
-      .subscribe(
-        (response: LiquorBottleItem[]) => {
-
-          // Save User Info
-          this.liquorBottleItems = response;
-
-          // Debug
-          //console.log('Liquor Bottles Items: ', this.liquorBottleItems);
-        }
-      );
+            }
+          )
+      }
+    });
   }
 
   /////////////////
@@ -421,14 +427,8 @@ export class AdminDashboardComponent implements OnInit {
       // Get Bottles again
       this.getLiquorBottles();
 
-      // Get INventory Again
-      this.getLiquorBottleItems();
-
-      // Get Last Submissions again.
-      this.getLastInventorySubmissions();
-
-      // run on barChage
-      this.onBarChange();
+      // Get Bars
+      this.getBars();
 
       // Reset Sorting..
       this.sortColumn = null;
@@ -437,51 +437,6 @@ export class AdminDashboardComponent implements OnInit {
 
     // Set the tab
     this.activeTab = tab;
-  }
-
-  // when changing Bar Inventories
-  onBarChange() {
-
-    // Change selected Bar..
-    if (this.isOutside) {
-
-      // Set Inventory Submission
-      const foundSubmission = this.lastInventorySubmissions.find(submission => submission.barId === 2);
-
-      if (foundSubmission) {
-
-        //Set it
-        this.selectedInventorySubmission = foundSubmission;
-
-      } else {
-
-        // Set Null
-        this.selectedInventorySubmission = null;
-      }
-
-      // Set Selected Bar Id
-      this.selectedBarId = 2;
-
-    } else {
-
-      // Set Inventory Submission
-      const foundSubmission = this.lastInventorySubmissions.find(submission => submission.barId === 1);
-
-      if (foundSubmission) {
-
-        //Set it
-        this.selectedInventorySubmission = foundSubmission;
-
-      } else {
-
-        // Set null
-        this.selectedInventorySubmission = null;
-      }
-
-      // Set Selected
-      this.selectedBarId = 1;
-
-    }
   }
 
   // Sort Deliveries By
@@ -516,21 +471,39 @@ export class AdminDashboardComponent implements OnInit {
   // Method to count how many bottles are available for a given LiquorBottle type
   getFullBottleCount(bottle: LiquorBottle): number {
 
-    // Filter liquorBottleItems to get only those that match the liquorBottleId
-    const matchingItems = this.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML === bottle.capacityML && item.barId === this.selectedBarId);
+    // If any items exist..
+    if (this.selectedBar?.liquorBottleItems) {
 
-    // Return the length
-    return matchingItems.length;
+      // Filter liquorBottleItems to get only those that match the liquorBottleId
+      const matchingItems = this.selectedBar.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML === bottle.capacityML);
+
+      // Return the length
+      return matchingItems.length;
+
+    } else {
+
+      // Return nothing
+      return 0;
+    }
   }
 
   // Get Partial Bottle Count
   getPartialBottleCount(bottle: LiquorBottle): number {
 
-    // Filter liquorBottleItems to get only those that match the liquorBottleId
-    const matchingItems = this.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML !== bottle.capacityML && item.barId === this.selectedBarId);
+    // If any items exist..
+    if (this.selectedBar?.liquorBottleItems) {
 
-    // Return the length
-    return matchingItems.length;
+      // Filter liquorBottleItems to get only those that match the liquorBottleId
+      const matchingItems = this.selectedBar.liquorBottleItems.filter(item => item.liquorBottleId === bottle.id && item.currentML !== bottle.capacityML);
+
+      // Return the length
+      return matchingItems.length;
+      
+    } else {
+
+      // Return nothing
+      return 0;
+    }
   }
 
   /////////////
@@ -691,6 +664,7 @@ export class AdminDashboardComponent implements OnInit {
 export interface UserInfo {
   firstName: string;
   lastName: string;
+  company: string;
 }
 
 export interface LiquorBottle {
@@ -703,6 +677,13 @@ export interface LiquorBottleItem {
   liquorBottleId: number;
   currentML: number;
   barId: number;
+}
+
+export interface Bar {
+  id: number;
+  name: string;
+  lastSubmission: LastInventorySubmissionResponse;
+  liquorBottleItems: LiquorBottleItem[];
 }
 
 export interface LastInventorySubmissionResponse {

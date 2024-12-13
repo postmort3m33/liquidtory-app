@@ -5,14 +5,16 @@ public class UserInfoResponse {
     // Name
     private String firstName;
     private String lastName;
+    private String company;
 
     // Constrcutror
     public UserInfoResponse() {
     }
 
-    public UserInfoResponse(String firstName, String lastName) {
+    public UserInfoResponse(String firstName, String lastName, String company) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.company = company;
     }
 
     // /Getters and Setters
@@ -32,4 +34,7 @@ public class UserInfoResponse {
         this.lastName = lastName;
     }
 
+    public String getCompany() { return company; }
+
+    public void setCompany(String company) { this.company = company; }
 }

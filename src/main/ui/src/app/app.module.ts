@@ -26,6 +26,7 @@ import { CreateUserModalComponent } from './modals/create-user-modal/create-user
 import { RootDashboardComponent } from './root-dashboard/root-dashboard.component';
 import { CreateCompanyModalComponent } from './modals/create-company-modal/create-company-modal.component';
 import { CreateUserRootModalComponent } from './modals/create-user-root-modal/create-user-root-modal.component';
+import { CreateBarModalComponent } from './modals/create-bar-modal/create-bar-modal.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { CreateUserRootModalComponent } from './modals/create-user-root-modal/cr
     RootDashboardComponent,
     CreateCompanyModalComponent,
     CreateUserRootModalComponent,
+    CreateBarModalComponent,
   ],
   imports: [
     BrowserModule,

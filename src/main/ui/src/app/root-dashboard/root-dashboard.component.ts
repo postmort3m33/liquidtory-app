@@ -268,6 +268,7 @@ export class RootDashboardComponent {
 export interface UserInfo {
   firstName: string;
   lastName: string;
+  company: string;
 }
 
 export interface Company {

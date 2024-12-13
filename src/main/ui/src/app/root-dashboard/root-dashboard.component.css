@@ -19,8 +19,8 @@
   
   #main-wrapper .dashboard-info {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
     padding: 30px 0;
     background-color: rgba(230, 230, 230, 0.8);
@@ -28,10 +28,31 @@
   
   #main-wrapper .dashboard-info h3 {
     font-size: 1.1em;
-    margin: auto 0;
+    line-height: 1.5;
   }
   
-  #main-wrapper .dashboard-info button {
+  #main-wrapper .dashboard-info .company-info {
+    text-align: left;
+    width: 100%;
+    padding:5px;
+    padding-left: 30px;
+  }
+  
+  #main-wrapper .dashboard-info .user-info {
+    text-align: left;
+    width: 100%;
+    padding: 5px;
+    padding-left: 30px;
+  }
+  
+  #main-wrapper .dashboard-info .button-wrapper {
+    width:100%;
+    text-align:right;
+    padding:5px;
+    padding-right: 30px;
+  }
+  
+  #main-wrapper .dashboard-info .button-wrapper button {
     font-weight: 600;
     padding:3px 8px;
   }

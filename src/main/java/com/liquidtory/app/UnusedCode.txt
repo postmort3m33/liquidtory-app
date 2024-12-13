@@ -90,3 +90,159 @@
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+
+        *************************************************************************
+        *************************************************************************
+
+        // Get Last Submission
+            @RequestMapping(path = "/inventory/submit/last", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+            public ResponseEntity<List<LastInventorySubmissionResponse>> getLastInventorySubmission(
+                    @RequestHeader("Authorization") String currentToken) {
+
+                /////////////////////////
+                // Get User From Token //
+                /////////////////////////
+
+                // Extract token..
+                String extractedToken = currentToken.substring(7);
+
+                // Extract username from token
+                String username = jwtUtil.extractUsername(extractedToken);
+
+                // Return null if none is found
+                if (username == null) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+
+                // Get User Entity
+                UserEntity userEntity = userRepository.findByUsername(username);
+
+                // If not Admin or ROOT leave..
+                if (userEntity.getRole().equalsIgnoreCase("USER")) {
+
+                    // LEave
+                    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                }
+
+                /////////////////////////////
+                // Get all Bars by Company //
+                /////////////////////////////
+
+                // Get Company
+                CompanyEntity thisCompany = userEntity.getCompany();
+
+                // Get all the Bars..
+                List<BarEntity> allBars = thisCompany.getBars();
+
+                // Init All Last Submissions..
+                List<InventorySubmission> allLastSubmissions = new ArrayList<>();
+
+                // Leave if Empty..
+                if (allBars.isEmpty()) { return new ResponseEntity<>(HttpStatus.BAD_REQUEST); }
+
+                // Loop through Bars..
+                for (BarEntity bar: allBars) {
+
+                    // Get last Submission Id
+                    Long lastSubmissionId = bar.getLastSubmissionId();
+
+                    // Skip if lastSubmissionId is null
+                    if (lastSubmissionId == null) {
+                        continue;
+                    }
+
+                    // Find submission
+                    Optional<InventorySubmission> inventorySubmissionOpt = inventorySubmissionRepository.findById(lastSubmissionId);
+
+                    // If found..
+                    if (inventorySubmissionOpt.isPresent()) {
+
+                        // Get Real one..
+                        InventorySubmission inventorySubmission = inventorySubmissionOpt.get();
+
+                        // Add to List.
+                        allLastSubmissions.add(inventorySubmission);
+
+                    } else {
+
+                        // Bad
+                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                    }
+                }
+
+                /////////////////////////////////
+                // Set Inventory Sub Responses //
+                /////////////////////////////////
+
+                // make List
+                List<LastInventorySubmissionResponse> inventoryResponses = new ArrayList<>();
+
+                for (InventorySubmission submission: allLastSubmissions) {
+
+                    // Get User
+                    Optional<UserEntity> userOpt = userRepository.findById(submission.getUserId());
+
+                    // If present
+                    if (userOpt.isPresent()) {
+
+                        // Get User
+                        UserEntity user = userOpt.get();
+
+                        // Formatter
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
+
+                        // Formated Date
+                        String formattedDate = submission.getTimestamp().format(formatter);
+
+                        // Make new Response
+                        LastInventorySubmissionResponse inventoryResponse = new LastInventorySubmissionResponse(user.getFirstName(), user.getLastName(), submission.getBar().getId(), formattedDate);
+
+                        // Add to List
+                        inventoryResponses.add(inventoryResponse);
+
+                    } else {
+
+                        continue;
+                    }
+                }
+
+                // Now return it..
+                return new ResponseEntity<>(inventoryResponses, HttpStatus.OK);
+
+            }
+
+             *************************************************************************
+                    *************************************************************************
+
+
+             /////////////////////////
+                // Liquor Bottle Items //
+                /////////////////////////
+
+                // Get all Liquor Bottles Items
+                @RequestMapping(path = "/inventory/liquor", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+                public ResponseEntity<List<LiquorBottleItemDto>> getAllLiquorBottleItems(@RequestHeader("Authorization") String currentToken) {
+
+                    ///////////////////////////////////////////
+                    // Make Sure this is Admin in the future //
+                    ///////////////////////////////////////////
+
+                    // Get all Bottles
+                    List<LiquorBottleItem> liquorBottleItems = liquorBottleItemRepository.findAll();
+
+                    // Check if the list is null or empty, return an empty list if so
+                    if (liquorBottleItems.isEmpty()) {
+                        return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+                    }
+
+                    // Stream to Dtos
+                    List<LiquorBottleItemDto> liquorBottleItemResponses = liquorBottleItems.stream()
+                            .map(item -> new LiquorBottleItemDto(
+                                    item.getLiquorBottle().getId(),
+                                    item.getCurrentML(),
+                                    item.getBar().getId()
+                            )).toList();
+
+                    // Return them
+                    return new ResponseEntity<>(liquorBottleItemResponses, HttpStatus.OK);
+                }

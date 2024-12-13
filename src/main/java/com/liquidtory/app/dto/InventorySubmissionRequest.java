@@ -6,15 +6,15 @@ public class InventorySubmissionRequest {
 
     // Vars
     private List<LiquorBottleItemDto> liquorBottleItemsToSubmit;
-    private boolean isOutside;
+    private Long barId;
 
     // Constructor
     public InventorySubmissionRequest() {
     }
 
-    public InventorySubmissionRequest(List<LiquorBottleItemDto> liquorBottleItemsToSubmit, boolean isOutside) {
+    public InventorySubmissionRequest(List<LiquorBottleItemDto> liquorBottleItemsToSubmit, Long barId) {
         this.liquorBottleItemsToSubmit = liquorBottleItemsToSubmit;
-        this.isOutside = isOutside;
+        this.barId = barId;
     }
 
     // Gets and Sets
@@ -26,11 +26,11 @@ public class InventorySubmissionRequest {
         this.liquorBottleItemsToSubmit = liquorBottleItemsToSubmit;
     }
 
-    public boolean getIsOutside() {
-        return isOutside;
+    public Long getBarId() {
+        return barId;
     }
 
-    public void setIsOutside(boolean outside) {
-        isOutside = outside;
+    public void setBarId(Long barId) {
+        this.barId = barId;
     }
 }

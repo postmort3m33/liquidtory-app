@@ -37,9 +37,11 @@
 
 .bottle-form h3 {
     padding: 0;
+    padding-bottom: 5px;
     margin: 0;
     font-size: 3vh;
     font-weight: 500;
+    line-height: 1.25;
 }
 
 .bottle-form p {

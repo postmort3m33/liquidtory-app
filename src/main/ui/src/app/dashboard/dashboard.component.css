@@ -19,8 +19,8 @@
 
 #main-wrapper .dashboard-info {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   padding: 30px 0;
   background-color: rgba(230, 230, 230, 0.8);
@@ -28,10 +28,31 @@
 
 #main-wrapper .dashboard-info h3 {
   font-size: 1.1em;
-  margin: auto 0;
+  line-height: 1.5;
 }
 
-#main-wrapper .dashboard-info button {
+#main-wrapper .dashboard-info .company-info {
+  text-align: left;
+  width: 100%;
+  padding:5px;
+  padding-left: 30px;
+}
+
+#main-wrapper .dashboard-info .user-info {
+  text-align: left;
+  width: 100%;
+  padding: 5px;
+  padding-left: 30px;
+}
+
+#main-wrapper .dashboard-info .button-wrapper {
+  width:100%;
+  text-align:right;
+  padding:5px;
+  padding-right: 30px;
+}
+
+#main-wrapper .dashboard-info .button-wrapper button {
   font-weight: 600;
   padding:3px 8px;
 }
@@ -64,14 +85,18 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  padding: 10px 0;
+  border-bottom: 2px solid #999;
 }
 
 .submit-wrapper h3 {
   font-size: 1em;
   font-weight: 550;
   text-align: center;
+  line-height: 1.5;
   margin: 0;
-  padding: 0;
+  padding: 10px;
+  padding-bottom: 0px;
 }
 
 .submit-wrapper .button-switch-wrapper {
@@ -80,6 +105,7 @@
   justify-content: space-evenly;
   align-items: center;
   flex-wrap: nowrap;
+  padding: 5px;
 }
 
 .submit-wrapper .switch-wrapper {
@@ -93,77 +119,6 @@
 .submit-wrapper .switch-wrapper h3 {
   padding: 0px 10px;
 }
-
-/*****************/
-/* Toggle Switch */
-/*****************/
-
-/* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked+.slider {
-  background-color: #2196F3;
-}
-
-input:focus+.slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked+.slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-/************************/
-/* End of Toggle Switch */
-/************************/
 
 #inventory-table {
   table-layout: fixed;
@@ -249,6 +204,12 @@ input:checked+.slider:before {
   color: white;
   /* Match the button's text color */
 }
+
+.error-message {
+  color: red;
+  font-size: 1em;
+}
+
 
 /* Styles for small screens */
 @media (max-width: 768px) {

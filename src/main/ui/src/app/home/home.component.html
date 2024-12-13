@@ -1,18 +1,28 @@
 <div id="main-page">
     <div id="main-wrapper">
+
+        <!-- Login Group -->
         <div class="logingroup" *ngIf="!token">
+
+            <!-- Image -->
             <img src="assets/images/liquidtory-logo.png">
-            <form class="d-flex">
-                <input class="form-control me-2" type="text" placeholder="Username" aria-label="Username"
-                    name="username" [(ngModel)]="username" required />
-                <input class="form-control me-2" type="password" placeholder="Password" aria-label="Password"
-                    name="password" [(ngModel)]="password" required />
-                <button class="btn btn-outline-success" (click)="onLoginSubmit()" type="button">Login</button>
-                <!-- Display Error Message if bad Login-->
-                <div class="error" *ngIf="errorMessage">
-                    <h3>Bad Credentials!</h3>
-                </div>
+
+            <!-- Form -->
+            <form [formGroup]="loginForm" class="d-flex" (ngSubmit)="onLoginSubmit()">
+                <input formControlName="username" class="form-control me-2" type="text" placeholder="Username"
+                    aria-label="Username" [ngClass]="{ 'username-error': loginForm.get('username')?.hasError('required') && loginForm.get('username')?.touched }" />
+
+                <input formControlName="password" class="form-control me-2" type="password" placeholder="Password"
+                    aria-label="Password" [ngClass]="{ 'password-error': loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched }" />
+
+                <button class="btn btn-outline-success" type="submit">Login</button>
             </form>
+
+            <!-- Display Error Message if bad Login-->
+            <div class="error-message" *ngIf="errorMessage">
+                <h3>{{ errorMessage }}</h3>
+            </div>
+
             <div class="version-wrapper">
                 <p>v1.0</p>
             </div>

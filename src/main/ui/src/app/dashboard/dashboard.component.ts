@@ -23,6 +23,7 @@ export class DashboardComponent implements OnInit {
   private userUrl: string = this.baseUrl + '/api/user';
   private liquorBottleUrl: string = this.baseUrl + '/api/liquor';
   private submitInventoryUrl: string = this.baseUrl + '/api/inventory/submit';
+  private barUrl: string = this.baseUrl + '/api/bar';
 
   // Vars
   currentToken: string | null = null;
@@ -33,7 +34,9 @@ export class DashboardComponent implements OnInit {
   liquorBottleItemsToSubmit: LiquorBottleItem[] = [];
   inventorySubmitted: boolean = false;
   lastInventorySubmission!: InventorySubmissionResponse;
-  isOutside: boolean = false;
+  bars: Bar[] = [];
+  selectedBar: Bar | null = null;
+  showError: boolean = false;
 
   // Table Stuff
   activeTab: string = 'inventory';
@@ -52,7 +55,7 @@ export class DashboardComponent implements OnInit {
       // Get Role
       const decodedToken: any = jwtDecode(this.currentToken); // Decode the JWT token
       const userRole = decodedToken.role
-      console.log('Token Role: ', userRole);
+      //console.log('Token Role: ', userRole);
 
       // Check Role..
       if (userRole != 'USER') {
@@ -67,7 +70,9 @@ export class DashboardComponent implements OnInit {
 
         // Get Bottles
         this.getLiquorBottles();
-        
+
+        // Get Bar Names
+        this.getBars();
       }
 
     } else {
@@ -93,48 +98,80 @@ export class DashboardComponent implements OnInit {
           // Save User Info
           this.userInfo = response;
 
-          // Debug
-          //console.log(this.userInfo);
         }
       );
   }
 
-  // Submit this Inventory w Timestamp
-  submitInventory() {
+  // Get Bars
+  getBars() {
 
     // Create JSON Header..
     const options = {
       headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
     };
 
-    // Create Response
-    const submission: InventorySubmissionRequest = {
-      liquorBottleItemsToSubmit: this.liquorBottleItemsToSubmit,
-      isOutside: this.isOutside
-    }
+    // Get deliveries..
+    this.httpClient.get<Bar[]>(this.barUrl, options)
+      .subscribe({
+        next: (response) => {
 
-    // Post it
-    this.httpClient.post<InventorySubmissionResponse>(this.submitInventoryUrl, submission, options)
-      .subscribe(
-        (response: InventorySubmissionResponse) => {
+          // Save User Info
+          this.bars = response;
 
-          // Set Response to Inventory Submission
-          this.lastInventorySubmission = response;
-
-          // Was submitted
-          this.inventorySubmitted = true;
-
-          // Debug
-          //console.log(this.lastInventorySubmission);
+        },
+        error: (error) => {
 
         }
-      );
+      });
+  }
 
+  // Submit this Inventory w Timestamp
+  submitInventory() {
+
+    // Only if a bar is chosen for inventory
+    if (!this.selectedBar) {
+
+      // Show error.
+      this.showError = true;
+
+    } else {
+
+      // Reset show error
+      this.showError = false
+
+      // Create JSON Header..
+      const options = {
+        headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+      };
+
+      // Define Bar Id
+      let barId: number = this.selectedBar?.id ?? 0;
+
+      // Create Response
+      const submission: InventorySubmissionRequest = {
+        liquorBottleItemsToSubmit: this.liquorBottleItemsToSubmit,
+        barId: barId
+      }
+
+      // Post it
+      this.httpClient.post<InventorySubmissionResponse>(this.submitInventoryUrl, submission, options)
+        .subscribe(
+          (response: InventorySubmissionResponse) => {
+
+            // Set Response to Inventory Submission
+            this.lastInventorySubmission = response;
+
+            // Was submitted
+            this.inventorySubmitted = true;
+
+          }
+        );
+    }
   }
 
   // Sign out function
   signOut() {
-    
+
     // Clear the JWT token from sessionStorage
     sessionStorage.removeItem('jwtToken');
 
@@ -220,8 +257,6 @@ export class DashboardComponent implements OnInit {
           // Save User Info
           this.liquorBottles = response;
 
-          // Debug
-          //console.log('Liquor Bottles: ', this.liquorBottles);
         }
       );
   }
@@ -315,9 +350,6 @@ export class DashboardComponent implements OnInit {
       // If we gfot a result..
       if (result) {
 
-        // Debug
-        //console.log('Partial Bottle Result: ', result);
-
         // Create JSON Header..
         const options = {
           headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
@@ -356,6 +388,7 @@ export class DashboardComponent implements OnInit {
 export interface UserInfo {
   firstName: String;
   lastName: String;
+  company: String;
 }
 
 export interface LiquorBottle {
@@ -369,6 +402,20 @@ export interface LiquorBottleItem {
   currentML: number;
 }
 
+export interface Bar {
+  id: number;
+  name: string;
+  lastSubmission: LastInventorySubmissionResponse;
+  liquorBottleItems: LiquorBottleItem[];
+}
+
+export interface LastInventorySubmissionResponse {
+  firstName: string;
+  lastName: string;
+  barId: number;
+  timestamp: Date;
+}
+
 export interface InventorySubmissionResponse {
   firstName: string;
   lastName: string;
@@ -378,5 +425,5 @@ export interface InventorySubmissionResponse {
 
 export interface InventorySubmissionRequest {
   liquorBottleItemsToSubmit: LiquorBottleItem[];
-  isOutside: boolean;
+  barId: number;
 }

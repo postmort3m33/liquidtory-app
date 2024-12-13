@@ -43,12 +43,20 @@ form {
 }
 
 form button {
-    width:50%;
+    width: 50%;
 }
 
 input.form-control {
     margin-bottom: 10px;
     /* Add space between inputs */
+}
+
+input.username-error {
+    border-color: red;
+}
+
+input.password-error {
+    border-color: red;
 }
 
 button {
@@ -57,14 +65,14 @@ button {
     margin: 10px;
 }
 
-.error {
+.error-message {
     text-align: center;
 }
 
-.error h3 {
+.error-message h3 {
     color: red;
     font-size: 2.5vh;
-    text-wrap:nowrap;
+    line-height: 1.5;
 }
 
 .dashboard-link {
