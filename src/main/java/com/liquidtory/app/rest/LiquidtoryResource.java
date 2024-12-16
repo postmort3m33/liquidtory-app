@@ -917,9 +917,6 @@ public class LiquidtoryResource {
             // If not successful, skip..
             if (!action.getSuccessful()) { continue; }
 
-            // Get User
-            UserEntity user = action.getPerformedBy();
-
             ////////////////////////////////
             // Finish Submission Response //
             ////////////////////////////////
@@ -930,20 +927,38 @@ public class LiquidtoryResource {
             // Formatted Date
             String formattedDate = action.getTimestamp().format(formatter);
 
-            // Make new Response
-            AdminActionResponse adminActionResponse = new AdminActionResponse(
-                    action.getId(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    action.getBar().getName(),
-                    formattedDate,
-                    action.getActionType(),
-                    action.getLiquorBottleId(),
-                    action.getNotes()
-            );
+            // Get the Liquor Bottle
+            Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(action.getLiquorBottleId());
 
-            // Add to List
-            adminActionResponses.add(adminActionResponse);
+            // If found
+            if (liquorBottleOpt.isPresent()) {
+
+                // Get Real One..
+                LiquorBottle liquorBottle = liquorBottleOpt.get();
+
+                // Make Description String
+                String bottleDesc = liquorBottle.getName() + " " + liquorBottle.getCapacityML().toString() + "mL";
+
+                // Make new Response
+                AdminActionResponse adminActionResponse = new AdminActionResponse(
+                        action.getId(),
+                        action.getFirstName(),
+                        action.getLastName(),
+                        action.getBar().getName(),
+                        formattedDate,
+                        action.getActionType(),
+                        bottleDesc,
+                        action.getNotes()
+                );
+
+                // Add to List
+                adminActionResponses.add(adminActionResponse);
+
+            } else {
+
+                // Bad Request
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }
 
         // Now return it..
@@ -1061,7 +1076,8 @@ public class LiquidtoryResource {
                 currentCentralTime,
                 adminActionRequest.getActionType(),
                 adminActionRequest.getLiquorBottleId(),
-                userEntity,
+                userEntity.getFirstName(),
+                userEntity.getLastName(),
                 bar,
                 adminActionRequest.getNotes(),
                 success

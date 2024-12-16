@@ -9,25 +9,25 @@ public class AdminActionResponse {
     private String barName;
     private String timestamp;
     private String actionType;
-    private Long liquorBottleId;
+    private String bottleDesc;
     private String notes;
 
     //Constructor
     public AdminActionResponse() {
     }
 
-    public AdminActionResponse(Long id, String firstName, String lastName, String barName, String timestamp, String actionType, Long liquorBottleId, String notes) {
+    public AdminActionResponse(Long id, String firstName, String lastName, String barName, String timestamp, String actionType, String bottleDesc, String notes) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.barName = barName;
         this.timestamp = timestamp;
         this.actionType = actionType;
+        this.bottleDesc = bottleDesc;
         this.notes = notes;
     }
 
     // Gets and Sets
-
 
     public Long getId() { return id; }
 
@@ -53,9 +53,9 @@ public class AdminActionResponse {
         this.actionType = actionType;
     }
 
-    public Long getLiquorBottleId() { return liquorBottleId; }
+    public String getBottleDesc() { return bottleDesc; }
 
-    public void setLiquorBottleId(Long liquorBottleId) { this.liquorBottleId = liquorBottleId; }
+    public void setBottleDesc(String bottleDesc) { this.bottleDesc = bottleDesc; }
 
     public String getBarName() { return barName; }
 

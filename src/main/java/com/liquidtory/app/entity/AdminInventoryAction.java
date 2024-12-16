@@ -21,9 +21,11 @@ public class AdminInventoryAction {
     @Column(nullable = false)
     private Long liquorBottleId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity performedBy; // Admin user who performed the action
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
 
     @ManyToOne
     @JoinColumn(name = "bar_id", nullable = false)
@@ -39,11 +41,12 @@ public class AdminInventoryAction {
     public AdminInventoryAction() {
     }
 
-    public AdminInventoryAction(LocalDateTime timestamp, String actionType, Long liquorBottleId, UserEntity performedBy, BarEntity bar, String notes, Boolean successful) {
+    public AdminInventoryAction(LocalDateTime timestamp, String actionType, Long liquorBottleId, String firstName, String lastName, BarEntity bar, String notes, Boolean successful) {
         this.timestamp = timestamp;
         this.actionType = actionType;
         this.liquorBottleId = liquorBottleId;
-        this.performedBy = performedBy;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.bar = bar;
         this.notes = notes;
         this.successful = successful;
@@ -82,13 +85,13 @@ public class AdminInventoryAction {
         this.liquorBottleId = liquorBottleId;
     }
 
-    public UserEntity getPerformedBy() {
-        return performedBy;
-    }
+    public String getFirstName() { return firstName; }
 
-    public void setPerformedBy(UserEntity performedBy) {
-        this.performedBy = performedBy;
-    }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+
+    public void setLastName(String lastName) { this.lastName = lastName;    }
 
     public BarEntity getBar() {
         return bar;

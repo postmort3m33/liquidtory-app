@@ -578,7 +578,7 @@ export class AdminDashboardComponent implements OnInit {
         ...inventory,
         type: 'Inventory Submission',  // Mark these as Inventory Submissions
         actionType: '',               // Inventory submissions don't have actionType
-        liquorBottleId: '',           // Inventory submissions don't have liquorBottleId
+        bottleDesc: '',           // Inventory submissions don't have liquorBottleId
         notes: '',                    // Inventory submissions don't have notes
       }))
     ];
@@ -634,7 +634,7 @@ export class AdminDashboardComponent implements OnInit {
           isAdminAction ? submission.actionType : '', // Show actionType for Admin Actions
           isAdminAction ? '' : submission.numShotsUsed, // Show numShotsUsed for Inventory Submissions
           isAdminAction ? submission.notes : '', // Show notes for Admin Actions
-          isAdminAction ? '' : snapshotFormattedString // Show snapshot info for Inventory Submissions
+          isAdminAction ? submission.bottleDesc : snapshotFormattedString // Show snapshot info for Inventory Submissions
         ];
       });
 
@@ -714,7 +714,7 @@ export interface AdminActionSubmission {
   barName: string;
   timestamp: string;
   actionType: string;
-  liquorBottleId: number;
+  bottleDesc: string;
   notes: string;
 }
 
