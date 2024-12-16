@@ -277,7 +277,6 @@ public class LiquidtoryResource {
 
             // Vars
             InventorySubmission lastSubmission = null;
-            UserEntity lastSubmissionUser = null;
             LastInventorySubmissionResponse lastSubmissionResponse = null;
             List<LiquorBottleItemDto> liquorBottleItemResponses = new ArrayList<>();
 
@@ -299,21 +298,10 @@ public class LiquidtoryResource {
 
                     // Real one
                     lastSubmission = lastSubmissionOpt.get();
-
-                    // Get User
-                    Optional<UserEntity> submissionUserOpt = userRepository.findById(lastSubmission.getUserId());
-
-                    // If found
-                    if (submissionUserOpt.isPresent()) {
-
-                        // Real one
-                        lastSubmissionUser = submissionUserOpt.get();
-
-                    }
                 }
 
-                // Ifboth were found
-                if (!(lastSubmission == null) && !(lastSubmissionUser == null)) {
+                // If a submission was found..
+                if (!(lastSubmission == null)) {
 
                     // Formatter
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
@@ -323,8 +311,8 @@ public class LiquidtoryResource {
 
                     // Convert to Response
                     lastSubmissionResponse = new LastInventorySubmissionResponse(
-                            lastSubmissionUser.getFirstName(),
-                            lastSubmissionUser.getLastName(),
+                            lastSubmission.getFirstName(),
+                            lastSubmission.getLastName(),
                             bar.getId(),
                             formattedDate
                     );
@@ -769,7 +757,7 @@ public class LiquidtoryResource {
                 )).toList();
 
         // Create New Submission
-        InventorySubmission submission = new InventorySubmission(currentCentralTime, userEntity.getId(), bar, totalShotsUsed, inventorySnapshots);
+        InventorySubmission submission = new InventorySubmission(currentCentralTime, userEntity.getFirstName(), userEntity.getLastName(), bar, totalShotsUsed, inventorySnapshots);
 
         // Save it
         inventorySubmissionRepository.save(submission);
@@ -836,72 +824,57 @@ public class LiquidtoryResource {
         // Loop to create Responses
         for (InventorySubmission submission: allSubmissions) {
 
-            // Get User
-            Optional<UserEntity> userOpt = userRepository.findById(submission.getUserId());
+            //////////////////////
+            // Stream Snapshots //
+            //////////////////////
 
-            // If present
-            if (userOpt.isPresent()) {
+            // New List
+            List<InventorySnapshotDto> snapshotDtos = new ArrayList<>();
 
-                // Get User
-                UserEntity user = userOpt.get();
+            // Loop
+            for (InventorySnapshot snapshot: submission.getInventorySnapshots()) {
 
-                //////////////////////
-                // Stream Snapshots //
-                //////////////////////
+                // GEt Liquor Bottle
+                Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(snapshot.getLiquorBottleId());
 
-                // New List
-                List<InventorySnapshotDto> snapshotDtos = new ArrayList<>();
+                // If
+                if (liquorBottleOpt.isPresent()) {
 
-                // Loop
-                for (InventorySnapshot snapshot: submission.getInventorySnapshots()) {
+                    // Get iut
+                    LiquorBottle liquorBottle = liquorBottleOpt.get();
 
-                    // GEt Liquor Bottle
-                    Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(snapshot.getLiquorBottleId());
+                    // Add new One
+                    snapshotDtos.add(new InventorySnapshotDto(liquorBottle.getName(), snapshot.getCurrentML()));
+                } else {
 
-                    // If
-                    if (liquorBottleOpt.isPresent()) {
-
-                        // Get iut
-                        LiquorBottle liquorBottle = liquorBottleOpt.get();
-
-                        // Add new One
-                        snapshotDtos.add(new InventorySnapshotDto(liquorBottle.getName(), snapshot.getCurrentML()));
-                    } else {
-
-                        continue;
-                    }
+                    continue;
                 }
-
-                ////////////////////////////////
-                // Finish Submission Response //
-                ////////////////////////////////
-
-                // Formatter
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
-
-                // Formated Date
-                String formattedDate = submission.getTimestamp().format(formatter);
-
-                // Make new Response
-                InventorySubmissionResponse inventoryResponse = new InventorySubmissionResponse(
-                        submission.getId(),
-                        user.getFirstName(),
-                        user.getLastName(),
-                        submission.getBar().getName(),
-                        formattedDate,
-                        submission.getNumShotsUsed(),
-                        snapshotDtos
-                );
-
-                // Add to List
-                inventoryResponses.add(inventoryResponse);
-
-            } else {
-
-                // This is where if a user has been deleted, it will not pulll the inventory
-                // that was submitted by them because the ID is invalid.
-                continue;
             }
+
+            ////////////////////////////////
+            // Finish Submission Response //
+            ////////////////////////////////
+
+            // Formatter
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd hh:mm a");
+
+            // Formated Date
+            String formattedDate = submission.getTimestamp().format(formatter);
+
+            // Make new Response
+            InventorySubmissionResponse inventoryResponse = new InventorySubmissionResponse(
+                    submission.getId(),
+                    submission.getFirstName(),
+                    submission.getLastName(),
+                    submission.getBar().getName(),
+                    formattedDate,
+                    submission.getNumShotsUsed(),
+                    snapshotDtos
+            );
+
+            // Add to List
+            inventoryResponses.add(inventoryResponse);
+
         }
 
         // Now return it..
@@ -1017,7 +990,23 @@ public class LiquidtoryResource {
         // Get Bar //
         /////////////
 
-        BarEntity bar = barRepository.findByName(adminActionRequest.getBarName());
+        // The Bar
+        BarEntity bar;
+
+        // Find by Id
+        Optional<BarEntity> barOpt = barRepository.findById(adminActionRequest.getBarId());
+
+        // If Bar is found..
+        if (barOpt.isPresent()) {
+
+            // Actual
+            bar = barOpt.get();
+
+        } else {
+
+            // Leave
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         /////////////////////////////////
         // Perform Action on Inventory //

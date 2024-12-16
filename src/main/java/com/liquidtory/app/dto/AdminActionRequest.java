@@ -5,16 +5,16 @@ public class AdminActionRequest {
     // Vars
     private String actionType; //ADD_BOTTLE, REMOVE_BOTTLE, etc.
     private Long liquorBottleId;
-    private String barName;
+    private Long barId;
     private String notes;
 
     //Constructor
     public AdminActionRequest() {
     }
 
-    public AdminActionRequest(String actionType, Long liquorBottleId, String barName, String notes) {
+    public AdminActionRequest(String actionType, Long liquorBottleId, Long barId, String notes) {
         this.actionType = actionType;
-        this.barName = barName;
+        this.barId = barId;
         this.notes = notes;
     }
 
@@ -31,9 +31,9 @@ public class AdminActionRequest {
 
     public void setLiquorBottleId(Long liquorBottleId) { this.liquorBottleId = liquorBottleId; }
 
-    public String getBarName() { return barName; }
+    public Long getBarId() { return barId; }
 
-    public void setBarName(String barName) { this.barName = barName; }
+    public void setBarId(Long barId) { this.barId = barId; }
 
     public String getNotes() {
         return notes;

@@ -11,6 +11,7 @@ export class AdminInventoryModalComponent implements OnInit {
 
   // Vars
   liquorBottles: LiquorBottle[] = [];
+  barNames: BarName[] = [];
   errorMessage: string = "";
 
   // Constructor
@@ -19,13 +20,14 @@ export class AdminInventoryModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any // Inject the data passed to the modal
   ) {
     this.liquorBottles = data.liquorBottles;
+    this.barNames = data.barNames;
   }
 
   // The Form
   form = new FormGroup({
     actionType: new FormControl('', Validators.required),
     liquorBottleId: new FormControl('', Validators.required),
-    barName: new FormControl('', Validators.required),
+    barId: new FormControl('', Validators.required),
     notes: new FormControl('')
   });
 
@@ -61,4 +63,9 @@ export interface LiquorBottle {
   id: number;
   name: string;
   capacityML: number;
+}
+
+export interface BarName {
+  id: number;
+  name: string;
 }

@@ -34,12 +34,13 @@
         <!-- Bar -->
         <mat-form-field class="form-field">
             <mat-label>Bar</mat-label>
-            <mat-select formControlName="barName">
-                <mat-option [value]="'Inside'">Inside</mat-option>
-                <mat-option [value]="'Outside'">Outside</mat-option>
+            <mat-select formControlName="barId">
+                <mat-option *ngFor="let barName of barNames" [value]="barName.id">
+                    {{ barName.name }}
+                </mat-option>
             </mat-select>
         </mat-form-field>
-        <div class="error-message" *ngIf="form.get('barName')?.invalid && form.get('barName')?.touched">
+        <div class="error-message" *ngIf="form.get('barId')?.invalid && form.get('barId')?.touched">
             Bar Required
         </div>
         <br>

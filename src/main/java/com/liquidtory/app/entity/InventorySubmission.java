@@ -18,7 +18,10 @@ public class InventorySubmission {
     private LocalDateTime timestamp; // Store when the inventory was submitted
 
     @Column(nullable = false)
-    private Long userId;
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
 
     @ManyToOne
     @JoinColumn(name = "bar_id", nullable = false)
@@ -35,9 +38,10 @@ public class InventorySubmission {
     public InventorySubmission() {
     }
 
-    public InventorySubmission(LocalDateTime timestamp, Long userId, BarEntity bar, Long numShotsUsed, List<InventorySnapshot> inventorySnapshots) {
+    public InventorySubmission(LocalDateTime timestamp, String firstName, String lastName, BarEntity bar, Long numShotsUsed, List<InventorySnapshot> inventorySnapshots) {
         this.timestamp = timestamp;
-        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.bar = bar;
         this.numShotsUsed = numShotsUsed;
         this.inventorySnapshots = inventorySnapshots;
@@ -60,13 +64,13 @@ public class InventorySubmission {
         this.timestamp = timestamp;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
+    public String getFirstName() { return firstName; }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
     public BarEntity getBar() { return bar; }
 

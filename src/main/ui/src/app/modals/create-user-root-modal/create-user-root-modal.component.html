@@ -58,7 +58,7 @@
         <!-- Password Field -->
         <mat-form-field class="form-field">
             <mat-label>Password</mat-label>
-            <input matInput formControlName="password">
+            <input matInput [type]="'password'" formControlName="password">
         </mat-form-field>
         <div class="error-message" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
             Password Required

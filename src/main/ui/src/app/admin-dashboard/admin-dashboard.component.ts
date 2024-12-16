@@ -242,9 +242,13 @@ export class AdminDashboardComponent implements OnInit {
     dialogConfig.maxHeight = '85vh';
     dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
 
+    // Only Send All Bar Names and id..
+    const barNames = this.bars.map(bar => ({ id: bar.id, name: bar.name }));
+
     // Data
     dialogConfig.data = {
-      liquorBottles: this.liquorBottles
+      liquorBottles: this.liquorBottles,
+      barNames: barNames
     }
 
     // Open It.
@@ -498,7 +502,7 @@ export class AdminDashboardComponent implements OnInit {
 
       // Return the length
       return matchingItems.length;
-      
+
     } else {
 
       // Return nothing
