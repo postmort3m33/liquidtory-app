@@ -4,7 +4,7 @@ const config = {
 
 // Check if running in production
 if (window.location.hostname !== 'localhost') {
-  config.baseUrl = 'http://liquidtory.com';      // HTTPS for API
+  config.baseUrl = 'https://liquidtory.com';      // HTTPS for API
 }
 
 export default config;

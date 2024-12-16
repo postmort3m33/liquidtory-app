@@ -898,6 +898,8 @@ public class LiquidtoryResource {
 
             } else {
 
+                // This is where if a user has been deleted, it will not pulll the inventory
+                // that was submitted by them because the ID is invalid.
                 continue;
             }
         }

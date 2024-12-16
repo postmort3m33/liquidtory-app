@@ -3,11 +3,11 @@ package com.liquidtory.app.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "InventoryItem")
+@Table(name = "LiquorBottleItem")
 public class LiquorBottleItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // Reference to the type of liquor bottle
