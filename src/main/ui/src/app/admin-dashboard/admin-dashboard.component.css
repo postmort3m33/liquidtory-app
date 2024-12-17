@@ -57,42 +57,6 @@
   padding:3px 8px;
 }
 
-/*******************/
-/* Message Wrapper */
-/*******************/
-
-#message-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: white;
-  width: 15%;
-  height: 125px;
-  position: fixed;
-  transform: translateY(-100%);
-  top: 0;
-  opacity: 0;
-  left: 30%;
-  z-index: 1000;
-  border: 3px solid #999;
-  border-top: none;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; /* Smooth transitions */
-}
-
-#message-wrapper.visible {
-  transform: translateY(0%);
-  opacity: 1;
-}
-
-#message-wrapper h3 {
-  text-align: center;
-  color: red;
-  font-size: 2.25vh;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
 /************/
 /* Nav Tabs */
 /************/
@@ -196,19 +160,6 @@
 }
 
 #createuser-wrapper h2 {
-  font-size: 1.5em;
-  font-weight: 600;
-}
-
-#createbottle-wrapper {
-  text-align: center;
-  width:90%;
-  border-top: 4px solid #999;
-  padding-bottom: 20px;
-}
-
-#createbottle-wrapper h2 {
-  padding-top: 20px;
   font-size: 1.5em;
   font-weight: 600;
 }
@@ -400,12 +351,6 @@
 
   #main-wrapper {
     width:100%;
-  }
-
-  #message-wrapper {
-    width: 50%;
-    height: 90px;
-    left: 10%;
   }
 
   .nav-tabs .nav-item {

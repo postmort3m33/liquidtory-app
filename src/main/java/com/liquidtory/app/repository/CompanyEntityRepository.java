@@ -4,4 +4,6 @@ import com.liquidtory.app.entity.CompanyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CompanyEntityRepository extends JpaRepository<CompanyEntity, Long> {
+    boolean existsByName(String name);
+
 }

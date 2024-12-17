@@ -1,11 +1,4 @@
 <div id="main-page">
-
-  <!-- Message Wrapper -->
-  <div id="message-wrapper" [class.visible]="messageVisible">
-    <h3 [style.color]="messageError ? 'red' : 'black'">{{ message }}</h3>
-  </div>
-
-  <!-- Main Content Wrapper -->
   <div id="main-wrapper">
 
     <!-- Dashboard Info -->
@@ -61,12 +54,6 @@
           <div id="createuser-wrapper">
             <h2>New User</h2>
             <button class="btn btn-primary" (click)="createNewUser()">New User</button>
-          </div>
-
-          <!-- Create New Bottle -->
-          <div id="createbottle-wrapper">
-            <h2>New Liquor Bottle</h2>
-            <button class="btn btn-primary" (click)="createNewLiquorBottle()">New Bottle Type</button>
           </div>
 
           <!-- New Bar -->

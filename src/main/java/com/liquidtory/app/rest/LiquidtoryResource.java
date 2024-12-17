@@ -110,6 +110,17 @@ public class LiquidtoryResource {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        ///////////////////////////////////////////
+        // Does this Company Name already Exist? //
+        ///////////////////////////////////////////
+
+        if (companyEntityRepository.existsByName(companyEntityRequest.getName())) {
+
+            // Return bad response
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+
+        }
+
         ////////////////////////////
         // Create the new Company //
         ////////////////////////////
@@ -618,7 +629,44 @@ public class LiquidtoryResource {
     // Create New Liquor Bottle
     @RequestMapping(path = "/liquor", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNewLiquorBottle(@RequestBody LiquorBottleRequest liquorBottleRequest) {
+    public ResponseEntity<?> createNewLiquorBottle(
+            @RequestHeader("Authorization") String currentToken,
+            @RequestBody LiquorBottleRequest liquorBottleRequest) {
+
+        /////////////////////////
+        // Get User From Token //
+        /////////////////////////
+
+        // Extract token..
+        String extractedToken = currentToken.substring(7);
+
+        // Extract username from token
+        String username = jwtUtil.extractUsername(extractedToken);
+
+        // Return null if none is found
+        if (username == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Get User Entity
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        // If not Admin or ROOT leave..
+        if (!userEntity.getRole().equalsIgnoreCase("ROOT")) {
+
+            // LEave
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        //////////////////////////////
+        // Does this already Exist? //
+        //////////////////////////////
+
+        if (liquorBottleRepository.existsByNameAndCapacityML(liquorBottleRequest.getName(), liquorBottleRequest.getCapacityML())) {
+
+            // Return Conflict
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
         // Create New Liquor Bottle..
         LiquorBottle liquorBottle = new LiquorBottle(liquorBottleRequest.getName(), liquorBottleRequest.getCapacityML());

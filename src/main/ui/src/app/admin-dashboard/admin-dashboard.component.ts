@@ -10,6 +10,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AdminInventoryModalComponent } from '../modals/admin-inventory-modal/admin-inventory-modal.component';
 import { CreateUserModalComponent } from '../modals/create-user-modal/create-user-modal.component';
 import { CreateBarModalComponent } from '../modals/create-bar-modal/create-bar-modal.component';
+import { WarningModalComponent } from '../modals/warning-modal/warning-modal.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -24,8 +25,8 @@ export class AdminDashboardComponent implements OnInit {
   // URLS
   private baseUrl: string = config.baseUrl;
   private userUrl: string = this.baseUrl + '/api/user';
-  private liquorBottleUrl: string = this.baseUrl + '/api/liquor';
   private barUrl: string = this.baseUrl + '/api/bar';
+  private liquorBottleUrl: string = this.baseUrl + '/api/liquor';
   private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
   private adminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
   private companyUsersUrl: string = this.baseUrl + '/api/company/users';
@@ -101,16 +102,6 @@ export class AdminDashboardComponent implements OnInit {
       // Redirect to home page..
       this.router.navigate(['home']);
     }
-  }
-
-  showMessage(newMessage: string, error: boolean) {
-    this.message = newMessage; 
-    this.messageVisible = true; // Add "visible" class
-    this.messageError = error;
-    setTimeout(() => {
-      this.messageVisible = false; // Remove "visible" class
-      setTimeout(() => this.message = null, 500); // Delay nulling message to allow animation
-    }, 5000); // Visible for 5 seconds
   }
 
   // Get User Info from Token
@@ -236,34 +227,6 @@ export class AdminDashboardComponent implements OnInit {
     );
   }
 
-  // Open Create Bottle Modal
-  openCreateBottleModal() {
-
-    // Get Window Width
-    const screenWidth = window.innerWidth;
-
-    // Calculate modal width using the utility function
-    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
-
-    // Create new Dialog
-    const dialogConfig = new MatDialogConfig();
-
-    // Vars
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.height = '55vh';
-    dialogConfig.width = `${modalWidthPercentage}vw`;
-    dialogConfig.maxHeight = '55vh';
-    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
-
-    // Open It.
-    const dialogRef = this.dialog.open(CreateBottleModalComponent, dialogConfig);
-
-    // return the answer..
-    return dialogRef.afterClosed();
-
-  }
-
   // Open Admin Invenbtory Action Modal
   openAdminInventoryModal() {
 
@@ -354,6 +317,37 @@ export class AdminDashboardComponent implements OnInit {
     return dialogRef.afterClosed();
   }
 
+  // Warning Modal
+  openWarningModal(messageToSend: string, errorToSend: boolean) {
+
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
+
+    // Create new Dialog
+    const dialogConfig = new MatDialogConfig();
+
+    // Vars
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.height = '35vh';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
+    dialogConfig.maxHeight = '35vh';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
+
+    // Data
+    dialogConfig.data = {
+      message: messageToSend,
+      error: errorToSend
+    }
+
+    // Open It.
+    const dialogRef = this.dialog.open(WarningModalComponent, dialogConfig);
+
+  }
+
   ///////////////////////
   // Actions Functions //
   ///////////////////////
@@ -378,7 +372,7 @@ export class AdminDashboardComponent implements OnInit {
             next: (response) => {
 
               // Show a message
-              this.showMessage('Action Submitted!', false);
+              this.openWarningModal('Action Submitted!', false);
 
             },
             error: (error) => {
@@ -409,7 +403,7 @@ export class AdminDashboardComponent implements OnInit {
             next: (response) => {
 
               // Show a message
-              this.showMessage('User Created!', false);
+              this.openWarningModal('User Created!', false);
 
             },
             error: (error) => {
@@ -418,37 +412,11 @@ export class AdminDashboardComponent implements OnInit {
               if (error.status === 409) {
 
                 // Show a message
-                this.showMessage('Username Taken!', true);
+                this.openWarningModal('Username Taken!', true);
 
               }
             }
           });
-      }
-    });
-
-  }
-
-  // Create new Bottle
-  createNewLiquorBottle() {
-
-    // Open and subscribe to modal..
-    this.openCreateBottleModal().subscribe(result => {
-
-      // If we gfot a result..
-      if (result) {
-
-        // Create JSON Header..
-        const options = {
-          headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
-        };
-
-        // Post it
-        this.httpClient.post(this.liquorBottleUrl, result, options)
-          .subscribe(
-            (response: any) => {
-
-            }
-          )
       }
     });
 
@@ -474,7 +442,7 @@ export class AdminDashboardComponent implements OnInit {
             next: (response) => {
 
               // Show a message
-              this.showMessage('Bar Created!', false);
+              this.openWarningModal('Bar Created!', false);
 
             },
             error: (error) => {
@@ -483,7 +451,7 @@ export class AdminDashboardComponent implements OnInit {
               if (error.status === 409) {
 
                 // Show a message
-                this.showMessage('Bar Name Taken!', true);
+                this.openWarningModal('Bar Name Taken!', true);
 
               }
             }
@@ -700,7 +668,7 @@ export class AdminDashboardComponent implements OnInit {
     if (combinedSubmissions.length < 1) {
       
       // Show error
-      this.showMessage('No submissions to export!', true);
+      this.openWarningModal('No submissions to export!', true);
 
       // Leave
       return;

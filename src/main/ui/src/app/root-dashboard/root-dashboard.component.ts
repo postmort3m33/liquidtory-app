@@ -6,6 +6,8 @@ import { jwtDecode } from 'jwt-decode';  // Import the jwt-decode library
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { CreateCompanyModalComponent } from '../modals/create-company-modal/create-company-modal.component';
 import { CreateUserRootModalComponent } from '../modals/create-user-root-modal/create-user-root-modal.component';
+import { WarningModalComponent } from '../modals/warning-modal/warning-modal.component';
+import { CreateBottleModalComponent } from '../modals/create-bottle-modal/create-bottle-modal.component';
 
 @Component({
   selector: 'app-root-dashboard',
@@ -21,6 +23,7 @@ export class RootDashboardComponent {
   private baseUrl: string = config.baseUrl;
   private userUrl: string = this.baseUrl + '/api/user';
   private companyUrl: string = this.baseUrl + '/api/company';
+  private liquorBottleUrl: string = this.baseUrl + '/api/liquor';
 
   // Vars
   currentToken: string | null = null;
@@ -185,6 +188,65 @@ export class RootDashboardComponent {
     return dialogRef.afterClosed();
   }
 
+  // Warning Modal
+  openWarningModal(messageToSend: string, errorToSend: boolean) {
+
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
+
+    // Create new Dialog
+    const dialogConfig = new MatDialogConfig();
+
+    // Vars
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.height = '35vh';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
+    dialogConfig.maxHeight = '35vh';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
+
+    // Data
+    dialogConfig.data = {
+      message: messageToSend,
+      error: errorToSend
+    }
+
+    // Open It.
+    const dialogRef = this.dialog.open(WarningModalComponent, dialogConfig);
+
+  }
+
+  // Open Create Bottle Modal
+  openCreateBottleModal() {
+
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
+
+    // Create new Dialog
+    const dialogConfig = new MatDialogConfig();
+
+    // Vars
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.height = '55vh';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
+    dialogConfig.maxHeight = '55vh';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
+
+    // Open It.
+    const dialogRef = this.dialog.open(CreateBottleModalComponent, dialogConfig);
+
+    // return the answer..
+    return dialogRef.afterClosed();
+
+  }
+
   /////////////
   // Methods //
   /////////////
@@ -198,9 +260,6 @@ export class RootDashboardComponent {
       // If we gfot a result..
       if (result) {
 
-        // Debug
-        //console.log(result);
-
         // Create JSON Header..
         const options = {
           headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
@@ -208,11 +267,24 @@ export class RootDashboardComponent {
 
         // Post it
         this.httpClient.post(this.companyUrl, result, options)
-          .subscribe(
-            (response: any) => {
+          .subscribe({
+            next: (response) => {
 
+              // Show a message
+              this.openWarningModal('Company Created!', false);
+
+            },
+            error: (error) => {
+
+              // If Username Conflict
+              if (error.status === 409) {
+
+                // Show a message
+                this.openWarningModal('Company Name Taken!', true);
+
+              }
             }
-          )
+          });
       }
     });
 
@@ -252,15 +324,67 @@ export class RootDashboardComponent {
 
               // Post it
               this.httpClient.post(this.userUrl, result, options)
-                .subscribe(
-                  (response: any) => {
+                .subscribe({
+                  next: (response) => {
 
+                    // Show a message
+                    this.openWarningModal('User Created!', false);
+
+                  },
+                  error: (error) => {
+
+                    // If Username Conflict
+                    if (error.status === 409) {
+
+                      // Show a message
+                      this.openWarningModal('Username Taken!', true);
+
+                    }
                   }
-                )
+                });
             }
           });
         }
       );
+  }
+
+  // Create new Bottle
+  createNewLiquorBottle() {
+
+    // Open and subscribe to modal..
+    this.openCreateBottleModal().subscribe(result => {
+
+      // If we gfot a result..
+      if (result) {
+
+        // Create JSON Header..
+        const options = {
+          headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+        };
+
+        // Post it
+        this.httpClient.post(this.liquorBottleUrl, result, options)
+          .subscribe({
+            next: (response) => {
+
+              // Show a message
+              this.openWarningModal('Bottle Created!', false);
+
+            },
+            error: (error) => {
+
+              // If Username Conflict
+              if (error.status === 409) {
+
+                // Show a message
+                this.openWarningModal('Bottle already exists!', true);
+
+              }
+            }
+          });
+      }
+    });
+
   }
 }
 

@@ -3,14 +3,18 @@ package com.liquidtory.app.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "LiquorBottle")
+@Table(name = "LiquorBottle",
+       uniqueConstraints = {
+               @UniqueConstraint(name = "unique_name_capacity", columnNames = {"name", "capacityML"})
+       }
+)
 public class LiquorBottle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)

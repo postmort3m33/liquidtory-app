@@ -1,7 +1,7 @@
 <div id="main-page">
-    <div id="main-wrapper">
-  
-      <!-- Dashboard Info -->
+  <div id="main-wrapper">
+
+    <!-- Dashboard Info -->
     <div class="dashboard-info" *ngIf="userInfo">
 
       <!-- Compan Info-->
@@ -20,44 +20,50 @@
       </div>
 
     </div>
-  
-      <!-- Navigation Tabs -->
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a class="nav-link" [ngClass]="{'active': activeTab === 'actions'}"
-            (click)="setActiveTab('actions')">Actions</a>
-        </li>
-      </ul>
-  
-      <!-- Tab Content -->
-      <div class="tab-content">
-  
-        <!-- Actions Group -->
-        <div *ngIf="activeTab === 'actions'" class="container" id="actions-group">
-  
-          <!-- Title -->
-          <div class="title">
-            <h2>Actions</h2>
-          </div>
-  
-          <!-- Action Buttons -->
-          <div class="action-buttons">
-  
-            <!-- Create New Company -->
-            <div id="createcompany-wrapper">
-              <h2>New Company</h2>
-              <button class="btn btn-primary" (click)="createNewCompany()">New Company</button>
-            </div>
 
-            <!-- Create New Company -->
-            <div id="createuser-wrapper">
-              <h2>New User</h2>
-              <button class="btn btn-primary" (click)="createNewUser()">New User</button>
-            </div>
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link" [ngClass]="{'active': activeTab === 'actions'}"
+          (click)="setActiveTab('actions')">Actions</a>
+      </li>
+    </ul>
 
-          </div>
+    <!-- Tab Content -->
+    <div class="tab-content">
+
+      <!-- Actions Group -->
+      <div *ngIf="activeTab === 'actions'" class="container" id="actions-group">
+
+        <!-- Title -->
+        <div class="title">
+          <h2>Actions</h2>
         </div>
-  
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+
+          <!-- Create New Company -->
+          <div id="createcompany-wrapper">
+            <h2>New Company</h2>
+            <button class="btn btn-primary" (click)="createNewCompany()">New Company</button>
+          </div>
+
+          <!-- Create New Company -->
+          <div id="createuser-wrapper">
+            <h2>New User</h2>
+            <button class="btn btn-primary" (click)="createNewUser()">New User</button>
+          </div>
+
+          <!-- Create New Bottle -->
+          <div id="createbottle-wrapper">
+            <h2>New Liquor Bottle</h2>
+            <button class="btn btn-primary" (click)="createNewLiquorBottle()">New Bottle Type</button>
+          </div>
+
+        </div>
       </div>
+
     </div>
   </div>
+</div>
