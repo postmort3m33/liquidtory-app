@@ -1,4 +1,11 @@
 <div id="main-page">
+
+  <!-- Message Wrapper -->
+  <div id="message-wrapper" [class.visible]="messageVisible">
+    <h3 [style.color]="messageError ? 'red' : 'black'">{{ message }}</h3>
+  </div>
+
+  <!-- Main Content Wrapper -->
   <div id="main-wrapper">
 
     <!-- Dashboard Info -->
@@ -30,6 +37,9 @@
       <li class="nav-item">
         <a class="nav-link" [ngClass]="{'active': activeTab === 'inventory'}"
           (click)="setActiveTab('inventory')">Inventory</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [ngClass]="{'active': activeTab === 'users'}" (click)="setActiveTab('users')">Users</a>
       </li>
     </ul>
 
@@ -73,11 +83,12 @@
               <div class="form-group">
                 <label for="from">From:</label>
                 <input id="from" type="date" class="form-control" formControlName="from"
-                  [ngClass]="{'is-invalid': inventorySearchForm.get('from')?.invalid && inventorySearchForm.get('from')?.touched}">                
+                  [ngClass]="{'is-invalid': inventorySearchForm.get('from')?.invalid && inventorySearchForm.get('from')?.touched}">
               </div>
 
               <!-- From error message -->
-              <div *ngIf="inventorySearchForm.get('from')?.invalid && inventorySearchForm.get('from')?.touched" class="error-message">
+              <div *ngIf="inventorySearchForm.get('from')?.invalid && inventorySearchForm.get('from')?.touched"
+                class="error-message">
                 Date required
               </div>
 
@@ -88,7 +99,8 @@
               </div>
 
               <!-- To error message -->
-              <div *ngIf="inventorySearchForm.get('to')?.invalid && inventorySearchForm.get('to')?.touched" class="error-message">
+              <div *ngIf="inventorySearchForm.get('to')?.invalid && inventorySearchForm.get('to')?.touched"
+                class="error-message">
                 Date required
               </div>
 
@@ -123,12 +135,12 @@
             <select [(ngModel)]="selectedBar" class="form-control">
               <!-- Placeholder Option -->
               <option [ngValue]="null" disabled selected>Select a bar...</option>
-              
+
               <!-- Dynamic Options -->
               <option *ngFor="let bar of bars" [ngValue]="bar">
                 {{ bar.name }}
               </option>
-            </select>            
+            </select>
           </div>
 
           <h3 *ngIf="selectedBar?.lastSubmission">
@@ -144,10 +156,10 @@
         <table class="table" id="inventory-table">
           <thead>
             <tr>
-              <th style='width:40%;' (click)="sortInventory('name')"
+              <th style='width:40%;' (click)="sortLiquorInventory('name')"
                 [ngClass]="{'sortable': true, 'sorted': sortColumn === 'name', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
                 Name</th>
-              <th style='width:20%;' (click)="sortInventory('capacityML')"
+              <th style='width:20%;' (click)="sortLiquorInventory('capacityML')"
                 [ngClass]="{'sortable': true, 'sorted': sortColumn === 'capacityML', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
                 Size</th>
               <th style='width:20%;'>Full</th>
@@ -167,6 +179,48 @@
                 <td id="partial-buttons">
                   <p>{{ getPartialBottleCount(bottle) }}</p>
                 </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+
+      </div>
+
+      <!-- Users Group -->
+      <div *ngIf="activeTab === 'users'" class="container" id="users-group">
+
+        <!-- Title -->
+        <div class="title">
+          <h2>Users</h2>
+        </div>
+
+        <!-- Table Wrapper -->
+        <table class="table" id="users-table">
+
+          <!-- Head -->
+          <thead>
+            <tr>
+              <th style='width:25%;' (click)="sortCompanyUsers('firstName')"
+                [ngClass]="{'sortable': true, 'sorted': sortColumn === 'firstName', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
+                First</th>
+              <th style='width:25%;' (click)="sortCompanyUsers('lastName')"
+                [ngClass]="{'sortable': true, 'sorted': sortColumn === 'lastName', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
+                Last</th>
+              <th style='width:40%;'>Username</th>
+              <th style='width:10%;' (click)="sortCompanyUsers('role')"
+                [ngClass]="{'sortable': true, 'sorted': sortColumn === 'role', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
+                Role</th>
+            </tr>
+          </thead>
+
+          <!-- Body -->
+          <tbody>
+            <ng-container *ngFor="let user of companyUsers">
+              <tr>
+                <td>{{ user.firstName }}</td>
+                <td>{{ user.lastName }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.role }}</td>
               </tr>
             </ng-container>
           </tbody>

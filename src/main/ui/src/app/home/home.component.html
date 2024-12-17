@@ -30,7 +30,7 @@
 
         <!-- Link to Dashboard when token is present -->
         <div class="dashboard-link" *ngIf="token">
-            <a routerLink="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+            <button class="btn btn-primary" (click)="dashboardRoute()">Dashboard</button>
         </div>
     </div>
 </div>

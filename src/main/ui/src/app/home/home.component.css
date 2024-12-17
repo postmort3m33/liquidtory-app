@@ -77,9 +77,12 @@ button {
 
 .dashboard-link {
     text-align: center;
-    /* Center the text (button) horizontally */
-    margin-top: 20px;
-    /* Add space above the button */
+}
+
+.dashboard-link button {
+    width: 15%;
+    font-weight: 600;
+    padding:3px 8px;
 }
 
 .version-wrapper {
@@ -102,6 +105,10 @@ button {
 
     .logingroup {
         width: 80%;
+    }
+
+    .dashboard-link button {
+        width: 50%;
     }
 
 }

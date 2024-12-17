@@ -19,7 +19,7 @@ export class HomeComponent {
   // Vars
   username!: string;
   password!: string;
-  token: string | null = null;
+  token!: string;
   errorMessage!: string;
   loginForm: FormGroup;
 
@@ -36,7 +36,7 @@ export class HomeComponent {
   ngOnInit() {
 
     // Get Token..
-    this.token = sessionStorage.getItem('jwtToken');
+    this.token = sessionStorage.getItem('jwtToken') || '';
   }
 
   // Login Functions
@@ -102,6 +102,33 @@ export class HomeComponent {
 
       // Set Error
       this.errorMessage = "Username and Password required!"
+    }
+  }
+
+  // Dashboard Route
+  dashboardRoute() {
+
+    // Decode the JWT token to get the role
+    const decodedToken: any = jwtDecode(this.token); // Decode the JWT token
+
+    // Set Role
+    const userRole = decodedToken.role;
+
+    // Send to proper dashboards..
+    if (userRole == "USER") {
+
+      // Navigate to regular dashboard page..
+      this.router.navigate(['/dashboard']);
+
+    } else if (userRole == "ADMIN") {
+
+      // Go to Admin Dashboard
+      this.router.navigate(['/admin']);
+
+    } else if (userRole == "ROOT") {
+
+      // Go to Root Dashboard
+      this.router.navigate(['/root']);
     }
   }
 }

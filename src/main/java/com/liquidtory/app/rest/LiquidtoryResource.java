@@ -25,10 +25,8 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -175,6 +173,52 @@ public class LiquidtoryResource {
         return new ResponseEntity<>(companyEntityResponses, HttpStatus.OK);
     }
 
+    // Get all Company users
+    @RequestMapping(path = "/company/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CompanyUserResponse>> getAllCompanyUsers(@RequestHeader("Authorization") String currentToken) {
+
+        /////////////////////////
+        // Get User From Token //
+        /////////////////////////
+
+        // Extract token..
+        String extractedToken = currentToken.substring(7);
+
+        // Extract username from token
+        String username = jwtUtil.extractUsername(extractedToken);
+
+        // Return null if none is found
+        if (username == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Get User Entity
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        ///////////////////////////////////////////////
+        // Get Company and Create Array OF Responses //
+        ///////////////////////////////////////////////
+
+        // The Company
+        CompanyEntity thisCompany = userEntity.getCompany();
+
+        // Get all Users
+        List<UserEntity> companyUsers = thisCompany.getUsers();
+
+        // Stream Responses
+        List<CompanyUserResponse> companyUserResponses = companyUsers.stream()
+                .map(user -> new CompanyUserResponse(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getUsername(),
+                        user.getRole()
+                )).toList();
+
+        // Return the List
+        return new ResponseEntity<>(companyUserResponses, HttpStatus.OK);
+    }
+
     //////////////////
     // Bar Endpoint //
     //////////////////
@@ -213,6 +257,24 @@ public class LiquidtoryResource {
 
         // Get Company
         CompanyEntity thisCompany = userEntity.getCompany();
+
+        ///////////////////////////////////////////
+        // Check if this bar name already exists //
+        ///////////////////////////////////////////
+
+        // Get all Bars
+        List<BarEntity> allBars = thisCompany.getBars();
+
+        // Loop through them..
+        for (BarEntity bar: allBars) {
+
+            // If exits
+            if (bar.getName().equalsIgnoreCase(barEntityRequest.getName())) {
+
+                // Leave
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
+        }
 
         ////////////////////////
         // Create the new Bar //
@@ -485,6 +547,17 @@ public class LiquidtoryResource {
 
             // Leave
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        ////////////////////////////////////////
+        // Check if username is already taken //
+        ////////////////////////////////////////
+
+        if (userRepository.existsByUsername(userInfoRequest.getUsername())) {
+
+            // Return bad response
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+
         }
 
         /////////////////////////

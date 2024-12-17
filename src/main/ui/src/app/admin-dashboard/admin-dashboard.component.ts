@@ -28,17 +28,22 @@ export class AdminDashboardComponent implements OnInit {
   private barUrl: string = this.baseUrl + '/api/bar';
   private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
   private adminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
+  private companyUsersUrl: string = this.baseUrl + '/api/company/users';
 
   // Vars
   currentToken: string | null = null;
   activeTab: string = 'actions';
   userInfo!: UserInfo;
+  companyUsers: CompanyUser[] = [];
   liquorBottles: LiquorBottle[] = [];
   bars: Bar[] = [];
   selectedBar: Bar | null = null;
   inventorySearchForm!: FormGroup;
   currentFromVal!: string;
   currentToVal!: string;
+  message: string | null = null;
+  messageVisible: boolean = false; // Controls the CSS class
+  messageError: boolean = false;
 
   // Table Stuff
   sortColumn: string | null = null;
@@ -86,6 +91,9 @@ export class AdminDashboardComponent implements OnInit {
         // Get Bars
         this.getBars();
 
+        // Get Company Users
+        this.getCompanyUsers();
+
       }
 
     } else {
@@ -93,6 +101,16 @@ export class AdminDashboardComponent implements OnInit {
       // Redirect to home page..
       this.router.navigate(['home']);
     }
+  }
+
+  showMessage(newMessage: string, error: boolean) {
+    this.message = newMessage; 
+    this.messageVisible = true; // Add "visible" class
+    this.messageError = error;
+    setTimeout(() => {
+      this.messageVisible = false; // Remove "visible" class
+      setTimeout(() => this.message = null, 500); // Delay nulling message to allow animation
+    }, 5000); // Visible for 5 seconds
   }
 
   // Get User Info from Token
@@ -156,6 +174,30 @@ export class AdminDashboardComponent implements OnInit {
 
         }
       });
+  }
+
+  // Get Users
+  getCompanyUsers() {
+
+    // Create JSON Header..
+    const options = {
+      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+    };
+
+    // Get deliveries..
+    this.httpClient.get<CompanyUser[]>(this.companyUsersUrl, options)
+      .subscribe({
+        next: (response) => {
+
+          // Save User Info
+          this.companyUsers = response;
+
+        },
+        error: (error) => {
+
+        }
+      });
+
   }
 
   // Sign out function
@@ -332,11 +374,17 @@ export class AdminDashboardComponent implements OnInit {
 
         // Post it
         this.httpClient.post(this.adminInventoryActionUrl, result, options)
-          .subscribe(
-            (response: any) => {
+          .subscribe({
+            next: (response) => {
+
+              // Show a message
+              this.showMessage('Action Submitted!', false);
+
+            },
+            error: (error) => {
 
             }
-          )
+          });
       }
     });
   }
@@ -357,11 +405,24 @@ export class AdminDashboardComponent implements OnInit {
 
         // Post it
         this.httpClient.post(this.userUrl, result, options)
-          .subscribe(
-            (response: any) => {
+          .subscribe({
+            next: (response) => {
 
+              // Show a message
+              this.showMessage('User Created!', false);
+
+            },
+            error: (error) => {
+
+              // If Username Conflict
+              if (error.status === 409) {
+
+                // Show a message
+                this.showMessage('Username Taken!', true);
+
+              }
             }
-          )
+          });
       }
     });
 
@@ -409,11 +470,24 @@ export class AdminDashboardComponent implements OnInit {
 
         // Post it
         this.httpClient.post(this.barUrl, result, options)
-          .subscribe(
-            (response: any) => {
+          .subscribe({
+            next: (response) => {
 
+              // Show a message
+              this.showMessage('Bar Created!', false);
+
+            },
+            error: (error) => {
+
+              // If Username Conflict
+              if (error.status === 409) {
+
+                // Show a message
+                this.showMessage('Bar Name Taken!', true);
+
+              }
             }
-          )
+          });
       }
     });
   }
@@ -437,6 +511,16 @@ export class AdminDashboardComponent implements OnInit {
       // Reset Sorting..
       this.sortColumn = null;
       this.sortDirection = 'asc';
+
+    } else if (tab == 'users') {
+
+      // Get Users again
+      this.getCompanyUsers();
+
+      // Reset Sorting..
+      this.sortColumn = null;
+      this.sortDirection = 'asc';
+
     }
 
     // Set the tab
@@ -444,7 +528,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   // Sort Deliveries By
-  sortInventory(column: keyof LiquorBottle) {
+  sortLiquorInventory(column: keyof LiquorBottle) {
 
     // Determine sort direction based on the column
     if (this.sortColumn === column) {
@@ -458,6 +542,35 @@ export class AdminDashboardComponent implements OnInit {
 
     // Sort the liquorBottles array
     this.liquorBottles.sort((a, b) => {
+      const valueA = a[column];
+      const valueB = b[column];
+
+      // Sort in ascending or descending order
+      if (valueA < valueB) {
+        return this.sortDirection === 'asc' ? -1 : 1;
+      } else if (valueA > valueB) {
+        return this.sortDirection === 'asc' ? 1 : -1;
+      } else {
+        return 0;
+      }
+    });
+  }
+
+  // Sort Deliveries By
+  sortCompanyUsers(column: keyof CompanyUser) {
+
+    // Determine sort direction based on the column
+    if (this.sortColumn === column) {
+      // Toggle sort direction if sorting by the same column
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Set the new column to sort by
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    // Sort the liquorBottles array
+    this.companyUsers.sort((a, b) => {
       const valueA = a[column];
       const valueB = b[column];
 
@@ -583,6 +696,16 @@ export class AdminDashboardComponent implements OnInit {
       }))
     ];
 
+    // Is it empty?
+    if (combinedSubmissions.length < 1) {
+      
+      // Show error
+      this.showMessage('No submissions to export!', true);
+
+      // Leave
+      return;
+    }
+
     // Helper function to parse the custom timestamp format
     const parseTimestamp = (timestamp: string): number => {
       const [date, time, period] = timestamp.split(' ');
@@ -663,6 +786,14 @@ export class AdminDashboardComponent implements OnInit {
       return { width: maxLength + 2 }; // Add some padding
     });
   }
+}
+
+export interface CompanyUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  role: string;
 }
 
 export interface UserInfo {
