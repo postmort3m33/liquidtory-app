@@ -619,7 +619,14 @@ public class LiquidtoryResource {
                 .map(bottle -> new LiquorBottleResponse(
                         bottle.getId(),
                         bottle.getName(),
-                        bottle.getCapacityML()
+                        bottle.getCapacityML(),
+                        bottle.getHeightCM(),
+                        bottle.getDiameterBottomCM(),
+                        bottle.getDimensions().stream()
+                                .map(dimension -> new LiquorBottleDimensionDto(
+                                        dimension.getHeight(),
+                                        dimension.getRadius()
+                                )).toList()
                 )).toList();
 
         // Return them
@@ -668,8 +675,28 @@ public class LiquidtoryResource {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
+        //////////////////////////////
+        // Create New Liquor Bottle //
+        //////////////////////////////
+
         // Create New Liquor Bottle..
-        LiquorBottle liquorBottle = new LiquorBottle(liquorBottleRequest.getName(), liquorBottleRequest.getCapacityML());
+        LiquorBottle liquorBottle = new LiquorBottle(
+                liquorBottleRequest.getName(),
+                liquorBottleRequest.getCapacityML(),
+                liquorBottleRequest.getHeightCM(),
+                liquorBottleRequest.getDiameterBottomCM()
+        );
+
+        // Stream Dimension Dtos to Dimension Entities
+        List<LiquorBottleDimension> dimensionEntities = liquorBottleRequest.getDimensions().stream()
+                .map(dto -> new LiquorBottleDimension(
+                        dto.getHeight(),
+                        dto.getRadius(),
+                        liquorBottle
+                )).toList();
+
+        // Set dimensions on Liquor Bottle
+        liquorBottle.setDimensions(dimensionEntities);
 
         // Save it..
         liquorBottleRepository.save(liquorBottle);

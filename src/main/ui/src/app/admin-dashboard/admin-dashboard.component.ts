@@ -774,6 +774,14 @@ export interface LiquorBottle {
   id: number;
   name: string;
   capacityML: number;
+  heightCM: number;
+  diameterBottomCM: number;
+  dimensions: LiquorBottleDimension[];
+}
+
+export interface LiquorBottleDimension {
+  height: number;
+  radius: number;
 }
 
 export interface LiquorBottleItem {

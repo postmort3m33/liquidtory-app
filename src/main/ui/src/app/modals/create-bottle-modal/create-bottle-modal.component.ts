@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'app-create-bottle-modal',
   templateUrl: './create-bottle-modal.component.html',
-  styleUrl: './create-bottle-modal.component.css'
+  styleUrls: ['./create-bottle-modal.component.css']
 })
 export class CreateBottleModalComponent {
 
@@ -15,8 +15,45 @@ export class CreateBottleModalComponent {
   // The Form
   form = new FormGroup({
     name: new FormControl('', Validators.required),
-    capacityML: new FormControl('', Validators.required)
+    capacityML: new FormControl('', Validators.required),
+    dimensions: new FormArray(
+      [this.createDimension()],
+      this.minTwoDimensions // Custom Validator
+    )
   });
+
+  // Creates a single dimension group
+  createDimension(): FormGroup {
+    return new FormGroup({
+      height: new FormControl('', [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)]),
+      radius: new FormControl('', [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)])
+    });
+  }
+
+  // Get the FormArray for dimensions
+  get dimensions(): FormArray {
+    return this.form.get('dimensions') as FormArray;
+  }
+
+  // Add a new dimension to the array
+  addDimension() {
+    this.dimensions.push(this.createDimension());
+    this.form.get('dimensions')?.updateValueAndValidity(); // Revalidate
+  }
+
+  // Remove a dimension from the array
+  removeDimension(index: number) {
+    if (this.dimensions.length > 1) { // Ensure at least one item remains
+      this.dimensions.removeAt(index);
+      this.form.get('dimensions')?.updateValueAndValidity(); // Revalidate
+    }
+  }
+
+  // Custom Validator for at least 2 dimensions
+  minTwoDimensions(control: AbstractControl): { [key: string]: any } | null {
+    const array = control as FormArray;
+    return array.length >= 2 ? null : { minTwoDimensions: true };
+  }
 
   // On Close
   cancel() {
@@ -25,16 +62,12 @@ export class CreateBottleModalComponent {
 
   // On Save
   save() {
-
-    // If Valid..
+    // If Valid
     if (this.form.valid) {
-
-      // Passes form data back to the calling component
+      // Pass form data back to the calling component
       this.dialogRef.close(this.form.value);
-      
     } else {
-
-      // Mark all as touched..
+      // Mark all as touched
       this.form.markAllAsTouched();
     }
   }

@@ -93,10 +93,20 @@ public class H2Bootstrap implements CommandLineRunner {
             // Add Pre-defined Liquor Bottles.. //
             //////////////////////////////////////
 
+            // Jack Daniels 750ML
+            LiquorBottle jackDaniel750 = new LiquorBottle("Jack Daniels Old No 7", 750L, 24.77, 8.00);
+            List<LiquorBottleDimension> dimensions = new ArrayList<>();
+            dimensions.add(new LiquorBottleDimension(0.00,100.00, jackDaniel750));
+            dimensions.add(new LiquorBottleDimension(64.7,100.00, jackDaniel750));
+            dimensions.add(new LiquorBottleDimension(73.00,45.10, jackDaniel750));
+            dimensions.add(new LiquorBottleDimension(100.00,34.36, jackDaniel750));
+            jackDaniel750.setDimensions(dimensions);
+            liquorBottleRepository.save(jackDaniel750);
+
+
+            /*
             // Liquor Bottle List
             List<LiquorBottle> liquorBottles = new ArrayList<>();
-
-            liquorBottles.add(new LiquorBottle("Jameson Orange", 1000L));
             liquorBottles.add(new LiquorBottle("Jameson Irish Whiskey", 1000L));
             liquorBottles.add(new LiquorBottle("Malibu Original", 1000L));
             liquorBottles.add(new LiquorBottle("Malibu Black", 1000L));
@@ -133,10 +143,8 @@ public class H2Bootstrap implements CommandLineRunner {
             liquorBottles.add(new LiquorBottle("Johnnie Walker Red Label", 1000L));
             liquorBottles.add(new LiquorBottle("Macallan 12 Year Old Sherry Oak", 1000L));
             liquorBottles.add(new LiquorBottle("Glenfiddich 12 Year Old", 1000L));
-
-            // Save to Repo
             liquorBottleRepository.saveAll(liquorBottles);
-
+            */
         }
     }
 }

@@ -26,6 +26,45 @@
     <br>
   </div>
 
+  <br>
+
+  <!-- Dimensions Wraper -->
+  <!-- Dimensions Wrapper -->
+  <div class="dimension-wrapper" formArrayName="dimensions">
+
+    <!-- Add Dimension Button -->
+    <button mat-stroked-button color="primary" (click)="addDimension()">+ Add Dimension</button>
+    <div class="error-message" *ngIf="dimensions.errors?.['minTwoDimensions'] && form.get('dimensions')?.touched">
+      At Least 2 Dimensions Required
+    </div>
+
+    <!-- One Dimension Item -->
+    <div class="dimension-item" *ngFor="let dimension of dimensions.controls; let i = index" [formGroupName]="i">
+      <!-- Title -->
+      <div class="dimension-title">
+        <h2>Dimension</h2>
+        <button mat-icon-button color="warn" (click)="removeDimension(i)" *ngIf="dimensions.length > 1">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <!-- Height -->
+      <mat-form-field>
+        <mat-label>Height %</mat-label>
+        <input matInput formControlName="height">
+      </mat-form-field>
+
+      <!-- Radius -->
+      <mat-form-field>
+        <mat-label>Radius %</mat-label>
+        <input matInput formControlName="radius">
+      </mat-form-field>
+    </div>
+  </div>
+
+
+
+
 </mat-dialog-content>
 
 <mat-dialog-actions class="action-buttons">

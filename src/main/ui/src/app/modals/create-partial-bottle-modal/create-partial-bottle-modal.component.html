@@ -10,11 +10,12 @@
 
         <!-- Display the bottle capacity -->
         <p>Capacity: {{ data.bottle.capacityML }} mL</p>
+        <p>Amount: {{ calculatedML }} mL</p>
 
         <!-- Vertical Slider -->
         <div class="slider-wrapper">
             <div class="vertical-slider">
-                <ngx-slider [(value)]="currentML" [options]="options"></ngx-slider>
+                <ngx-slider [(value)]="currentHeight" [options]="options" (userChange)="calculateVolumeAtHeight()"></ngx-slider>
             </div>
         </div>
 

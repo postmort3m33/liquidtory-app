@@ -234,9 +234,9 @@ export class RootDashboardComponent {
     // Vars
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.height = '55vh';
+    dialogConfig.height = '85vh';
     dialogConfig.width = `${modalWidthPercentage}vw`;
-    dialogConfig.maxHeight = '55vh';
+    dialogConfig.maxHeight = '85vh';
     dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
 
     // Open It.
@@ -356,6 +356,9 @@ export class RootDashboardComponent {
 
       // If we gfot a result..
       if (result) {
+
+        // Debug
+        console.log(result);
 
         // Create JSON Header..
         const options = {
