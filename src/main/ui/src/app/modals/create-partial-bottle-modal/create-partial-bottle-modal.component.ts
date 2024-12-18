@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, ElementRef, Inject, ViewEncapsulation, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Options } from '@angular-slider/ngx-slider';
 
@@ -15,12 +15,22 @@ export class CreatePartialBottleModalComponent {
   currentHeight: number = 0;
   calculatedML: number = 0;
   options!: Options;
+  imageUrl!: string;
+
+  // Image Urls
+  private bottleImageUrls: LiquorBottleImageUrl[] = [
+    { id: 2, url: '../../../../assets/images/grey-goose-original-750.png' },
+    { id: 1, url: '../../../../assets/images/jack-daniels-old-no-7-750.png' }
+  ];
+
+  @ViewChild('bottleCanvas') bottleCanvas!: ElementRef<HTMLCanvasElement>;
 
   // Constructor
   constructor(
     public dialogRef: MatDialogRef<CreatePartialBottleModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any // Inject the data passed to the modal
   ) {
+    // Get Bottle Data
     this.bottle = data.bottle;
 
     // Initialize options after `bottle` is assigned
@@ -34,6 +44,80 @@ export class CreatePartialBottleModalComponent {
         return value + '%';
       }
     };
+
+    // Set the Image Url
+    const bottleImageUrl = this.bottleImageUrls.find(b => b.id === this.bottle.id);
+    if(bottleImageUrl) {
+      this.imageUrl = bottleImageUrl.url;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    //this.drawBottleOutline();
+  }
+
+  // Draw the bottle outline
+  drawBottleOutline() {
+    const canvas = this.bottleCanvas.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dimensions = this.bottle.dimensions; // { height: %, radius: % }
+    const canvasHeight = canvas.height;
+    const canvasWidth = canvas.width;
+    const centerX = canvasWidth / 2; // Center of the canvas
+    const maxHeight = this.bottle.heightCM; // Max height of the bottle
+    const maxRadius = this.bottle.diameterBottomCM / 2; // Max radius of the bottle
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    // Calculate scaling factors based on canvas dimensions
+    const scaleRatio = 0.6;
+    const scaleHeight = (canvasHeight / maxHeight); // Scaling factor for height
+    const scaleWidth = (canvasWidth / (maxRadius * 2)) * scaleRatio; // Scaling factor for width (using diameter)
+
+    // Begin drawing the outline
+    ctx.beginPath();
+    ctx.moveTo(centerX, canvasHeight);
+
+    // Draw the left side (based on height and scaled radius)
+    dimensions.forEach((dim, index) => {
+      const heightPx = (dim.height / 100) * maxHeight * scaleHeight; // Scaled height in pixels
+      const radiusPx = (dim.radius / 100) * maxRadius * scaleWidth; // Scaled radius in pixels
+
+      const y = canvasHeight - heightPx;
+      if (index === 0) {
+        ctx.lineTo(centerX - radiusPx, y); // Start the left curve
+      } else {
+        ctx.lineTo(centerX - radiusPx, y); // Continue drawing the left side
+      }
+    });
+
+    // Mirror the right side
+    for (let i = dimensions.length - 1; i >= 0; i--) {
+      const dim = dimensions[i];
+      const heightPx = (dim.height / 100) * maxHeight * scaleHeight; // Scaled height in pixels
+      const radiusPx = (dim.radius / 100) * maxRadius * scaleWidth; // Scaled radius in pixels
+
+      const y = canvasHeight - heightPx;
+      ctx.lineTo(centerX + radiusPx, y); // Draw the right curve
+    }
+
+    ctx.closePath();
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Optional: Fill the liquid level (if needed)
+    //this.fillLiquid(ctx, canvasWidth, canvasHeight);
+  }
+
+
+  // On slider change, recalculate and update liquid level
+  onHeightChange() {
+    this.calculateVolumeAtHeight();
+    //this.fillLiquid();
   }
 
   // Numerical Integration for Volume of Revolution (up to the given height %)
@@ -75,12 +159,9 @@ export class CreatePartialBottleModalComponent {
       //console.log("New Volume: ", volume);
     }
 
-    // The volume is directly in mL (since 1 cm³ = 1 mL)
-    this.calculatedML = volume;
-    //console.log('Calculated Volume (mL): ', this.calculatedML);
+    // Round the volume to 2 decimal places
+    this.calculatedML = Math.round(volume * 100) / 100;
   }
-
-
 
   // On Close
   cancel() {
@@ -107,3 +188,9 @@ export interface LiquorBottleDimension {
   height: number;
   radius: number;
 }
+
+export interface LiquorBottleImageUrl {
+  id: number;
+  url: string;
+}
+

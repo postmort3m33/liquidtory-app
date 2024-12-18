@@ -16,9 +16,11 @@ export class CreateBottleModalComponent {
   form = new FormGroup({
     name: new FormControl('', Validators.required),
     capacityML: new FormControl('', Validators.required),
+    heightCM: new FormControl('', Validators.required),
+    diameterBottomCM: new FormControl('', Validators.required),
     dimensions: new FormArray(
       [this.createDimension()],
-      this.minTwoDimensions // Custom Validator
+      this.minTwoDimensions
     )
   });
 

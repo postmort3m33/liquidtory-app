@@ -6,6 +6,7 @@
 
     <div class="bottle-form">
 
+        <!-- Bottle Name -->
         <h3>{{ bottle.name }}</h3>
 
         <!-- Display the bottle capacity -->
@@ -13,10 +14,17 @@
         <p>Amount: {{ calculatedML }} mL</p>
 
         <!-- Vertical Slider -->
-        <div class="slider-wrapper">
+        <div class="slider-wrapper" [ngStyle]="{'background-image': 'url(' + imageUrl + ')'}">
             <div class="vertical-slider">
-                <ngx-slider [(value)]="currentHeight" [options]="options" (userChange)="calculateVolumeAtHeight()"></ngx-slider>
+                <ngx-slider
+                    [(value)]="currentHeight"
+                    [options]="options"
+                    (valueChange)="onHeightChange()">
+                </ngx-slider>
             </div>
+
+            <!-- Canvas for the bottle visualization -->
+            <canvas #bottleCanvas></canvas>
         </div>
 
     </div>

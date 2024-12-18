@@ -53,14 +53,24 @@
 /**************/
 
 .slider-wrapper {
+    position: relative;
     padding: 0;
     margin: 0;
     height: inherit;
     background-color: transparent;
-    background-image: url('../../../../public/assets/images/empty-bottle.png');
     background-size:contain;
     background-position: top;
     background-repeat: no-repeat;
+}
+
+.slider-wrapper canvas {
+    position: absolute; /* Position the canvas within the slider-wrapper */
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%); /* Center the canvas horizontally */
+    width: 100%; /* Make the canvas fill the wrapper */
+    height: 100%; /* Match the height of the slider */
+    z-index: 0; /* Place the canvas behind other elements */
 }
 
 .vertical-slider {
