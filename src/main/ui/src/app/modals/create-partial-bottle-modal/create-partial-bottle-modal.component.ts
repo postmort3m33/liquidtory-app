@@ -20,7 +20,13 @@ export class CreatePartialBottleModalComponent {
   // Image Urls
   private bottleImageUrls: LiquorBottleImageUrl[] = [
     { id: 2, url: '../../../../assets/images/grey-goose-original-750.png' },
-    { id: 1, url: '../../../../assets/images/jack-daniels-old-no-7-750.png' }
+    { id: 1, url: '../../../../assets/images/jack-daniels-old-no-7-750.png' },
+    { id: 3, url: '../../../../assets/images/bacardi-superior-1000.png' },
+    { id: 4, url: '../../../../assets/images/blue-chair-bay-banana-rum-cream-750.png'},
+    { id: 5, url: '../../../../assets/images/blue-chair-bay-spiced-rum-1000.png'},
+    { id: 6, url: '../../../../assets/images/captain-morgan-original-spiced-rum-1000.png'},
+    { id: 7, url: '../../../../assets/images/cruzan-aged-dark-rum-1000.png'},
+    { id: 8, url: '../../../../assets/images/malibu-original-1000.png'}
   ];
 
   @ViewChild('bottleCanvas') bottleCanvas!: ElementRef<HTMLCanvasElement>;
@@ -113,11 +119,9 @@ export class CreatePartialBottleModalComponent {
     //this.fillLiquid(ctx, canvasWidth, canvasHeight);
   }
 
-
   // On slider change, recalculate and update liquid level
   onHeightChange() {
     this.calculateVolumeAtHeight();
-    //this.fillLiquid();
   }
 
   // Numerical Integration for Volume of Revolution (up to the given height %)
@@ -172,7 +176,6 @@ export class CreatePartialBottleModalComponent {
   save() {
     this.dialogRef.close(this.calculatedML); // Passes form data back to the calling component
   }
-
 }
 
 export interface LiquorBottle {
