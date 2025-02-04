@@ -18,12 +18,8 @@
 }
 
 .content {
-    padding: 0;
+    padding: 20px;
     margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: nowrap;
     width: 100%;
 }
 

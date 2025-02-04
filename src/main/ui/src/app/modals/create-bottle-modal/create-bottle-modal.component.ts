@@ -10,12 +10,13 @@ import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '
 export class CreateBottleModalComponent {
 
   // Constructor
-  constructor(public dialogRef: MatDialogRef<CreateBottleModalComponent>) {}
+  constructor(public dialogRef: MatDialogRef<CreateBottleModalComponent>) { }
 
   // The Form
   form = new FormGroup({
     name: new FormControl('', Validators.required),
     capacityML: new FormControl('', Validators.required),
+    isSimple: new FormControl(false),
     heightCM: new FormControl('', Validators.required),
     diameterBottomCM: new FormControl('', Validators.required),
     dimensions: new FormArray(
@@ -64,11 +65,30 @@ export class CreateBottleModalComponent {
 
   // On Save
   save() {
+
+    // Was this a Simple Bottle?
+    if (this.form.get('isSimple')?.value) {
+
+      // Remove Validators for a Simple Bottle
+      this.form.get('heightCM')?.clearValidators();
+      this.form.get('heightCM')?.updateValueAndValidity();
+      this.form.get('diameterBottomCM')?.clearValidators();
+      this.form.get('diameterBottomCM')?.updateValueAndValidity();
+
+      // Clear dimensions
+      this.dimensions.clear();
+      this.dimensions.setValidators(null);
+      this.dimensions.updateValueAndValidity();
+    }
+
     // If Valid
     if (this.form.valid) {
+
       // Pass form data back to the calling component
       this.dialogRef.close(this.form.value);
+
     } else {
+
       // Mark all as touched
       this.form.markAllAsTouched();
     }

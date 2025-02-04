@@ -28,8 +28,21 @@
 
     <br>
 
+    <!-- Simple Bottle Checkbox -->
+    <div class="simple-bottle-checkbox">
+      <input
+        type="checkbox"
+        id="simpleBottleCheckbox"
+        formControlName="isSimple"
+        name="bottleCheckbox"
+      />
+      <label class="simple-bottle-label" for="simpleBottleCheckbox">
+        Simple Bottle?
+      </label>
+    </div>
+
     <!-- Height CM-->
-    <mat-form-field class="form-field">
+    <mat-form-field *ngIf="!form.get('isSimple')?.value" class="form-field">
       <mat-label>Height (cm)</mat-label>
       <input matInput formControlName="heightCM">
     </mat-form-field>
@@ -40,7 +53,7 @@
     <br>
 
     <!-- Diameter Bottom CM-->
-    <mat-form-field class="form-field">
+    <mat-form-field *ngIf="!form.get('isSimple')?.value" class="form-field">
       <mat-label>Bottom Diameter (cm)</mat-label>
       <input matInput formControlName="diameterBottomCM">
     </mat-form-field>
@@ -55,7 +68,7 @@
   <br>
 
   <!-- Dimensions Wrapper -->
-  <div class="dimension-wrapper" formArrayName="dimensions">
+  <div *ngIf="!form.get('isSimple')?.value" class="dimension-wrapper" formArrayName="dimensions">
 
     <!-- Add Dimension Button -->
     <button mat-stroked-button color="primary" (click)="addDimension()">+ Add Dimension</button>

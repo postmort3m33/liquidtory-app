@@ -157,6 +157,7 @@
   margin: auto;
   width: 50%;
   height: 30px;
+  touch-action: manipulation;
 }
 
 #full-buttons p {
@@ -190,6 +191,7 @@
   margin: auto;
   width: 50%;
   height: 30px;
+  touch-action: manipulation;
 }
 
 #partial-buttons button::before {

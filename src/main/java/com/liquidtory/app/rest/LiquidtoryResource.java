@@ -679,32 +679,45 @@ public class LiquidtoryResource {
         // Create New Liquor Bottle //
         //////////////////////////////
 
-        // Create New Liquor Bottle..
-        LiquorBottle liquorBottle = new LiquorBottle(
-                liquorBottleRequest.getName(),
-                liquorBottleRequest.getCapacityML(),
-                liquorBottleRequest.getHeightCM(),
-                liquorBottleRequest.getDiameterBottomCM()
-        );
+        // new One
+        LiquorBottle liquorBottle;
 
-        // Stream Dimension Dtos to Dimension Entities
-        List<LiquorBottleDimension> dimensionEntities = liquorBottleRequest.getDimensions().stream()
-                .map(dto -> new LiquorBottleDimension(
-                        dto.getHeight(),
-                        dto.getRadius(),
-                        liquorBottle
-                )).toList();
+        // Was this a Simple bottle?
+        if (liquorBottleRequest.getIsSimple()) {
 
-        // Set dimensions on Liquor Bottle
-        liquorBottle.setDimensions(dimensionEntities);
+            // New Simple Bottle..
+            liquorBottle = new LiquorBottle(liquorBottleRequest.getName(), liquorBottleRequest.getCapacityML());
+
+        } else {
+
+            // Create New Liquor Bottle..
+            liquorBottle = new LiquorBottle(
+                    liquorBottleRequest.getName(),
+                    liquorBottleRequest.getCapacityML(),
+                    liquorBottleRequest.getHeightCM(),
+                    liquorBottleRequest.getDiameterBottomCM()
+            );
+
+            // Stream Dimension Dtos to Dimension Entities
+            List<LiquorBottleDimension> dimensionEntities = liquorBottleRequest.getDimensions().stream()
+                    .map(dto -> new LiquorBottleDimension(
+                            dto.getHeight(),
+                            dto.getRadius(),
+                            liquorBottle
+                    )).toList();
+
+            // Set dimensions on Liquor Bottle
+            liquorBottle.setDimensions(dimensionEntities);
+
+        }
 
         // Save it..
         liquorBottleRepository.save(liquorBottle);
 
         // Return it.
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
 
+    }
 
     ///////////////////////////
     // Inventory Submissions //

@@ -7,6 +7,7 @@ public class LiquorBottleRequest {
     // Vars
     private String name;
     private Long capacityML;
+    private Boolean isSimple;
     private Double heightCM;
     private Double diameterBottomCM;
     private List<LiquorBottleDimensionDto> dimensions;
@@ -15,9 +16,10 @@ public class LiquorBottleRequest {
     public LiquorBottleRequest() {
     }
 
-    public LiquorBottleRequest(String name, Long capacityML, Double heightCM, Double diameterBottomCM, List<LiquorBottleDimensionDto> dimensions) {
+    public LiquorBottleRequest(String name, Long capacityML, Boolean isSimple, Double heightCM, Double diameterBottomCM, List<LiquorBottleDimensionDto> dimensions) {
         this.name = name;
         this.capacityML = capacityML;
+        this.isSimple = isSimple;
         this.heightCM = heightCM;
         this.diameterBottomCM = diameterBottomCM;
         this.dimensions = dimensions;
@@ -40,9 +42,11 @@ public class LiquorBottleRequest {
         this.capacityML = capacityML;
     }
 
-    public Double getHeightCM() {
-        return heightCM;
-    }
+    public Boolean getIsSimple() { return isSimple; }
+
+    public void setIsSimple(Boolean simple) { isSimple = simple; }
+
+    public Double getHeightCM() { return heightCM; }
 
     public void setHeightCM(Double heightCM) {
         this.heightCM = heightCM;

@@ -11,10 +11,10 @@ public class LiquorBottleDimension {
     private Long id;
 
     @Column(nullable = false)
-    private Double height; // in cm
+    private Double height; // in %
 
     @Column(nullable = false)
-    private Double radius; // in cm
+    private Double radius; // in %
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "liquor_bottle_id", nullable = false)

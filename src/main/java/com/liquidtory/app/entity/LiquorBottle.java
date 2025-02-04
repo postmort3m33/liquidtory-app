@@ -36,6 +36,32 @@ public class LiquorBottle {
     public LiquorBottle() {
     }
 
+    public LiquorBottle(String name, Long capacityML) {
+        this.name = name;
+        this.capacityML = capacityML;
+        this.heightCM = 30.0;
+        this.diameterBottomCM = 7.9;
+
+        // Create Default Dimensions
+        LiquorBottleDimension dimension1 = new LiquorBottleDimension(0.0, 100.0, this);
+        LiquorBottleDimension dimension2 = new LiquorBottleDimension(63.98, 100.0, this);
+        LiquorBottleDimension dimension3 = new LiquorBottleDimension(74.56, 38.76, this);
+        LiquorBottleDimension dimension4 = new LiquorBottleDimension(100.0, 38.76, this);
+
+        // new List
+        List<LiquorBottleDimension> newList = new ArrayList<>();
+
+        // Add to it
+        newList.add(dimension1);
+        newList.add(dimension2);
+        newList.add(dimension3);
+        newList.add(dimension4);
+
+        // Set it..
+        this.dimensions = newList;
+
+    }
+
     public LiquorBottle(String name, Long capacityML, Double heightCM, Double diameterBottomCM) {
         this.name = name;
         this.capacityML = capacityML;

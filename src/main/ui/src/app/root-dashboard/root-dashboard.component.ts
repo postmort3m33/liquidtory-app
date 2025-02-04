@@ -42,7 +42,7 @@ export class RootDashboardComponent {
       // Get Role
       const decodedToken: any = jwtDecode(this.currentToken); // Decode the JWT token
       const userRole = decodedToken.role
-      console.log('Token Role: ', userRole);
+      //console.log('Token Role: ', userRole);
 
       // Check Role..
       if (userRole != 'ROOT') {
@@ -358,7 +358,7 @@ export class RootDashboardComponent {
       if (result) {
 
         // Debug
-        console.log(result);
+        //console.log(result);
 
         // Create JSON Header..
         const options = {

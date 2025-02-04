@@ -35,6 +35,16 @@
     margin: auto;
 }
 
+.simple-bottle-checkbox {
+    padding:15px;
+    text-align: center;
+}
+
+.simple-bottle-label {
+    padding: 10px;
+    font-size: 2.5vh;
+}
+
 .dimension-wrapper {
     display: flex;
     flex-direction: column;

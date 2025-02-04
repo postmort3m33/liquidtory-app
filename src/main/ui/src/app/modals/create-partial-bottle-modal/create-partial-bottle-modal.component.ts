@@ -59,6 +59,9 @@ export class CreatePartialBottleModalComponent {
     const bottleImageUrl = this.bottleImageUrls.find(b => b.id === this.bottle.id);
     if(bottleImageUrl) {
       this.imageUrl = bottleImageUrl.url;
+    } else {
+      // Load Default bottle
+      this.imageUrl = '../../../../assets/images/empty-bottle.png';
     }
   }
 
