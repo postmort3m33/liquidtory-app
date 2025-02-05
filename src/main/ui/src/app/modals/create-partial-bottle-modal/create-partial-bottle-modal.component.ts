@@ -30,7 +30,10 @@ export class CreatePartialBottleModalComponent {
     { id: 9, url: '../../../../assets/images/el-jimador-blanco-750.png'},
     { id: 10, url: '../../../../assets/images/myers-original-dark-rum-1000.png'},
     { id: 11, url: '../../../../assets/images/sailor-jerry-spiced-rum-1000.png'},
-    { id: 12, url: '../../../../assets/images/zaya-gran-reserva-16-750.png'}
+    { id: 12, url: '../../../../assets/images/zaya-gran-reserva-16-750.png'},
+    { id: 37, url: '../../../../assets/images/buffalo-trace-bourbon-1000.png'},
+    { id: 38, url: '../../../../assets/images/bulleit-bourbon-1000.png'},
+    { id: 39, url: '../../../../assets/images/canadian-club-1858-1000.png'}
   ];
 
   @ViewChild('bottleCanvas') bottleCanvas!: ElementRef<HTMLCanvasElement>;
