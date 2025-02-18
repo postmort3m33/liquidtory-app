@@ -33,6 +33,9 @@ build/
 ### VS Code ###
 .vscode/
 
+# Ignore Application.properties to hide passwords..
+/src/main/resources/application.properties
+
 # Ignore Angular / UI project files in src/main/ui
 /src/main/ui/node_modules
 /src/main/ui/dist
