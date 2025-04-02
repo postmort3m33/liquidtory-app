@@ -181,22 +181,30 @@
           <h2>Users</h2>
         </div>
 
+        <!-- Action List -->
+        <div id="user-actions-list" [ngClass]="{'open': userActionsListOpen}" [ngStyle]="{'top': actionListTop, 'left': actionListLeft}">
+          <ul>
+            <li (click)="userActionChangePassword()">Change Password</li>
+          </ul>
+        </div>
+
         <!-- Table Wrapper -->
         <table class="table" id="users-table">
 
           <!-- Head -->
           <thead>
             <tr>
-              <th style='width:25%;' (click)="sortCompanyUsers('firstName')"
+              <th style='width:20%;' (click)="sortCompanyUsers('firstName')"
                 [ngClass]="{'sortable': true, 'sorted': sortColumn === 'firstName', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
                 First</th>
-              <th style='width:25%;' (click)="sortCompanyUsers('lastName')"
+              <th style='width:20%;' (click)="sortCompanyUsers('lastName')"
                 [ngClass]="{'sortable': true, 'sorted': sortColumn === 'lastName', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
                 Last</th>
-              <th style='width:40%;'>Username</th>
-              <th style='width:10%;' (click)="sortCompanyUsers('role')"
+              <th style='width:25%;'>Username</th>
+              <th style='width:15%;' (click)="sortCompanyUsers('role')"
                 [ngClass]="{'sortable': true, 'sorted': sortColumn === 'role', 'asc': sortDirection === 'asc', 'desc': sortDirection === 'desc'}">
                 Role</th>
+              <th style='width:20%;'>Actions</th>
             </tr>
           </thead>
 
@@ -208,6 +216,8 @@
                 <td>{{ user.lastName }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.role }}</td>
+                <td id="user-actions-button"><button data-char="..." class="btn btn-primary" (click)="openUserActionsList(user.id, $event)"></button>
+                </td>
               </tr>
             </ng-container>
           </tbody>

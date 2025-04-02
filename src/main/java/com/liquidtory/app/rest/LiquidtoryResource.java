@@ -599,6 +599,77 @@ public class LiquidtoryResource {
 
     }
 
+    // Change User Password
+    @RequestMapping(path = "/user/changepassword", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changeUserPassword(
+            @RequestHeader("Authorization") String currentToken,
+            @RequestBody UserChangePasswordRequest userChangePasswordRequest) {
+
+        ////////////////////////////////
+        // Make sure this is an ADMIN //
+        ////////////////////////////////
+
+        // Extract token..
+        String extractedToken = currentToken.substring(7);
+
+        // Extract username from token
+        String username = jwtUtil.extractUsername(extractedToken);
+
+        // Return null if none is found
+        if (username == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Get User Entity
+        UserEntity userEntity = userRepository.findByUsername(username);
+
+        // If not Admin leave..
+        if (!userEntity.getRole().equalsIgnoreCase("ADMIN")) {
+
+            // LEave
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        ///////////////////
+        // FUTURE UPDATE //
+        // Make sure this userId belongs to the user requesting the changes Company //
+        //////////////////////////////////////////////////////////////////////////////
+
+        ///////////
+        // Logic //
+        ///////////
+
+        // Get user from UserID
+        Optional<UserEntity> userToUpdateOpt = userRepository.findById(userChangePasswordRequest.getUserId());
+
+        // If found
+        if (userToUpdateOpt.isPresent()) {
+
+            // Get it..
+            UserEntity userToUpdate = userToUpdateOpt.get();
+
+            // Create password encoder
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+            // Encrypt password
+            String encodedPassword = encoder.encode(userChangePasswordRequest.getPassword1());
+
+            // Update the User Info.
+            userToUpdate.setPassword(encodedPassword);
+
+            // Save it
+            userRepository.save(userToUpdate);
+
+        } else {
+
+            // Bad
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Return
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     ////////////////////
     // Liquor Bottles //
     ////////////////////

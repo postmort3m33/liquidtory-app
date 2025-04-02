@@ -28,6 +28,7 @@ import { CreateCompanyModalComponent } from './modals/create-company-modal/creat
 import { CreateUserRootModalComponent } from './modals/create-user-root-modal/create-user-root-modal.component';
 import { CreateBarModalComponent } from './modals/create-bar-modal/create-bar-modal.component';
 import { WarningModalComponent } from './modals/warning-modal/warning-modal.component';
+import { ChangePasswordModalComponent } from './modals/change-password-modal/change-password-modal.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { WarningModalComponent } from './modals/warning-modal/warning-modal.comp
     CreateUserRootModalComponent,
     CreateBarModalComponent,
     WarningModalComponent,
+    ChangePasswordModalComponent,
   ],
   imports: [
     BrowserModule,

@@ -11,6 +11,7 @@ import { AdminInventoryModalComponent } from '../modals/admin-inventory-modal/ad
 import { CreateUserModalComponent } from '../modals/create-user-modal/create-user-modal.component';
 import { CreateBarModalComponent } from '../modals/create-bar-modal/create-bar-modal.component';
 import { WarningModalComponent } from '../modals/warning-modal/warning-modal.component';
+import { ChangePasswordModalComponent } from '../modals/change-password-modal/change-password-modal.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -30,6 +31,7 @@ export class AdminDashboardComponent implements OnInit {
   private getAllInventorySubmissionsUrl: string = this.baseUrl + '/api/inventory/submit';
   private adminInventoryActionUrl: string = this.baseUrl + '/api/inventory/admin';
   private companyUsersUrl: string = this.baseUrl + '/api/company/users';
+  private changePasswordUrl: string = this.baseUrl + '/api/user/changepassword'
 
   // Vars
   currentToken: string | null = null;
@@ -45,6 +47,12 @@ export class AdminDashboardComponent implements OnInit {
   message: string | null = null;
   messageVisible: boolean = false; // Controls the CSS class
   messageError: boolean = false;
+
+  // User Actions  Stuff
+  userActionsListOpen: boolean = false;
+  actionListTop = '0px';
+  actionListLeft = '0px';
+  selectedUserId: number | null = null;
 
   // Table Stuff
   sortColumn: string | null = null;
@@ -348,6 +356,39 @@ export class AdminDashboardComponent implements OnInit {
 
   }
 
+  // Change Password Modal
+  openChangePasswordModal() {
+
+    // Get Window Width
+    const screenWidth = window.innerWidth;
+
+    // Calculate modal width using the utility function
+    const modalWidthPercentage = this.calculateModalWidth(screenWidth);
+
+    // Create new Dialog
+    const dialogConfig = new MatDialogConfig();
+
+    // Vars
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.height = '45vh';
+    dialogConfig.width = `${modalWidthPercentage}vw`;
+    dialogConfig.maxHeight = '45vh';
+    dialogConfig.maxWidth = `${modalWidthPercentage}vw`;
+
+    // Data
+    dialogConfig.data = {
+      userId: this.selectedUserId
+    }
+
+    // Open It.
+    const dialogRef = this.dialog.open(ChangePasswordModalComponent, dialogConfig);
+
+    // return the answer..
+    return dialogRef.afterClosed();
+
+  }
+
   ///////////////////////
   // Actions Functions //
   ///////////////////////
@@ -480,6 +521,12 @@ export class AdminDashboardComponent implements OnInit {
       this.sortColumn = null;
       this.sortDirection = 'asc';
 
+      // reset User Actions List
+      this.userActionsListOpen = false;
+
+      // Nulkl selectedUserId
+      this.selectedUserId = null;
+
     } else if (tab == 'users') {
 
       // Get Users again
@@ -488,6 +535,14 @@ export class AdminDashboardComponent implements OnInit {
       // Reset Sorting..
       this.sortColumn = null;
       this.sortDirection = 'asc';
+
+    } else if (tab == 'actions') {
+
+      // reset User Actions List
+      this.userActionsListOpen = false;
+
+      // Nulkl selectedUserId
+      this.selectedUserId = null;
 
     }
 
@@ -591,6 +646,91 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
+  ////////////////////////
+  // User Actions Stuff //
+  ////////////////////////
+
+  // Change Password
+  userActionChangePassword() {
+
+    // If there is a selectedIs
+    if (this.selectedUserId) {
+
+      // Debug
+      //console.log("Open Change Password Modal with userId: " + this.selectedUserId);
+
+      // Close Actio List
+      this.userActionsListOpen = false;
+
+      // Open and subscribe to modal..
+      this.openChangePasswordModal().subscribe(result => {
+
+        // If we gfot a result..
+        if (result) {
+
+          // Debugging
+          //console.log(result);
+
+          // Create JSON Header..
+          const options = {
+            headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
+          };
+
+          // Post it
+          this.httpClient.put(this.changePasswordUrl, result, options)
+            .subscribe({
+              next: (response) => {
+
+                // Show a message
+                this.openWarningModal('Password Changed!', false);
+
+              },
+              error: (error) => {
+
+                // If Username Conflict
+                if (error.status === 400) {
+
+                  // Show a message
+                  this.openWarningModal('User does not exist!', true);
+
+                }
+              }
+            });
+        }
+      });
+    }
+  }
+
+  // Open Action List
+  openUserActionsList(userId: number, event: MouseEvent) {
+
+    // If it was closed open it..
+    if (!this.userActionsListOpen) {
+
+      // Get button Pos
+      const button = event.target as HTMLElement;
+      const buttonRect = button.getBoundingClientRect(); // Get button position
+
+      // Set Slide out window Pos
+      this.actionListTop = `${buttonRect.top + 10}px`; // Set vertical position
+      this.actionListLeft = `${buttonRect.left - (window.innerWidth * 0.5) - 10}px`; // Set vertical position
+
+      // Open it
+      this.userActionsListOpen = true;
+
+      // set selected UserId
+      this.selectedUserId = userId;
+
+    } else {
+
+      //close it
+      this.userActionsListOpen = false;
+
+      // Nulkl selectedUserId
+      this.selectedUserId = null;
+    }
+  }
+
   /////////////
   // Exports //
   /////////////
@@ -666,7 +806,7 @@ export class AdminDashboardComponent implements OnInit {
 
     // Is it empty?
     if (combinedSubmissions.length < 1) {
-      
+
       // Show error
       this.openWarningModal('No submissions to export!', true);
 
