@@ -65,6 +65,12 @@ export class DashboardComponent implements OnInit {
 
       } else {
 
+        // Retrieve liquorBottleItemsToSubmit from session storage
+        const storedItems = sessionStorage.getItem('liquorBottleItemsToSubmit');
+        if (storedItems) {
+          this.liquorBottleItemsToSubmit = JSON.parse(storedItems);
+        }
+
         // Get USer INfo
         this.getUserInfo();
 
@@ -158,11 +164,20 @@ export class DashboardComponent implements OnInit {
         .subscribe(
           (response: InventorySubmissionResponse) => {
 
+            /////////////////////
+            // FUTURE ADDITION //
+            /////////////////////
+            // Set this up to receive error messages back from back-end
+
             // Set Response to Inventory Submission
             this.lastInventorySubmission = response;
 
             // Was submitted
             this.inventorySubmitted = true;
+
+            // Reset Items to submit session storage..
+            sessionStorage.removeItem('liquorBottleItemsToSubmit');
+            this.liquorBottleItemsToSubmit = [];
 
           }
         );
@@ -176,11 +191,17 @@ export class DashboardComponent implements OnInit {
     sessionStorage.removeItem('jwtToken');
 
     // Optionally clear other user-related data if necessary
-    sessionStorage.clear(); // Use this if you want to clear all sessionStorage
+    //sessionStorage.clear(); // Use this if you want to clear all sessionStorage
 
     // Redirect the user to the 'home' route
     this.router.navigate(['/home']);
   }
+
+  // Persists Temp inventory to session storage
+  saveLiquorBottleItemsToStorage() {
+
+    sessionStorage.setItem('liquorBottleItemsToSubmit', JSON.stringify(this.liquorBottleItemsToSubmit));
+  }  
 
   ////////////
   // Modals //
@@ -328,6 +349,9 @@ export class DashboardComponent implements OnInit {
 
     // Add to this variable...
     this.liquorBottleItemsToSubmit.push(liquorBottleItem);
+
+    // Save to Session Storage
+    this.saveLiquorBottleItemsToStorage();
   }
 
   // Decrease Inventory
@@ -342,6 +366,9 @@ export class DashboardComponent implements OnInit {
     if (indexToRemove !== -1) {
       this.liquorBottleItemsToSubmit.splice(indexToRemove, 1);
     }
+
+    // Save to SessionStorage
+    this.saveLiquorBottleItemsToStorage();
   }
 
   // Increase Partial Inventory
@@ -366,6 +393,9 @@ export class DashboardComponent implements OnInit {
 
         // Add to items to submit..
         this.liquorBottleItemsToSubmit.push(partialBottle);
+
+        // Save to session storage
+        this.saveLiquorBottleItemsToStorage();
       }
     });
 
@@ -374,16 +404,14 @@ export class DashboardComponent implements OnInit {
   // Decrease Partial Inventory
   resetPartialInventory() {
 
-    // Create JSON Header..
-    const options = {
-      headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
-    };
-
     // Remove all Partials..
     this.liquorBottleItemsToSubmit = this.liquorBottleItemsToSubmit.filter(item => {
       const matchingBottle = this.liquorBottles.find(bottle => bottle.id === item.liquorBottleId);
       return matchingBottle ? item.currentML === matchingBottle.capacityML : false;
     });
+
+    // Save to sessionStorage
+    this.saveLiquorBottleItemsToStorage();
   }
 }
 
