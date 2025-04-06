@@ -201,7 +201,7 @@ export class DashboardComponent implements OnInit {
   saveLiquorBottleItemsToStorage() {
 
     sessionStorage.setItem('liquorBottleItemsToSubmit', JSON.stringify(this.liquorBottleItemsToSubmit));
-  }  
+  }
 
   ////////////
   // Modals //

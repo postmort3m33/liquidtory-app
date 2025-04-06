@@ -39,8 +39,15 @@ public class LiquorBottle {
     public LiquorBottle(String name, Long capacityML) {
         this.name = name;
         this.capacityML = capacityML;
-        this.heightCM = 30.0;
-        this.diameterBottomCM = 7.9;
+
+        // Different heights and diameters based on different capacities..
+        if(capacityML == 1000L) {
+            this.heightCM = 30.0;
+            this.diameterBottomCM = 7.9;
+        } else if (capacityML == 750L) {
+            this.heightCM = 28.0;
+            this.diameterBottomCM = 7.1;
+        }
 
         // Create Default Dimensions
         LiquorBottleDimension dimension1 = new LiquorBottleDimension(0.0, 100.0, this);
