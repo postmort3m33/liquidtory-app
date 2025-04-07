@@ -27,6 +27,7 @@ export class CreatePartialBottleModalComponent {
     { id: 6, url: '../../../../assets/images/captain-morgan-original-spiced-rum-1000.png'},
     { id: 7, url: '../../../../assets/images/cruzan-aged-dark-rum-1000.png'},
     { id: 8, url: '../../../../assets/images/malibu-original-1000.png'},
+    { id: 102, url: '../../../../assets/images/malibu-original-1000.png'},
     { id: 9, url: '../../../../assets/images/el-jimador-blanco-750.png'},
     { id: 10, url: '../../../../assets/images/myers-original-dark-rum-1000.png'},
     { id: 11, url: '../../../../assets/images/sailor-jerry-spiced-rum-1000.png'},
@@ -34,7 +35,12 @@ export class CreatePartialBottleModalComponent {
     { id: 37, url: '../../../../assets/images/buffalo-trace-bourbon-1000.png'},
     { id: 38, url: '../../../../assets/images/bulleit-bourbon-1000.png'},
     { id: 39, url: '../../../../assets/images/canadian-club-1858-1000.png'},
-    { id: 97, url: '../../../../assets/images/deep-eddy-pineapple-vodka-750.png'}
+    { id: 97, url: '../../../../assets/images/deep-eddy-pineapple-vodka-750.png'},
+    { id: 91, url: '../../../../assets/images/barefoot-cabernet-sauvignon-1500.png'},
+    { id: 92, url: '../../../../assets/images/barefoot-chardonnay-1500.png'},
+    { id: 93, url: '../../../../assets/images/barefoot-merlot-1500.png'},
+    { id: 94, url: '../../../../assets/images/barefoot-pinot-grigio-1500.png'},
+    { id: 95, url: '../../../../assets/images/barefoot-white-zinfandel-1500.png'}
   ];
 
   @ViewChild('bottleCanvas') bottleCanvas!: ElementRef<HTMLCanvasElement>;
