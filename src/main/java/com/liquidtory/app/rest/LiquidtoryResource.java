@@ -1063,6 +1063,12 @@ public class LiquidtoryResource {
             // New List
             List<InventorySnapshotDto> snapshotDtos = new ArrayList<>();
 
+            //////////////////////////////////////////////////////////////////////////////////////
+            // This controls whether Inventory SnapShots are included in the Excel Export Sheet //
+            //////////////////////////////////////////////////////////////////////////////////////
+
+            /*
+
             // Loop
             for (InventorySnapshot snapshot: submission.getInventorySnapshots()) {
 
@@ -1082,6 +1088,8 @@ public class LiquidtoryResource {
                     continue;
                 }
             }
+
+            */
 
             ////////////////////////////////
             // Finish Submission Response //
@@ -1271,8 +1279,28 @@ public class LiquidtoryResource {
             // Real one
             LiquorBottle liquorBottle = liquorBottleOpt.get();
 
-            // New Inventory Item
-            LiquorBottleItem liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottle.getCapacityML());
+            // Define a liquorbottleitem
+            LiquorBottleItem liquorBottleItem;
+
+            // Was this Full or Partial?
+            if (adminActionRequest.getFullOrPartial().equalsIgnoreCase("FULL")) {
+
+                // New Full Bottle
+                liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottle.getCapacityML());
+
+            } else if(adminActionRequest.getFullOrPartial().equalsIgnoreCase("PARTIAL")) {
+
+                // New Partial Bottle
+                liquorBottleItem = new LiquorBottleItem(
+                        liquorBottle,
+                        (long) (liquorBottle.getCapacityML() * (adminActionRequest.getPartialAmount() / 100.0))
+                );
+
+            } else {
+
+                // New Full Bottle
+                liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottle.getCapacityML());
+            }
 
             // If add
             if (adminActionRequest.getActionType().equalsIgnoreCase("ADD_BOTTLE")) {
@@ -1318,8 +1346,17 @@ public class LiquidtoryResource {
         // Save it
         adminInventoryActionRepository.save(adminInventoryAction);
 
-        // Good return
-        return new ResponseEntity<>(HttpStatus.OK);
+        // Return success of Failure
+        if (success) {
+
+            // Good return
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } else {
+
+            // Bad
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
     }
 }

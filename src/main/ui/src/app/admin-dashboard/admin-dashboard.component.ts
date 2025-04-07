@@ -402,6 +402,9 @@ export class AdminDashboardComponent implements OnInit {
       // If we gfot a result..
       if (result) {
 
+        // Debugging
+        //console.log(result);
+
         // Create JSON Header..
         const options = {
           headers: new HttpHeaders().set("Authorization", "Bearer " + this.currentToken)
@@ -412,11 +415,21 @@ export class AdminDashboardComponent implements OnInit {
           .subscribe({
             next: (response) => {
 
+              //console.log(response);
+
               // Show a message
               this.openWarningModal('Action Submitted!', false);
 
             },
             error: (error) => {
+
+              // If Username Conflict
+              if (error.status === 400) {
+
+                // Show a message
+                this.openWarningModal('Bottle not found!', true);
+
+              }
 
             }
           });
@@ -760,6 +773,8 @@ export class AdminDashboardComponent implements OnInit {
       .subscribe(
         (response: AdminActionSubmission[]) => {
           adminActionSubmissions = response;
+          //Debug
+          //console.log("Admin Actions", adminActionSubmissions);
           // Once both requests are completed, create the Excel
           this.generateExcel(adminActionSubmissions, inventorySubmissions);
         }
@@ -770,6 +785,7 @@ export class AdminDashboardComponent implements OnInit {
       .subscribe(
         (response: InventorySubmission[]) => {
           inventorySubmissions = response;
+          //console.log("Inventory Submissions", inventorySubmissions);
           // Once both requests are completed, create the Excel
           this.generateExcel(adminActionSubmissions, inventorySubmissions);
         }

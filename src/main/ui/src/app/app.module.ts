@@ -15,6 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
@@ -56,6 +58,8 @@ import { ChangePasswordModalComponent } from './modals/change-password-modal/cha
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatCheckboxModule,
+    MatRadioModule,
     MatSelectModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

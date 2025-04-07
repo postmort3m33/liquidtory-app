@@ -268,6 +268,15 @@
   margin: 0;
   padding: 10px;
   padding-bottom: 3px;
+  padding-top:3px;
+}
+
+.submit-wrapper h2 {
+  font-size: 1.2em;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  padding: 10px;
 }
 
 .submit-wrapper .switch-wrapper {

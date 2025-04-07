@@ -18,6 +18,7 @@
             Action Required
         </div>
         <br>
+
         <!-- Bottle Type -->
         <mat-form-field class="form-field">
             <mat-label>Bottle</mat-label>
@@ -31,6 +32,26 @@
             Liquor Bottle Required
         </div>
         <br>
+
+        <!-- Full or Partial -->
+        <mat-radio-group formControlName="fullOrPartial">
+            <mat-radio-button value="FULL">Full</mat-radio-button>
+            <mat-radio-button value="PARTIAL">Partial</mat-radio-button>
+        </mat-radio-group>
+        <br>
+        <br *ngIf="form.get('fullOrPartial')?.value === 'PARTIAL'">
+
+        <!-- Partial Box (Only shows if "PARTIAL" is selected) -->
+        <mat-form-field class="form-field" *ngIf="form.get('fullOrPartial')?.value === 'PARTIAL'">
+            <mat-label>Amount %</mat-label>
+            <input matInput formControlName="partialAmount"/>
+        </mat-form-field>
+
+        <div class="error-message" *ngIf="form.get('partialAmount')?.invalid && form.get('partialAmount')?.touched">
+            Percentage Required
+        </div>
+        <br>
+        
         <!-- Bar -->
         <mat-form-field class="form-field">
             <mat-label>Bar</mat-label>

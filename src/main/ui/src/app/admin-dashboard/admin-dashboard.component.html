@@ -130,6 +130,8 @@
             </select>
           </div>
 
+          <h2>Total Bottles: {{ selectedBar?.liquorBottleItems?.length }}</h2>
+
           <h3 *ngIf="selectedBar?.lastSubmission">
             Last Updated by
             <span style="color: red;">{{ selectedBar?.lastSubmission?.firstName }}</span>

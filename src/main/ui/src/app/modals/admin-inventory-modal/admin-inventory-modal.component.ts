@@ -26,15 +26,34 @@ export class AdminInventoryModalComponent implements OnInit {
   // The Form
   form = new FormGroup({
     actionType: new FormControl('', Validators.required),
+    fullOrPartial: new FormControl('FULL', Validators.required),
+    partialAmount: new FormControl('', [Validators.min(0), Validators.max(100)]),
     liquorBottleId: new FormControl('', Validators.required),
     barId: new FormControl('', Validators.required),
     notes: new FormControl('')
   });
 
   ngOnInit(): void {
-      
+
     // Sort Liquor Bottles..
     this.liquorBottles.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Dynamically Vlidate Partial Amount..
+    this.form.get('fullOrPartial')?.valueChanges.subscribe(value => {
+      const partialAmountControl = this.form.get('partialAmount');
+  
+      if (value === 'PARTIAL') {
+        partialAmountControl?.setValidators([
+          Validators.required,
+          Validators.min(0),
+          Validators.max(100)
+        ]);
+      } else {
+        partialAmountControl?.clearValidators();
+      }
+  
+      partialAmountControl?.updateValueAndValidity();
+    });
   }
 
   // On Close
