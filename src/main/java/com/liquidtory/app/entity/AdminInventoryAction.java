@@ -21,6 +21,9 @@ public class AdminInventoryAction {
     @Column(nullable = false)
     private Long liquorBottleId;
 
+    @Column(nullable = true)
+    private Long amountMls;
+
     @Column(nullable = false)
     private String firstName;
 
@@ -41,10 +44,11 @@ public class AdminInventoryAction {
     public AdminInventoryAction() {
     }
 
-    public AdminInventoryAction(LocalDateTime timestamp, String actionType, Long liquorBottleId, String firstName, String lastName, BarEntity bar, String notes, Boolean successful) {
+    public AdminInventoryAction(LocalDateTime timestamp, String actionType, Long liquorBottleId, Long amountMls, String firstName, String lastName, BarEntity bar, String notes, Boolean successful) {
         this.timestamp = timestamp;
         this.actionType = actionType;
         this.liquorBottleId = liquorBottleId;
+        this.amountMls = amountMls;
         this.firstName = firstName;
         this.lastName = lastName;
         this.bar = bar;
@@ -84,6 +88,10 @@ public class AdminInventoryAction {
     public void setLiquorBottleId(Long liquorBottleId) {
         this.liquorBottleId = liquorBottleId;
     }
+
+    public Long getAmountMls() { return amountMls; }
+
+    public void setAmountMls(Long amountMls) { this.amountMls = amountMls; }
 
     public String getFirstName() { return firstName; }
 

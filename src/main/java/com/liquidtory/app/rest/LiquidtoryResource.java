@@ -808,9 +808,6 @@ public class LiquidtoryResource {
         ZoneId usCentralZone = ZoneId.of("America/Chicago");
         LocalDateTime currentCentralTime = LocalDateTime.now(usCentralZone);
 
-        // Last Sub Timestamp (Init to Now Time Just Incase)
-        LocalDateTime lastSubmissionTimestamp = currentCentralTime;
-
         /////////////////////////
         // Get User From Token //
         /////////////////////////
@@ -857,73 +854,15 @@ public class LiquidtoryResource {
         /////////////////////////////////////////////////////////
 
         // Vars to use
-        Long lastSubmissionTotalMls = 0L;
+        Long currentBarMls = 0L;
         Long thisSubmissionTotalMls = 0L;
-        Long adminSubmissionsTotalMls = 0L;
 
-        // 1. Get Last Inventory..
-        if (bar.getLastSubmissionId() != null) {
+        // Get the current Ml's at the bar
+        for (LiquorBottleItem barItem: bar.getLiquorBottleItems()) {
 
-            Optional<InventorySubmission> lastSubmissionOpt = inventorySubmissionRepository.findById(bar.getLastSubmissionId());
+            // Add to it
+            currentBarMls += barItem.getCurrentML();
 
-            // If present
-            if (lastSubmissionOpt.isPresent()) {
-
-                // Get it
-                InventorySubmission lastSubmission = lastSubmissionOpt.get();
-
-                // Get the timestamp for later use
-                lastSubmissionTimestamp = lastSubmission.getTimestamp();
-
-                // Get the snapshots..
-                List<InventorySnapshot> lastSubmissionSnapshots = lastSubmission.getInventorySnapshots();
-
-                // Loop through them..
-                for (InventorySnapshot snapshot: lastSubmissionSnapshots) {
-
-                    // Add to total Ml Used..
-                    lastSubmissionTotalMls += snapshot.getCurrentML();
-                }
-
-            } else {
-
-                // Bad
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-
-        // 2. Get Admin Submissions ML's
-        List<AdminInventoryAction> adminActions = adminInventoryActionRepository.findAllByTimestampBetween(lastSubmissionTimestamp, currentCentralTime);
-
-        // Loop through them..
-        for (AdminInventoryAction action: adminActions) {
-
-            // If it was successful
-            if (action.getSuccessful()) {
-
-                // Get the Bottle
-                Optional<LiquorBottle> liquorBottleOpt = liquorBottleRepository.findById(action.getLiquorBottleId());
-
-                // If found..
-                if (liquorBottleOpt.isPresent()) {
-
-                    // Get real one..
-                    LiquorBottle liquorBottle = liquorBottleOpt.get();
-
-                    // Was it an Add?
-                    if (action.getActionType().equalsIgnoreCase("ADD_BOTTLE")) {
-
-                        // Add to Var
-                        adminSubmissionsTotalMls += liquorBottle.getCapacityML();
-
-                    } else if (action.getActionType().equalsIgnoreCase("REMOVE_BOTTLE")) {
-
-                        // Add to Var
-                        adminSubmissionsTotalMls -= liquorBottle.getCapacityML();
-
-                    }
-                }
-            }
         }
 
         //////////////////////
@@ -975,7 +914,8 @@ public class LiquidtoryResource {
         // Finalize Shot Calculation //
         ///////////////////////////////
 
-        Long totalShotsUsed = Math.round((double)((lastSubmissionTotalMls - thisSubmissionTotalMls) + adminSubmissionsTotalMls) / LiquorConstants.mlPerShot);
+        // Debugging..
+        Long totalShotsUsed = Math.round((double)(currentBarMls - thisSubmissionTotalMls) / LiquorConstants.mlPerShot);
 
         /////////////////////////////////
         // Create Inventory Submission //
@@ -1020,9 +960,7 @@ public class LiquidtoryResource {
 
         // Return
         return new ResponseEntity<>(response, HttpStatus.OK);
-
     }
-
 
     // Get all Inventory Submissions..
     @RequestMapping(path = "/inventory/submit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -1155,7 +1093,7 @@ public class LiquidtoryResource {
         for (AdminInventoryAction action: allAdminSubmissions) {
 
             // If not successful, skip..
-            if (!action.getSuccessful()) { continue; }
+            //if (!action.getSuccessful()) { continue; }
 
             ////////////////////////////////
             // Finish Submission Response //
@@ -1177,7 +1115,7 @@ public class LiquidtoryResource {
                 LiquorBottle liquorBottle = liquorBottleOpt.get();
 
                 // Make Description String
-                String bottleDesc = liquorBottle.getName() + " " + liquorBottle.getCapacityML().toString() + "mL";
+                String bottleDesc = liquorBottle.getName() + " " + action.getAmountMls() + "/" + liquorBottle.getCapacityML().toString() + "mL";
 
                 // Make new Response
                 AdminActionResponse adminActionResponse = new AdminActionResponse(
@@ -1267,6 +1205,9 @@ public class LiquidtoryResource {
         // Perform Action on Inventory //
         /////////////////////////////////
 
+        // List of Admin Actions to Submit..
+        List<AdminInventoryAction> pendingActions = new ArrayList<>();
+
         // Was it successful
         Boolean success = false;
 
@@ -1279,75 +1220,110 @@ public class LiquidtoryResource {
             // Real one
             LiquorBottle liquorBottle = liquorBottleOpt.get();
 
-            // Define a liquorbottleitem
-            LiquorBottleItem liquorBottleItem;
-
-            // Was this Full or Partial?
+            // If full..
             if (adminActionRequest.getFullOrPartial().equalsIgnoreCase("FULL")) {
 
-                // New Full Bottle
-                liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottle.getCapacityML());
+                // Loop by numbottles..
+                for (int i = 0; i < adminActionRequest.getNumFullBottles(); i++) {
 
-            } else if(adminActionRequest.getFullOrPartial().equalsIgnoreCase("PARTIAL")) {
+                    // New Full Bottle
+                    LiquorBottleItem liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottle.getCapacityML());
+
+                    // If add
+                    if (adminActionRequest.getActionType().equalsIgnoreCase("ADD_BOTTLE")) {
+
+                        // Add this to the bar..
+                        success = bar.addLiquorBottleItem(liquorBottleItem);
+
+                    } else if (adminActionRequest.getActionType().equalsIgnoreCase("REMOVE_BOTTLE")) {
+
+                        // Add this to the bar..
+                        success = bar.removeLiquorBottleItem(liquorBottleItem);
+                    }
+
+                    /////////////////////////////
+                    // Create New Admin Action //
+                    /////////////////////////////
+
+                    // Save a new Admin Action
+                    AdminInventoryAction adminInventoryAction = new AdminInventoryAction(
+                            LocalDateTime.now(ZoneId.of("America/Chicago")),
+                            adminActionRequest.getActionType(),
+                            adminActionRequest.getLiquorBottleId(),
+                            liquorBottleItem.getCurrentML(),
+                            userEntity.getFirstName(),
+                            userEntity.getLastName(),
+                            bar,
+                            adminActionRequest.getNotes(),
+                            success
+                    );
+
+                    // Add to pending action..
+                    pendingActions.add(adminInventoryAction);
+
+                    // If it failed abandon loop..
+                    if (!success) {
+
+                        break;
+
+                    }
+                }
+
+            } else if (adminActionRequest.getFullOrPartial().equalsIgnoreCase("PARTIAL")) {
 
                 // New Partial Bottle
-                liquorBottleItem = new LiquorBottleItem(
+                LiquorBottleItem liquorBottleItem = new LiquorBottleItem(
                         liquorBottle,
                         (long) (liquorBottle.getCapacityML() * (adminActionRequest.getPartialAmount() / 100.0))
                 );
 
-            } else {
+                // If add
+                if (adminActionRequest.getActionType().equalsIgnoreCase("ADD_BOTTLE")) {
 
-                // New Full Bottle
-                liquorBottleItem = new LiquorBottleItem(liquorBottle, liquorBottle.getCapacityML());
+                    // Add this to the bar..
+                    success = bar.addLiquorBottleItem(liquorBottleItem);
+
+                } else if (adminActionRequest.getActionType().equalsIgnoreCase("REMOVE_BOTTLE")) {
+
+                    // Add this to the bar..
+                    success = bar.removeLiquorBottleItem(liquorBottleItem);
+                }
+
+                /////////////////////////////
+                // Create New Admin Action //
+                /////////////////////////////
+
+                // Save a new Admin Action
+                AdminInventoryAction adminInventoryAction = new AdminInventoryAction(
+                        LocalDateTime.now(ZoneId.of("America/Chicago")),
+                        adminActionRequest.getActionType(),
+                        adminActionRequest.getLiquorBottleId(),
+                        liquorBottleItem.getCurrentML(),
+                        userEntity.getFirstName(),
+                        userEntity.getLastName(),
+                        bar,
+                        adminActionRequest.getNotes(),
+                        success
+                );
+
+                // Add to pending action..
+                pendingActions.add(adminInventoryAction);
+
             }
-
-            // If add
-            if (adminActionRequest.getActionType().equalsIgnoreCase("ADD_BOTTLE")) {
-
-                // Add this to the bar..
-                success = bar.addLiquorBottleItem(liquorBottleItem);
-
-            } else if (adminActionRequest.getActionType().equalsIgnoreCase("REMOVE_BOTTLE")) {
-
-                // Add this to the bar..
-                success = bar.removeLiquorBottleItem(liquorBottleItem);
-            }
-
-            // Save it
-            barRepository.save(bar);
-
         } else {
 
-            // Bad
+            // Bottle Does not exist for whatever reason
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        /////////////////////////////
-        // Create New Admin Action //
-        /////////////////////////////
+        // Save All Actions
+        adminInventoryActionRepository.saveAll(pendingActions);
 
-        // Create New Submission with US Central Time Zone
-        ZoneId usCentralZone = ZoneId.of("America/Chicago");
-        LocalDateTime currentCentralTime = LocalDateTime.now(usCentralZone);
-
-        // Save a new Admin Action
-        AdminInventoryAction adminInventoryAction = new AdminInventoryAction(
-                currentCentralTime,
-                adminActionRequest.getActionType(),
-                adminActionRequest.getLiquorBottleId(),
-                userEntity.getFirstName(),
-                userEntity.getLastName(),
-                bar,
-                adminActionRequest.getNotes(),
-                success
-        );
-
-        // Save it
-        adminInventoryActionRepository.save(adminInventoryAction);
-
-        // Return success of Failure
+        // Only save if all operations were successful
         if (success) {
+
+            // Save Bar
+            barRepository.save(bar);
 
             // Good return
             return new ResponseEntity<>(HttpStatus.OK);
@@ -1357,6 +1333,5 @@ public class LiquidtoryResource {
             // Bad
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
     }
 }

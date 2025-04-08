@@ -24,7 +24,7 @@
             <mat-label>Bottle</mat-label>
             <mat-select formControlName="liquorBottleId">
                 <mat-option *ngFor="let bottle of liquorBottles" [value]="bottle.id">
-                    {{ bottle.name }}
+                    {{ bottle.name }} ({{ bottle.capacityML/1000}}L)
                 </mat-option>
             </mat-select>
         </mat-form-field>
@@ -43,12 +43,23 @@
 
         <!-- Partial Box (Only shows if "PARTIAL" is selected) -->
         <mat-form-field class="form-field" *ngIf="form.get('fullOrPartial')?.value === 'PARTIAL'">
-            <mat-label>Amount %</mat-label>
+            <mat-label>Percentage %</mat-label>
             <input matInput formControlName="partialAmount"/>
         </mat-form-field>
 
-        <div class="error-message" *ngIf="form.get('partialAmount')?.invalid && form.get('partialAmount')?.touched">
+        <div class="error-message" *ngIf="form.get('partialAmount')?.invalid && form.get('partialAmount')?.touched && form.get('fullOrPartial')?.value === 'PARTIAL'">
             Percentage Required
+        </div>
+        <br>
+
+        <!-- Num Full Box (Only shows if "FULL" is selected) -->
+        <mat-form-field class="form-field" *ngIf="form.get('fullOrPartial')?.value === 'FULL'">
+            <mat-label>Amount</mat-label>
+            <input matInput formControlName="numFullBottles"/>
+        </mat-form-field>
+
+        <div class="error-message" *ngIf="form.get('numFullBottles')?.invalid && form.get('numFullBottles')?.touched && form.get('fullOrPartial')?.value === 'FULL'" >
+            Amount Required
         </div>
         <br>
         

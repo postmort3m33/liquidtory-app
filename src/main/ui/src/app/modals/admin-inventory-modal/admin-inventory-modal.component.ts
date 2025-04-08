@@ -28,6 +28,7 @@ export class AdminInventoryModalComponent implements OnInit {
     actionType: new FormControl('', Validators.required),
     fullOrPartial: new FormControl('FULL', Validators.required),
     partialAmount: new FormControl('', [Validators.min(0), Validators.max(100)]),
+    numFullBottles: new FormControl('', Validators.required),
     liquorBottleId: new FormControl('', Validators.required),
     barId: new FormControl('', Validators.required),
     notes: new FormControl('')
@@ -41,18 +42,35 @@ export class AdminInventoryModalComponent implements OnInit {
     // Dynamically Vlidate Partial Amount..
     this.form.get('fullOrPartial')?.valueChanges.subscribe(value => {
       const partialAmountControl = this.form.get('partialAmount');
+      const numBottlesControl = this.form.get('numFullBottles');
   
       if (value === 'PARTIAL') {
+
+        // Set Partial Validation
         partialAmountControl?.setValidators([
           Validators.required,
           Validators.min(0),
           Validators.max(100)
         ]);
-      } else {
+
+        // Clear Full Validation
+        numBottlesControl?.clearValidators();
+
+      } else if (value === 'FULL') {
+
+        // Set Full Validation
+        numBottlesControl?.setValidators(
+          Validators.required
+        );
+
+        // Clear Partial Validators
         partialAmountControl?.clearValidators();
+        
       }
   
+      // Update Validators
       partialAmountControl?.updateValueAndValidity();
+      numBottlesControl?.updateValueAndValidity();
     });
   }
 
