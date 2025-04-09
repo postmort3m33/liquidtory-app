@@ -165,8 +165,8 @@
                 <td id="full-buttons">
                   <p>{{ getFullBottleCount(bottle) }}</p>
                 </td>
-                <td id="partial-buttons">
-                  <p>{{ getPartialBottleCount(bottle) }}</p>
+                <td id="partial-numbers">
+                  <p (click)="showPartialBottleInfo(bottle)">{{ getPartialBottleCount(bottle) }}</p>
                 </td>
               </tr>
             </ng-container>

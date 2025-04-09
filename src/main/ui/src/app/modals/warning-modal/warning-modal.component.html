@@ -4,7 +4,7 @@
   </div>
   
   <mat-dialog-content class="content">
-    <h3 [style.color]="error ? 'red' : 'black'">{{ message }}</h3>
+    <h3 [style.color]="error ? 'red' : 'black'" [innerHTML]="message"></h3>
   </mat-dialog-content>
   
   <mat-dialog-actions class="action-buttons">

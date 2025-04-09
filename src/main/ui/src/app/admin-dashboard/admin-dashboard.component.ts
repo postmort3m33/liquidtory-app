@@ -393,6 +393,33 @@ export class AdminDashboardComponent implements OnInit {
   // Actions Functions //
   ///////////////////////
 
+  showPartialBottleInfo(bottle: LiquorBottle) {
+    // Vars
+    let stringToSend: string | null = null;
+
+    // Get Partial Bottles..
+    if (this.selectedBar?.liquorBottleItems) {
+      const matchingItems = this.selectedBar.liquorBottleItems.filter(
+        item => item.liquorBottleId === bottle.id && item.currentML !== bottle.capacityML
+      );
+
+      // Build the string
+      if (matchingItems.length > 0) {
+        const details = matchingItems
+          .map((item, index) => `${index + 1}: ${item.currentML}/${bottle.capacityML}mL`)
+          .join('\n');
+
+        stringToSend = `${bottle.name}\n${details}`.replace(/\n/g, '<br>');
+
+        //console.log(stringToSend);
+
+        // Send to Warning Modal
+        this.openWarningModal(stringToSend, false);
+      }
+    }
+  }
+
+
   // New Admin Inventory Action
   createNewAdminInventoryAction() {
 

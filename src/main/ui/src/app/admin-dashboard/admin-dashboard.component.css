@@ -231,6 +231,12 @@
   font-weight: 600;
 }
 
+#partial-numbers {
+  cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;  
+}
+
 /*******************/
 /* Inventory Group */
 /*******************/
