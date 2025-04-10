@@ -22,25 +22,26 @@ export class CreatePartialBottleModalComponent {
     { id: 2, url: '../../../../assets/images/grey-goose-original-750.png' },
     { id: 1, url: '../../../../assets/images/jack-daniels-old-no-7-750.png' },
     { id: 3, url: '../../../../assets/images/bacardi-superior-1000.png' },
-    { id: 4, url: '../../../../assets/images/blue-chair-bay-banana-rum-cream-750.png'},
-    { id: 5, url: '../../../../assets/images/blue-chair-bay-spiced-rum-1000.png'},
-    { id: 6, url: '../../../../assets/images/captain-morgan-original-spiced-rum-1000.png'},
-    { id: 7, url: '../../../../assets/images/cruzan-aged-dark-rum-1000.png'},
-    { id: 8, url: '../../../../assets/images/malibu-original-1000.png'},
-    { id: 102, url: '../../../../assets/images/malibu-original-1000.png'},
-    { id: 9, url: '../../../../assets/images/el-jimador-blanco-750.png'},
-    { id: 10, url: '../../../../assets/images/myers-original-dark-rum-1000.png'},
-    { id: 11, url: '../../../../assets/images/sailor-jerry-spiced-rum-1000.png'},
-    { id: 12, url: '../../../../assets/images/zaya-gran-reserva-16-750.png'},
-    { id: 37, url: '../../../../assets/images/buffalo-trace-bourbon-1000.png'},
-    { id: 38, url: '../../../../assets/images/bulleit-bourbon-1000.png'},
-    { id: 39, url: '../../../../assets/images/canadian-club-1858-1000.png'},
-    { id: 97, url: '../../../../assets/images/deep-eddy-pineapple-vodka-750.png'},
-    { id: 91, url: '../../../../assets/images/barefoot-cabernet-sauvignon-1500.png'},
-    { id: 92, url: '../../../../assets/images/barefoot-chardonnay-1500.png'},
-    { id: 93, url: '../../../../assets/images/barefoot-merlot-1500.png'},
-    { id: 94, url: '../../../../assets/images/barefoot-pinot-grigio-1500.png'},
-    { id: 95, url: '../../../../assets/images/barefoot-white-zinfandel-1500.png'}
+    { id: 4, url: '../../../../assets/images/blue-chair-bay-banana-rum-cream-750.png' },
+    { id: 5, url: '../../../../assets/images/blue-chair-bay-spiced-rum-1000.png' },
+    { id: 6, url: '../../../../assets/images/captain-morgan-original-spiced-rum-1000.png' },
+    { id: 7, url: '../../../../assets/images/cruzan-aged-dark-rum-1000.png' },
+    { id: 8, url: '../../../../assets/images/malibu-original-1000.png' },
+    { id: 102, url: '../../../../assets/images/malibu-original-1000.png' },
+    { id: 9, url: '../../../../assets/images/el-jimador-blanco-750.png' },
+    { id: 10, url: '../../../../assets/images/myers-original-dark-rum-1000.png' },
+    { id: 11, url: '../../../../assets/images/sailor-jerry-spiced-rum-1000.png' },
+    { id: 12, url: '../../../../assets/images/zaya-gran-reserva-16-750.png' },
+    { id: 37, url: '../../../../assets/images/buffalo-trace-bourbon-1000.png' },
+    { id: 38, url: '../../../../assets/images/bulleit-bourbon-1000.png' },
+    { id: 39, url: '../../../../assets/images/canadian-club-1858-1000.png' },
+    { id: 97, url: '../../../../assets/images/deep-eddy-pineapple-vodka-750.png' },
+    { id: 91, url: '../../../../assets/images/barefoot-cabernet-sauvignon-1500.png' },
+    { id: 92, url: '../../../../assets/images/barefoot-chardonnay-1500.png' },
+    { id: 93, url: '../../../../assets/images/barefoot-merlot-1500.png' },
+    { id: 94, url: '../../../../assets/images/barefoot-pinot-grigio-1500.png' },
+    { id: 95, url: '../../../../assets/images/barefoot-white-zinfandel-1500.png' },
+    { id: 103, url: '../../../../assets/images/lalo-blanco-1000.png' }
   ];
 
   @ViewChild('bottleCanvas') bottleCanvas!: ElementRef<HTMLCanvasElement>;
@@ -67,7 +68,7 @@ export class CreatePartialBottleModalComponent {
 
     // Set the Image Url
     const bottleImageUrl = this.bottleImageUrls.find(b => b.id === this.bottle.id);
-    if(bottleImageUrl) {
+    if (bottleImageUrl) {
       this.imageUrl = bottleImageUrl.url;
     } else {
       // Load Default bottle
@@ -85,55 +86,89 @@ export class CreatePartialBottleModalComponent {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const dimensions = this.bottle.dimensions; // { height: %, radius: % }
+    const dimensions = [...this.bottle.dimensions];
+    dimensions.sort((a, b) => a.height - b.height); // Ensure sorted by height
+
     const canvasHeight = canvas.height;
     const canvasWidth = canvas.width;
-    const centerX = canvasWidth / 2; // Center of the canvas
-    const maxHeight = this.bottle.heightCM; // Max height of the bottle
-    const maxRadius = this.bottle.diameterBottomCM / 2; // Max radius of the bottle
+    const centerX = canvasWidth / 2;
 
-    // Clear the canvas
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    const maxHeight = this.bottle.heightCM;
+    const maxRadius = this.bottle.diameterBottomCM / 2;
 
-    // Calculate scaling factors based on canvas dimensions
     const scaleRatio = 0.6;
-    const scaleHeight = (canvasHeight / maxHeight); // Scaling factor for height
-    const scaleWidth = (canvasWidth / (maxRadius * 2)) * scaleRatio; // Scaling factor for width (using diameter)
+    const scaleHeight = canvasHeight / maxHeight;
+    const scaleWidth = (canvasWidth / (maxRadius * 2)) * scaleRatio;
 
-    // Begin drawing the outline
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     ctx.beginPath();
-    ctx.moveTo(centerX, canvasHeight);
 
-    // Draw the left side (based on height and scaled radius)
-    dimensions.forEach((dim, index) => {
-      const heightPx = (dim.height / 100) * maxHeight * scaleHeight; // Scaled height in pixels
-      const radiusPx = (dim.radius / 100) * maxRadius * scaleWidth; // Scaled radius in pixels
+    // --- LEFT SIDE ---
+    for (let h = 1; h <= 100; h++) {
+      let prevDim = dimensions[0];
+      let nextDim = dimensions[dimensions.length - 1];
 
-      const y = canvasHeight - heightPx;
-      if (index === 0) {
-        ctx.lineTo(centerX - radiusPx, y); // Start the left curve
-      } else {
-        ctx.lineTo(centerX - radiusPx, y); // Continue drawing the left side
+      for (let i = 0; i < dimensions.length - 1; i++) {
+        if (h >= dimensions[i].height && h <= dimensions[i + 1].height) {
+          prevDim = dimensions[i];
+          nextDim = dimensions[i + 1];
+          break;
+        }
       }
-    });
 
-    // Mirror the right side
-    for (let i = dimensions.length - 1; i >= 0; i--) {
-      const dim = dimensions[i];
-      const heightPx = (dim.height / 100) * maxHeight * scaleHeight; // Scaled height in pixels
-      const radiusPx = (dim.radius / 100) * maxRadius * scaleWidth; // Scaled radius in pixels
+      let radiusPercent = prevDim.radius;
+      const heightDiff = nextDim.height - prevDim.height;
+      if (heightDiff !== 0) {
+        const ratio = (h - prevDim.height) / heightDiff;
+        const radiusDiff = nextDim.radius - prevDim.radius;
+        radiusPercent = prevDim.radius + ratio * radiusDiff;
+      }
 
+      const radiusCM = (radiusPercent / 100) * maxRadius;
+      const heightPx = (h / 100) * maxHeight * scaleHeight;
+      const radiusPx = radiusCM * scaleWidth;
       const y = canvasHeight - heightPx;
-      ctx.lineTo(centerX + radiusPx, y); // Draw the right curve
+
+      if (h === 1) {
+        ctx.moveTo(centerX - radiusPx, y);
+      } else {
+        ctx.lineTo(centerX - radiusPx, y);
+      }
+    }
+
+    // --- RIGHT SIDE (mirror) ---
+    for (let h = 100; h >= 1; h--) {
+      let prevDim = dimensions[0];
+      let nextDim = dimensions[dimensions.length - 1];
+
+      for (let i = 0; i < dimensions.length - 1; i++) {
+        if (h >= dimensions[i].height && h <= dimensions[i + 1].height) {
+          prevDim = dimensions[i];
+          nextDim = dimensions[i + 1];
+          break;
+        }
+      }
+
+      let radiusPercent = prevDim.radius;
+      const heightDiff = nextDim.height - prevDim.height;
+      if (heightDiff !== 0) {
+        const ratio = (h - prevDim.height) / heightDiff;
+        const radiusDiff = nextDim.radius - prevDim.radius;
+        radiusPercent = prevDim.radius + ratio * radiusDiff;
+      }
+
+      const radiusCM = (radiusPercent / 100) * maxRadius;
+      const heightPx = (h / 100) * maxHeight * scaleHeight;
+      const radiusPx = radiusCM * scaleWidth;
+      const y = canvasHeight - heightPx;
+
+      ctx.lineTo(centerX + radiusPx, y);
     }
 
     ctx.closePath();
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 2;
     ctx.stroke();
-
-    // Optional: Fill the liquid level (if needed)
-    //this.fillLiquid(ctx, canvasWidth, canvasHeight);
   }
 
   // On slider change, recalculate and update liquid level
@@ -141,46 +176,45 @@ export class CreatePartialBottleModalComponent {
     this.calculateVolumeAtHeight();
   }
 
-  // Numerical Integration for Volume of Revolution (up to the given height %)
   calculateVolumeAtHeight() {
-    const dimensions = this.bottle.dimensions; // { height: %, radius: % }
-    const heightCM = this.bottle.heightCM; // Total height in cm
-    const diameterBottomCM = this.bottle.diameterBottomCM; // Bottom diameter in cm
-    const radiusBottomCM = diameterBottomCM / 2; // Bottom radius in cm
-    const step = 1; // Step size in percentage (smaller step = better accuracy)
+    const dimensions = [...this.bottle.dimensions]; // Copy array to avoid mutation
+    dimensions.sort((a, b) => a.height - b.height); // Ensure sorted by height
+
+    const heightCM = this.bottle.heightCM;
+    const diameterBottomCM = this.bottle.diameterBottomCM;
+    const radiusBottomCM = diameterBottomCM / 2;
+    const step = 1; // Step in %
+
     const sliceHeightCM = (step / 100) * heightCM;
+    let volume = 0;
 
-    let volume = 0; // Initialize volume in mL (1 cm³ = 1 mL)
-
-    // Iterate through height percentages (from 0% to the provided height percentage)
     for (let h = 1; h <= this.currentHeight; h += step) {
-      // Find two points between which the current height percentage falls
-      const prevDim = dimensions.find(dim => dim.height <= h);
-      const nextDim = dimensions.find(dim => dim.height > h);
+      let prevDim = dimensions[0];
+      let nextDim = dimensions[dimensions.length - 1];
 
-      // Interpolated radius percentage at height h
-      let radiusPercent = 0;
-      if (prevDim && nextDim) {
-        // Linear interpolation for radius
-        const heightDiff = nextDim.height - prevDim.height;
-        const radiusDiff = nextDim.radius - prevDim.radius;
-        const ratio = (h - prevDim.height) / heightDiff;
-        radiusPercent = prevDim.radius + ratio * radiusDiff; // Interpolated radius in %
-      } else if (prevDim) {
-        // Use last known radius if no next dimension exists
-        radiusPercent = prevDim.radius;
+      // Get correct Prev and Next Dimensions
+      for (let i = 0; i < dimensions.length - 1; i++) {
+        if (h >= dimensions[i].height && h <= dimensions[i + 1].height) {
+          prevDim = dimensions[i];
+          nextDim = dimensions[i + 1];
+          break;
+        }
       }
 
-      // Convert the radius percentage to an actual radius in cm
-      const radiusCM = (radiusPercent / 100) * radiusBottomCM;
-      //console.log("Step: ", h, " RadiusCM: ", radiusCM);
+      // interpolate Radius
+      let radiusPercent = prevDim.radius;
+      const heightDiff = nextDim.height - prevDim.height;
+      if (heightDiff !== 0) {
+        const ratio = (h - prevDim.height) / heightDiff;
+        const radiusDiff = nextDim.radius - prevDim.radius;
+        radiusPercent = prevDim.radius + ratio * radiusDiff;
+      }
 
-      // Add the volume of the slice using the formula for volume of revolution
-      volume += Math.PI * Math.pow(radiusCM, 2) * sliceHeightCM; // Volume of a thin slice
-      //console.log("New Volume: ", volume);
+      // Set Values
+      const radiusCM = (radiusPercent / 100) * radiusBottomCM;
+      volume += Math.PI * Math.pow(radiusCM, 2) * sliceHeightCM;
     }
 
-    // Round the volume to 2 decimal places
     this.calculatedML = Math.round(volume * 100) / 100;
   }
 
