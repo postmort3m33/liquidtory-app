@@ -41,7 +41,8 @@ export class CreatePartialBottleModalComponent {
     { id: 93, url: '../../../../assets/images/barefoot-merlot-1500.png' },
     { id: 94, url: '../../../../assets/images/barefoot-pinot-grigio-1500.png' },
     { id: 95, url: '../../../../assets/images/barefoot-white-zinfandel-1500.png' },
-    { id: 103, url: '../../../../assets/images/lalo-blanco-1000.png' }
+    { id: 103, url: '../../../../assets/images/lalo-blanco-1000.png' },
+    { id: 89, url: '../../../../assets/images/titos-handmade-vodka-1000.png' }
   ];
 
   @ViewChild('bottleCanvas') bottleCanvas!: ElementRef<HTMLCanvasElement>;
