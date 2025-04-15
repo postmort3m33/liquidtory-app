@@ -42,7 +42,13 @@ export class CreatePartialBottleModalComponent {
     { id: 94, url: '../../../../assets/images/barefoot-pinot-grigio-1500.png' },
     { id: 95, url: '../../../../assets/images/barefoot-white-zinfandel-1500.png' },
     { id: 103, url: '../../../../assets/images/lalo-blanco-1000.png' },
-    { id: 89, url: '../../../../assets/images/titos-handmade-vodka-1000.png' }
+    { id: 89, url: '../../../../assets/images/titos-handmade-vodka-1000.png' },
+    { id: 104, url: '../../../../assets/images/grey-goose-original-750.png' },
+    { id: 105, url: '../../../../assets/images/rio-grande-gold-tequila-1000.png' },
+    { id: 106, url: '../../../../assets/images/tx-blended-whiskey-1000.png' },
+    { id: 107, url: '../../../../assets/images/crown-royal-black-750.png' },
+    { id: 108, url: '../../../../assets/images/jack-daniels-old-no-7-750.png' },
+    { id: 109, url: '../../../../assets/images/royale-club-blended-whiskey-1000.png' }
   ];
 
   @ViewChild('bottleCanvas') bottleCanvas!: ElementRef<HTMLCanvasElement>;
